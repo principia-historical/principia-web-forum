@@ -1,0 +1,7 @@
+# Junk files.
+.DS_Store
+Thumbs.db
+
+# Other stuff
+lib/config.php
+userpic/

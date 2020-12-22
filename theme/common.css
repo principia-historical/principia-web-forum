@@ -1,0 +1,51 @@
+/* Spoiler shizzazle */
+.spoiler1 {
+	border: 1px dotted rgba(255,255,255,0.5);
+}
+.spoiler2 {
+	opacity: 0;
+}
+.spoiler2:hover {
+	opacity: 1;
+}
+
+table.c1 {
+	border-spacing: 0px;
+	border-collapse: collapse;
+	width: 100%;
+}
+tr.h, tr.c {
+	text-align: center;
+}
+td.nb {
+	border: 0px none;
+}
+.sfont {
+	font-size: 0.9em;
+}
+
+a:link, a:visited	{ color: #FFC040 }
+a:active, a:hover	{ color: #FFFFFF }
+a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.left	{ text-align: left; }
+.center	{ text-align: center; }
+.right	{ text-align: right; }
+
+.pagelist {
+	margin-left: 4px;
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
+.microlight {
+	background-color: #2f3640;
+	color: #ffd66f;
+	display: block;
+	font-family: Monaco, Consolas, monospace;
+	padding: 5px;
+	white-space: pre;
+}
