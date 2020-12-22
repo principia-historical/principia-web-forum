@@ -1,17 +1,5 @@
 <?php
 
-$userbirthdays = [];
-
-function dobirthdays() { //Function for calling after we get the timezone for the user set
-	global $sql, $userbirthdays;
-	// Check for birthdays globally.
-	// Makes stuff like checking for rainbow usernames a lot easier.
-	$rbirthdays = $sql->query("SELECT id FROM users WHERE birth LIKE ?", [date('m-d').'%']);
-	while ($bd = $rbirthdays->fetch())
-		$userbirthdays[$bd['id']] = true;
-	return;
-}
-
 function checkuser($name, $pass) {
 	global $sql;
 	$id = $sql->result("SELECT id FROM users WHERE (name = ? OR displayname = ?) AND pass = ?", [$name, $name, $pass]);
@@ -93,39 +81,6 @@ function getrank($set, $posts) {
 	return '';
 }
 
-function randnickcolor() {
-	/* OLD HACKISH CODE FOR APRIL 5 */
-	$stime = gettimeofday();
-	$h = (($stime['usec'] / 5) % 600);
-	if ($h < 100) {
-		$r = 255;
-		$g = 155 + $h;
-		$b = 155;
-	} elseif ($h < 200) {
-		$r = 255 - $h + 100;
-		$g = 255;
-		$b = 155;
-	} elseif ($h < 300) {
-		$r = 155;
-		$g = 255;
-		$b = 155 + $h - 200;
-	} elseif ($h < 400) {
-		$r = 155;
-		$g = 255 - $h + 300;
-		$b = 255;
-	} elseif ($h < 500) {
-		$r = 155 + $h - 400;
-		$g = 155;
-		$b = 255;
-	} else {
-		$r = 255;
-		$g = 155;
-		$b = 255 - $h + 500;
-	}
-	$rndcolor = substr(dechex($r * 65536 + $g * 256 + $b), -6);
-	return $rndcolor;
-}
-
 function userfields($tbl = '', $pf = '') {
 	$fields = ['id', 'name', 'displayname', 'group_id', 'nick_color', 'enablecolor'];
 
@@ -164,7 +119,7 @@ function userlink($user, $u = '') {
 }
 
 function userdisp($user, $u = '') {
-	global $usergroups, $userbirthdays;
+	global $usergroups;
 
 	if ($user[$u.'nick_color'] && $user[$u.'enablecolor']) { //Over-ride for custom colours
 		$nc = $user[$u.'nick_color'];
@@ -172,9 +127,6 @@ function userdisp($user, $u = '') {
 		$group = $usergroups[$user[$u.'group_id']];
 		$nc = $group['nc'];
 	}
-	//Random Nick Color on Birthday
-	if (isset($userbirthdays[$user[$u.'id']]))
-		$nc = randnickcolor();
 
 	$n = ($user[$u.'displayname'] ? $user[$u.'displayname'] : $user[$u.'name']);
 

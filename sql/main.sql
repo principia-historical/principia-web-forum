@@ -33,7 +33,7 @@ CREATE TABLE `forums` (
   `posts` mediumint(8) NOT NULL DEFAULT 0,
   `lastdate` int(11) NOT NULL DEFAULT 0,
   `lastuser` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `lastid` int(11) NOT NULL,
+  `lastid` int(11) NOT NULL DEFAULT 0,
   `private` int(1) NOT NULL,
   `readonly` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
@@ -69,15 +69,6 @@ INSERT INTO `groups` (`id`, `title`, `nc`, `inherit_group_id`, `sortorder`, `vis
 (5,	'Moderator',	'47B53C',	4,	600,	1),
 (6,	'Administrator',	'd8b00d',	5,	700,	1),
 (7,	'Root Administrator',	'AA3C3C',	0,	800,	1);
-
-CREATE TABLE `guests` (
-  `date` int(11) NOT NULL DEFAULT 0,
-  `ip` varchar(15) NOT NULL,
-  `bot` tinyint(4) NOT NULL DEFAULT 0,
-  `lastforum` int(10) DEFAULT NULL,
-  UNIQUE KEY `ip` (`ip`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 
 CREATE TABLE `ipbans` (
   `ipmask` varchar(15) NOT NULL,

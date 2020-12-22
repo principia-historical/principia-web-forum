@@ -61,7 +61,6 @@ if (!$log) {
 }
 
 date_default_timezone_set($loguser['timezone']);
-dobirthdays(); //Called here to account for timezone bugs.
 
 if ($loguser['ppp'] < 1) $loguser['ppp'] = 20;
 if ($loguser['tpp'] < 1) $loguser['tpp'] = 20;
@@ -78,22 +77,10 @@ if (str_replace($botlist, "x", strtolower($_SERVER['HTTP_USER_AGENT'])) != strto
 	$bot = 0;
 }
 
-$sql->query("DELETE FROM guests WHERE ip = ? OR date < ?", [$userip, (time() - 300)]);
 if ($log) {
 	$sql->query("UPDATE users SET lastview = ?, ip = ?, url = ? WHERE id = ?",
 		[time(), $userip, addslashes($url), $loguser['id']]);
-} else {
-	$sql->query("INSERT INTO guests (date, ip, bot) VALUES (?,?,?)", [time(),$userip,$bot]);
 }
-
-if (!$bot) {
-	$sql->query("UPDATE misc SET views = views + 1");
-} else {
-	$sql->query("UPDATE misc SET botviews = botviews + 1");
-}
-
-$views = $sql->result("SELECT views FROM misc");
-
 $count = $sql->fetch("SELECT (SELECT COUNT(*) FROM users) u, (SELECT COUNT(*) FROM threads) t, (SELECT COUNT(*) FROM posts) p");
 $date = date("m-d-y", time());
 
@@ -140,158 +127,77 @@ if ($r) {
  * @return void
  */
 function pageheader($pagetitle = '', $fid = null) {
-	global $dateformat, $sql, $log, $loguser, $views, $boardtitle, $boardlogo,
-	$theme, $themefile, $meta, $favicon, $count, $bot;
+	global $log, $loguser, $boardtitle, $theme, $themefile, $favicon;
 
 	if ($log) {
-		$sql->query("UPDATE users SET lastforum = ? WHERE id = ?", [($fid == null ? 0 : $fid), $loguser['id']]);
-	} else {
-		$sql->query("UPDATE guests SET lastforum = ? WHERE ip = ?", [($fid == null ? 0 : $fid), $_SERVER['REMOTE_ADDR']]);
-	}
+		if ($fid && is_numeric($fid))
+			$markread = '<a href="./?action=markread&fid='.$fid.'">Mark forum read</a>';
+		else
+			$markread = '<a href="./?action=markread&fid=all">Mark all forums read</a>';
 
-	if ($pagetitle) $pagetitle .= " - ";
+		$links = [];
 
-	$t = $sql->result("SELECT attention FROM misc");
+		$links[] = ['url' => "./", 'title' => 'Forum'];
+		$links[] = ['url' => "activeusers.php", 'title' => 'Active users'];
+		$links[] = ['url' => "thread.php?time=86400", 'title' => 'Latest posts'];
 
-	if ($t != '')
-		$extratitle = <<<HTML
-<table class="c1 center" width="100%">
-	<tr class="h"><td class="b h">News</td></tr>
-	<tr class="n1 center"><td class="b sfont">$t</td></tr>
-</table>
-HTML;
-
-	if (isset($extratitle)) {
-		$boardlogo = <<<HTML
-<table width="100%"><tr class="center">
-	<td class="nb" valign="center">$boardlogo</td>
-	<td class="nb" valign="center" width="300">$extratitle</td>
-</tr></table>
-HTML;
+		if ($log) {
+			if (has_perm('view-own-pms'))
+				$links[] = ['url' => "private.php", 'title' => 'Private messages'];
+			if (has_perm("update-own-profile"))
+				$links[] = ['url' => "editprofile.php", 'title' => 'Edit profile'];
+			if (has_perm('manage-board'))
+				$links[] = ['url' => 'management.php', 'title' => 'Management'];
+		}
 	}
 
 	?><!DOCTYPE html>
-<html>
-	<head>
-		<title><?=$pagetitle.$boardtitle?></title>
-		<?=$meta?>
-		<link rel="icon" type="image/png" href="<?=$favicon?>">
-		<link rel="stylesheet" href="theme/common.css">
-		<link rel="stylesheet" href="theme/<?=$theme?>/<?=$themefile?>">
-		<script src="lib/js/microlight.js"></script>
-		<script src="lib/js/tools.js"></script>
-	</head>
-	<body>
-		<table class="c1">
-			<tr class="nt n2 center"><td class="b n1 center" colspan="3"><?=$boardlogo?></td></tr>
-			<tr class="n2 center">
-				<td class="b"><div style="width: 150px">Views: <?=number_format($views) ?></div></td>
-				<td class="b" width="100%">
-					<a href="./">Main</a>
-					| <a href="faq.php">FAQ</a>
-					| <a href="memberlist.php">Memberlist</a>
-					| <a href="activeusers.php">Active users</a>
-					| <a href="thread.php?time=86400">Latest posts</a>
-					| <a href="ranks.php">Ranks</a>
-					| <a href="online.php">Online users</a>
-					| <a href="search.php">Search</a>
-				</td>
-				<td class="b"><div style="width: 150px"><?=date($dateformat, time())?></div></td>
-				<tr class="n1 center"><td class="b" colspan="3"><?=($log ? userlink($loguser) : 'Not logged in ')?>
-<?php
-	if ($log && has_perm('view-own-pms')) {
-		$unreadpms = $sql->result("SELECT COUNT(*) FROM pmsgs WHERE userto = ? AND unread = 1 AND del_to = 0", [$loguser['id']]);
+	<html>
+		<head>
+			<meta charset="utf-8">
+			<title><?=$pagetitle.$boardtitle?></title>
+			<link rel="icon" type="image/png" href="<?=$favicon?>">
+			<link rel="stylesheet" href="../assets/css/style.css" type="text/css">
+			<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+			<link rel="stylesheet" href="theme/common.css">
+			<link rel="stylesheet" href="theme/<?=$theme?>/<?=$themefile?>">
+			<script src="lib/js/microlight.js"></script>
+			<script src="lib/js/tools.js"></script>
+		</head>
+		<body>
+			<div class="top">
+				<a href="../"><img class="picon" src="../assets/icon.png"/></a>
+				<ul class="menu left">
+					<li><a href="../selected.php" class="btn">Selected</a></li>
+					<li><a href="../top.php" class="btn">Top</a></li>
+					<li><a href="../latest.php" class="btn">New</a></li>
+					<li><a href="../forum.php" class="btn">Forum</a></li>
+					<li><a href="../contests.php" class="btn">Contests</a></li>
+					<li><a href="../download.php" class="btn download">Download</a></li>
+					<li><a href="../search.php" class="btn"><img src="../assets/icons/search.svg" class="search"></a></li>
+				</ul>
+				<ul class="menu right">
+					<li><em><?=($log ? userlink($loguser) : '<a href="../login.php">Login</a>')?></em></li>
+				</ul>
+			</div>
+			<div class="top">
+				<ul class="menu left">
+					<?php foreach ($links as $link) { ?>
+						<li><a href="<?=$link['url']?>" class="btn"><?=$link['title']?></a></li>
+					<?php } ?>
+				</ul>
+				<ul class="menu right">
+					<li><?=$markread?></li>
+				</ul>
+			</div><br>
+			<div class="home content forum">
+	<?php
+}
+/*function pageheader($pagetitle = '', $fid = null) {
+	global $dateformat, $sql, $log, $loguser, $views, $boardtitle,
+	$theme, $themefile, $meta, $favicon, $count, $bot;
 
-		printf(
-			' <a href="private.php"><img src="img/pm%s.png" width="20" alt="Private messages"></a> %s ',
-		(!$unreadpms ? '-off' : ''), ($unreadpms ? "($unreadpms new)" : ''));
-	}
-
-	if ($fid && is_numeric($fid))
-		$markread = ['url' => "index.php?action=markread&fid=$fid", 'title' => "Mark forum read"];
-	else
-		$markread = ['url' => "index.php?action=markread&fid=all", 'title' => "Mark all forums read"];
-
-	$userlinks = [];
-
-	if (!$log) {
-		if (!$bot) {
-			$userlinks[] = ['url' => "register.php", 'title' => 'Register'];
-			$userlinks[] = ['url' => "login.php", 'title' => 'Login'];
-		}
-	} else {
-		$userlinks[] = ['url' => "javascript:document.logout.submit()", 'title' => 'Logout'];
-	}
-	if ($log) {
-		if (has_perm("update-own-profile"))
-			$userlinks[] = ['url' => "editprofile.php", 'title' => 'Edit profile'];
-		if (has_perm('manage-board'))
-			$userlinks[] = ['url' => 'management.php', 'title' => 'Management'];
-		$userlinks[] = $markread;
-	}
-
-	foreach ($userlinks as $v) {
-		echo " | <a href=\"{$v['url']}\">{$v['title']}</a>";
-	}
-
-	echo "</td></table>";
-	if ($log) {
-		?><form action="login.php" method="post" name="logout">
-			<input type="hidden" name="action" value="logout">
-		</form><?php
-	}
-
-	echo '<br>';
-
-	if ($fid || $fid == 0) {
-		$onusers = $sql->query("SELECT ".userfields().",lastpost,lastview FROM users WHERE lastview > ? ".($fid != 0 ? " AND lastforum =".$fid : '')." ORDER BY name",
-			[(time()-300)]);
-		$onuserlist = '';
-		$onusercount = 0;
-		while ($user = $onusers->fetch()) {
-			$onuserlist.=($onusercount ? ', ' : '') . userlink($user);
-			$onusercount++;
-		}
-
-		$result = $sql->query("SELECT COUNT(*) guest_count, SUM(bot) bot_count FROM guests WHERE date > ?".($fid != 0 ? " AND lastforum =".$fid : ''),
-			[(time()-300)]);
-
-		while ($data = $result->fetch()) {
-			$numbots = $data['bot_count'];
-			$numguests = $data['guest_count'] - $numbots;
-
-			if ($numguests)	$onuserlist .= " | $numguests guest" . ($numguests != 1 ? "s" : '');
-			if ($numbots)	$onuserlist .= " | $numbots bot" . ($numbots != 1 ? "s" : '');
-		}
-	}
-
-	if ($fid) {
-		$fname = $sql->result("SELECT title FROM forums WHERE id = ?", [$fid]);
-		$onuserlist = "$onusercount user" . ($onusercount != 1 ? "s" : '') . " currently in $fname" . ($onusercount > 0 ? ": " : '') . $onuserlist;
-
-		?><table class="c1"><tr class="n1"><td class="b n1 center"><?=$onuserlist ?></td></tr></table><br><?php
-	} else if (isset($fid) && $fid == 0) {
-		$birthdaylimit = 86400 * 30;
-		$rbirthdays = $sql->query("SELECT birth, ".userfields()." FROM users WHERE birth LIKE ? AND lastview > ? ORDER BY name",
-			[date('m-d').'%', (time() - $birthdaylimit)]);
-		$birthdays = [];
-		while ($user = $rbirthdays->fetch()) {
-			$b = explode('-', $user['birth']);
-			if ($b['2'] <= 0 && $b['2'] > -2) {
-				$y = '';
-			} else {
-				$y = "(" . (date("Y") - $b['2']) . ")";
-			}
-
-			$birthdays[] = userlink($user) . " " . $y;
-		}
-
-		$birthdaybox = '';
-		if (count($birthdays)) {
-			$birthdaystoday = implode(", ", $birthdays);
-			$birthdaybox = "<tr class=\"n1 center\"><td class=\"b n2 center\">Birthdays today: $birthdaystoday</td></tr>";
-		}
-
+	if (isset($fid)) {
 		$count['d'] = $sql->result("SELECT COUNT(*) FROM posts WHERE date > ?", [(time() - 86400)]);
 		$count['h'] = $sql->result("SELECT COUNT(*) FROM posts WHERE date > ?", [(time() - 86400)]);
 		$lastuser = $sql->fetch("SELECT ".userfields()." FROM users ORDER BY id DESC LIMIT 1");
@@ -299,7 +205,6 @@ HTML;
 		$onuserlist = "$onusercount user" . ($onusercount != 1 ? 's' : '') . ' online' . ($onusercount > 0 ? ': ' : '') . $onuserlist;
 
 		?><table class="c1">
-			<?=$birthdaybox ?>
 			<tr><td class="b n1">
 				<table style="width:100%"><tr>
 					<td class="nb" width="170"></td>
@@ -312,10 +217,9 @@ HTML;
 					</td>
 				</tr></table>
 			</td></tr>
-			<tr><td class="b n2 center"><?=$onuserlist ?></td></tr>
 		</table><br><?php
 	}
-}
+}*/
 
 /**
  * Print a notice message.
@@ -346,17 +250,11 @@ function noticemsg($name, $msg, $error = false) {
 function pagefooter() {
 	global $start;
 	$time = microtime(true) - $start;
-	?><br>
-	<table class="c1">
-		<tr>
-			<td class="b n2 sfont">
-				<span style="float:right; text-align:right;">
-					<?=sprintf("Page rendered in %1.3f seconds. (%dKB of memory used)", $time, memory_get_usage(false) / 1024); ?>
-				</span>
-				<a href="http://github.com/rasmusolle/acmlmboard"><img src="img/poweredbyacmlm.png" title="Acmlmboard 2" style="float:left; margin-right:4px;"></a>
-				Acmlmboard v2.5.3MOD<br>
-				&copy; 2005-2019 Acmlm, Emuz, <a href="credits.php">et al</a>.
-			</td>
-		</tr>
-	</table><?php
+	?></div><br><div class="footer">
+	<a href="about">About</a><br><?=sprintf("Page rendered in %1.3f seconds. (%dKB of memory used)", $time, memory_get_usage(false) / 1024); ?>
+</div>
+<script type="text/javascript" src="assets/base.js"></script>
+</body>
+</html><?php
 }
+
