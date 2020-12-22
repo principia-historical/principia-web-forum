@@ -123,7 +123,6 @@ if (isset($time)) {
 
 ?><br>
 <table class="c1">
-	<?=($fid ? announcement_row(6) : '')?>
 	<tr class="h">
 		<td class="b h" width=17>&nbsp;</td>
 		<?=($showforum ? '<td class="b h">Forum</td>' : '') ?>

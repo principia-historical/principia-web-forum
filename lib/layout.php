@@ -218,26 +218,6 @@ function ranklist() {
 	return $rlist;
 }
 
-function announcement_row($tblspan) {
-	global $dateformat, $sql;
-
-	$anc = $sql->fetch("SELECT t.title,t.user,t.lastdate date,".userfields('u')." FROM threads t JOIN users u ON t.user = u.id WHERE t.announce = 1 ORDER BY lastdate DESC LIMIT 1");
-
-	if (isset($anc['title']) || has_perm('create-forum-announcements')) {
-		if (isset($anc['title'])) {
-			$anlink = sprintf(
-				'<a href="thread.php?announce=1">%s</a> - by %s on %s',
-			$anc['title'], userlink($anc), date($dateformat, $anc['date']));
-		} else {
-			$anlink = 'No announcements';
-		}
-		?><tr class="h"><td class="b" colspan="<?=$tblspan ?>">Announcements</td></tr>
-		<tr class="n1 center"><td class="b left" colspan="<?=$tblspan ?>"><?=$anlink ?>
-			<?=(has_perm('create-forum-announcements') ? '<span class="right" style="float:right"><a href=newthread.php?announce=1>New Announcement</a></span>' : '') ?>
-		</td></tr><?php
-	}
-}
-
 /**
  * Display $message if $result (the result of a SQL query) is empty (has no lines).
  */
