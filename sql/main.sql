@@ -70,24 +70,6 @@ INSERT INTO `groups` (`id`, `title`, `nc`, `inherit_group_id`, `sortorder`, `vis
 (6,	'Administrator',	'd8b00d',	5,	700,	1),
 (7,	'Root Administrator',	'AA3C3C',	0,	800,	1);
 
-CREATE TABLE `ipbans` (
-  `ipmask` varchar(15) NOT NULL,
-  `hard` tinyint(1) NOT NULL,
-  `expires` int(12) NOT NULL,
-  `banner` varchar(25) NOT NULL,
-  `reason` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `misc` (
-  `views` int(11) NOT NULL DEFAULT 0,
-  `botviews` int(11) NOT NULL DEFAULT 0,
-  `attention` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-INSERT INTO `misc` (`views`, `botviews`, `attention`) VALUES
-(0,	0,	'<b>Welcome to your new Acmlmboard!</b>');
-
 CREATE TABLE `perm` (
   `id` varchar(64) NOT NULL,
   `title` varchar(255) NOT NULL,
@@ -116,14 +98,12 @@ INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('delete-user-pms',	'Delete User PMs',	''),
 ('edit-all-group',	'Edit All Group Assets',	''),
 ('edit-all-group-member',	'Edit All User Assets',	''),
-('edit-attentions-box',	'Edit Attentions Box',	''),
 ('edit-customusercolors',	'Edit Custom Username Colors',	''),
 ('edit-displaynames',	'Edit Displaynames',	''),
 ('edit-forum-post',	'Edit Forum Post',	'forums'),
 ('edit-forum-thread',	'Edit Forum Thread',	'forums'),
 ('edit-forums',	'Edit Forums',	''),
 ('edit-groups',	'Edit Groups',	''),
-('edit-ip-bans',	'Edit IP Bans',	''),
 ('edit-own-permissions',	'Edit Own Permissions',	''),
 ('edit-own-title',	'Edit Own Title',	''),
 ('edit-permissions',	'Edit Permissions',	''),
@@ -306,9 +286,7 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (6,	'group',	'create-all-private-forum-posts',	'',	0,	0),
 (6,	'group',	'create-all-private-forum-threads',	'',	0,	0),
 (6,	'group',	'edit-all-group',	'',	0,	0),
-(6,	'group',	'edit-attentions-box',	'',	0,	0),
 (6,	'group',	'edit-forums',	'',	0,	0),
-(6,	'group',	'edit-ip-bans',	'',	0,	0),
 (6,	'group',	'edit-permissions',	'',	0,	0),
 (6,	'group',	'edit-titles',	'',	0,	0),
 (6,	'group',	'edit-users',	'',	0,	0),
