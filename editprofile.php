@@ -26,7 +26,7 @@ if ($act == 'Edit profile') {
 	if ($_POST['token'] !== $token) die('No.');
 
 	if ($_POST['pass'] != '' && $_POST['pass'] == $_POST['pass2'] && $targetuserid == $loguser['id'])
-		setcookie('pass', packlcookie(md5($pwdsalt2 . $_POST['pass'] . $pwdsalt)), 2147483647);
+		setcookie('acmlm_pass', packlcookie(md5($pwdsalt2 . $_POST['pass'] . $pwdsalt)), 2147483647);
 }
 
 $user = $sql->fetch("SELECT * FROM users WHERE id = ?", [$targetuserid]);

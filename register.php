@@ -45,8 +45,8 @@ if ($act == 'Register') {
 			$sql->query("INSERT INTO threadsread (uid,tid,time) SELECT ?,id,? FROM threads", [$id, time()]);
 			$sql->query("INSERT INTO forumsread (uid,fid,time) SELECT ?,id,? FROM forums", [$id, time()]);
 
-			setcookie('user', $id, 2147483647);
-			setcookie('pass', packlcookie(md5($pwdsalt2 . $_POST['pass'] . $pwdsalt), implode(".", array_slice(explode(".", $_SERVER['REMOTE_ADDR']), 0, 2)) . ".*"), 2147483647);
+			setcookie('acmlm_user', $id, 2147483647);
+			setcookie('acmlm_pass', packlcookie(md5($pwdsalt2 . $_POST['pass'] . $pwdsalt), implode(".", array_slice(explode(".", $_SERVER['REMOTE_ADDR']), 0, 2)) . ".*"), 2147483647);
 
 			echo 'If you aren\'t redirected, then please <a href="./">go here.</a>
 				<script>window.location = "./"</script>';

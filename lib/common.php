@@ -21,14 +21,14 @@ if ($q = getenv("QUERY_STRING")) $url .= "?$q";
 $log = false;
 $logpermset = [];
 
-if (!empty($_COOKIE['user']) && !empty($_COOKIE['pass'])) {
-	if ($user = checkuid($_COOKIE['user'], unpacklcookie($_COOKIE['pass']))) {
+if (!empty($_COOKIE['acmlm_user']) && !empty($_COOKIE['acmlm_pass'])) {
+	if ($user = checkuid($_COOKIE['acmlm_user'], unpacklcookie($_COOKIE['acmlm_pass']))) {
 		$log = true;
 		$loguser = $user;
 		load_user_permset();
 	} else {
-		setcookie('user',0);
-		setcookie('pass','');
+		setcookie('acmlm_user',0);
+		setcookie('acmlm_pass','');
 		load_guest_permset();
 	}
 } else {

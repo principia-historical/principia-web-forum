@@ -10,14 +10,14 @@ if ($action == "update") {
 	if (isset($err)) {
 		noticemsg("Error", $err, true);
 	} else {
-		$_COOKIE['pass'] = packlcookie(unpacklcookie($_COOKIE['pass']), $_POST['ranges']);
-		setcookie('pass', $_COOKIE['pass'], 2147483647);
+		$_COOKIE['acmlm_pass'] = packlcookie(unpacklcookie($_COOKIE['acmlm_pass']), $_POST['ranges']);
+		setcookie('acmlm_pass', $_COOKIE['acmlm_pass'], 2147483647);
 	}
 }
 
 pageheader('Advanced login cookie setup');
 
-$dsegments = explode(",", decryptpwd($_COOKIE['pass']));
+$dsegments = explode(",", decryptpwd($_COOKIE['acmlm_pass']));
 ?>
 <table class="c1" style="width:200px!important">
 	<tr class="h">

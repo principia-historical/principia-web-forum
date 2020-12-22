@@ -4,16 +4,16 @@ require('lib/common.php');
 $act = (isset($_POST['action']) ? $_POST['action'] : 'needle');
 if ($act == 'Login') {
 	if ($userid = checkuser($_POST['name'], md5($pwdsalt2 . $_POST['pass'] . $pwdsalt))) {
-		setcookie('user', $userid, 2147483647);
-		setcookie('pass', packlcookie(md5($pwdsalt2 . $_POST['pass'] . $pwdsalt),
+		setcookie('acmlm_user', $userid, 2147483647);
+		setcookie('acmlm_pass', packlcookie(md5($pwdsalt2 . $_POST['pass'] . $pwdsalt),
 				implode(".", array_slice(explode(".", $_SERVER['REMOTE_ADDR']), 0, 2)) . ".*"), 2147483647);
 		redirect('./');
 	} else {
 		$err = "Invalid username or password, cannot log in.";
 	}
 } elseif ($act == 'logout') {
-	setcookie('user', 0);
-	setcookie('pass', '');
+	setcookie('acmlm_user', 0);
+	setcookie('acmlm_pass', '');
 	redirect('./');
 }
 
