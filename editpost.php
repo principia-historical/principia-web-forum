@@ -18,7 +18,7 @@ if ($_GET['act'] == 'delete' || $_GET['act'] == 'undelete') {
 needs_login();
 
 $thread = $sql->fetch("SELECT p.user puser, t.*, f.title ftitle, f.private fprivate, f.readonly freadonly FROM posts p LEFT JOIN threads t ON t.id = p.thread "
-	."LEFT JOIN forums f ON f.id=t.forum WHERE p.id = ? AND (t.forum IN ".forums_with_view_perm()." OR (t.forum IN (0, NULL) AND t.announce >= 1))", [$pid]);
+	."LEFT JOIN forums f ON f.id=t.forum WHERE p.id = ? AND (t.forum IN ".forums_with_view_perm().")", [$pid]);
 
 if (!$thread) $pid = 0;
 
@@ -31,17 +31,13 @@ if ($thread['closed'] && !can_edit_forum_posts($thread['forum'])) {
 }
 
 $topbot = [
-	'breadcrumb' => [['href' => './', 'title' => 'Main']],
+	'breadcrumb' => [
+		['href' => './', 'title' => 'Main'],
+		['href' => "forum.php?id={$thread['forum']}", 'title' => $thread['ftitle']],
+		['href' => "thread.php?id={$thread['id']}", 'title' => esc($thread['title'])]
+	],
 	'title' => 'Edit post'
 ];
-
-if ($thread['announce']) {
-	array_push($topbot['breadcrumb'], ['href' => 'thread.php?announce=1', 'title' => 'Announcements']);
-} else {
-	array_push($topbot['breadcrumb'],
-		['href' => "forum.php?id={$thread['forum']}", 'title' => $thread['ftitle']],
-		['href' => "thread.php?id={$thread['id']}", 'title' => esc($thread['title'])]);
-}
 
 $post = $sql->fetch("SELECT u.id, p.user, pt.text FROM posts p LEFT JOIN poststext pt ON p.id=pt.id "
 		."JOIN (SELECT id,MAX(revision) toprev FROM poststext GROUP BY id) as pt2 ON pt2.id = pt.id AND pt2.toprev = pt.revision "

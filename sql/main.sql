@@ -103,7 +103,6 @@ INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('consecutive-posts',	'Consecutive Posts',	''),
 ('create-all-private-forum-posts',	'Create All Private Forum Posts',	''),
 ('create-all-private-forum-threads',	'Create All Private Forum Threads',	''),
-('create-forum-announcements',	'Create Forum Announcements',	''),
 ('create-pms',	'Create PMs',	''),
 ('create-private-forum-post',	'Create Private Forum Post',	'forums'),
 ('create-private-forum-thread',	'Create Private Forum Thread',	'forums'),
@@ -174,7 +173,6 @@ CREATE TABLE `posts` (
   `ip` char(15) NOT NULL,
   `num` mediumint(9) NOT NULL DEFAULT 0,
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
-  `announce` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `threadid` (`thread`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -202,7 +200,6 @@ CREATE TABLE `threads` (
   `lastdate` int(11) NOT NULL DEFAULT 0,
   `lastuser` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `lastid` int(11) NOT NULL DEFAULT 0,
-  `announce` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -300,7 +297,6 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (4,	'group',	'has-displayname',	'',	0,	0),
 (4,	'group',	'view-private-forum',	'forums',	2,	0),
 (5,	'group',	'ban-users',	'',	0,	0),
-(5,	'group',	'create-forum-announcements',	'',	0,	0),
 (5,	'group',	'delete-post',	'',	0,	0),
 (5,	'group',	'delete-thread',	'',	0,	0),
 (5,	'group',	'override-closed',	'',	0,	0),

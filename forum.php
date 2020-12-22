@@ -24,7 +24,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "LEFT JOIN users u1 ON u1.id=t.user "
 		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
 		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$loguser[id])" : '')
-		. "WHERE t.forum = ? AND t.announce = 0 "
+		. "WHERE t.forum = ? "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $loguser['tpp']) . "," . $loguser['tpp'],
 		[$fid]);

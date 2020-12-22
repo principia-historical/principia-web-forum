@@ -18,28 +18,16 @@ if (isset($_REQUEST['id'])) {
 } elseif (isset($_GET['time'])) {
 	$time = (int)$_GET['time'];
 	$viewmode = "time";
-} elseif (isset($_GET['announce'])) {
-	$announcefid = (int)$_GET['announce'];
-	$viewmode = "announce";
 }
 // "link" support (i.e., thread.php?pid=999whatever)
 elseif (isset($_GET['pid'])) {
 	$pid = (int)$_GET['pid'];
 	$numpid = $sql->fetch("SELECT t.id tid FROM posts p LEFT JOIN threads t ON p.thread = t.id WHERE p.id = ?", [$pid]);
 	if (!$numpid) noticemsg("Error", "Thread post does not exist.", true);
-	$isannounce = $sql->result("SELECT announce FROM posts WHERE id = ?", [$pid]);
-	if ($isannounce) {
-		$pinf = $sql->fetch("SELECT t.forum fid, t.id tid FROM posts p LEFT JOIN threads t ON p.thread=t.id WHERE p.id = ?", [$pid]);
-		$announcefid = $pinf['fid'];
-		$atid = $pinf['tid'];
 
-		$page = floor($sql->result("SELECT COUNT(*) FROM threads WHERE announce = 1 AND forum = ? AND id > ?", [$announcefid, $atid]) / $ppp) + 1;
-		$viewmode = "announce";
-	} else {
-		$tid = $sql->result("SELECT thread FROM posts WHERE id = ?", [$pid]);
-		$page = floor($sql->result("SELECT COUNT(*) FROM posts WHERE thread = ? AND id < ?", [$tid, $pid]) / $ppp) + 1;
-		$viewmode = "thread";
-	}
+	$tid = $sql->result("SELECT thread FROM posts WHERE id = ?", [$pid]);
+	$page = floor($sql->result("SELECT COUNT(*) FROM posts WHERE thread = ? AND id < ?", [$tid, $pid]) / $ppp) + 1;
+	$viewmode = "thread";
 } else {
 	noticemsg("Error", "Thread does not exist.", true);
 }
@@ -146,21 +134,6 @@ if ($viewmode == "thread") {
 		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp);
 
 	$thread['replies'] = $sql->result("SELECT count(*) FROM posts p WHERE user = ?", [$uid]) - 1;
-} elseif ($viewmode == "announce") {
-	pageheader('Announcements');
-
-	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum, p.announce isannounce "
-		. "FROM posts p "
-		. "LEFT JOIN poststext pt ON p.id=pt.id "
-		. "LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr " //SQL barrel roll
-		. "LEFT JOIN users u ON p.user=u.id "
-		. "LEFT JOIN threads t ON p.thread=t.id "
-		. "LEFT JOIN forums f ON f.id=t.forum "
-		. "WHERE p.announce=1 AND t.announce=1 AND ISNULL(pt2.id) GROUP BY pt.id "
-		. "ORDER BY p.id DESC "
-		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp);
-
-	$thread['replies'] = $sql->result("SELECT count(*) FROM posts WHERE announce = 1") - 1;
 } elseif ($viewmode == "time") {
 	if (is_numeric($time))
 		$mintime = time() - $time;
@@ -193,8 +166,6 @@ if ($thread['replies'] <= $ppp) {
 		$furl = "thread.php?user=$uid";
 	elseif ($viewmode == "time")
 		$furl = "thread.php?time=$time";
-	elseif ($viewmode == "announce")
-		$furl = "thread.php?announce=1";
 	$pagelist = '<br>'.pagelist($thread['replies'], $ppp, $furl, $page, true);
 }
 
@@ -218,13 +189,6 @@ if ($viewmode == "thread") {
 		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "profile.php?id=$uid", 'title' => ($user['displayname'] ? $user['displayname'] : $user['name'])]],
 		'title' => 'Posts'
 	];
-} elseif ($viewmode == "announce") {
-	$topbot = [
-		'breadcrumb' => [['href' => './', 'title' => 'Main']],
-		'title' => "Announcements"
-	];
-	if (has_perm('create-forum-announcements'))
-		$topbot['actions'] = [['href' => "newthread.php?announce=1", 'title' => 'New announcement']];
 } elseif ($viewmode == "time") {
 	$topbot = [];
 	$time = $_GET['time'];
