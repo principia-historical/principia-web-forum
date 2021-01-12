@@ -6,7 +6,6 @@ if (!file_exists('lib/config.php')) {
 $start = microtime(true);
 
 $rankset_names = ['None'];
-$gender = ['Male', 'Female', 'N/A'];
 
 foreach (glob("lib/*.php") as $filename)
 	if ($filename != 'lib/config.sample.php')
@@ -15,58 +14,45 @@ foreach (glob("lib/*.php") as $filename)
 header("Content-type: text/html; charset=utf-8");
 
 $userip = $_SERVER['REMOTE_ADDR'];
-$url = getenv("SCRIPT_NAME");
-if ($q = getenv("QUERY_STRING")) $url .= "?$q";
 
 $log = false;
 $logpermset = [];
 
-if (!empty($_COOKIE['acmlm_user']) && !empty($_COOKIE['acmlm_pass'])) {
-	if ($user = checkuid($_COOKIE['acmlm_user'], unpacklcookie($_COOKIE['acmlm_pass']))) {
+// Authentication code.
+if (isset($_COOKIE['user']) || isset($_COOKIE['passenc'])) {
+	$pass_db = $sql->result("SELECT password FROM principia.users WHERE id = ?", [$_COOKIE['user']]);
+
+	if (password_verify(base64_decode($_COOKIE['passenc']), $pass_db)) {
+		// Valid password cookie.
 		$log = true;
-		$loguser = $user;
+		$loguser = $sql->fetch("SELECT * FROM users WHERE id = ?", [$_COOKIE['user']]);
 		load_user_permset();
 	} else {
-		setcookie('acmlm_user',0);
-		setcookie('acmlm_pass','');
+		// Invalid password cookie.
+		$log = false;
 		load_guest_permset();
 	}
 } else {
+	// No password cookie.
+	$log = false;
 	load_guest_permset();
-}
-
-if ($lockdown) {
-	if (has_perm('bypass-lockdown'))
-		echo '<span style="color:red"><center>LOCKDOWN!!</center></span>';
-	else {
-		echo <<<HTML
-<body style="background-color:#C02020;padding:5em;color:#ffffff;margin:auto;">
-	Access to the board has been restricted by the administration.
-	Please forgive any inconvenience caused and stand by until the underlying issues have been resolved.
-</body>
-HTML;
-		die();
-	}
 }
 
 if (!$log) {
 	$loguser = [];
 	$loguser['id'] = 0;
-	$loguser['timezone'] = "UTC";
-	$loguser['dateformat'] = "Y-m-d";
-	$loguser['timeformat'] = "H:i";
-	$loguser['theme'] = $defaulttheme;
-	$loguser['ppp'] = 20;
-	$loguser['tpp'] = 20;
 }
 
+// todo
+$loguser['dateformat'] = "Y-m-d";
+$loguser['timeformat'] = "H:i";
+$loguser['ppp'] = 20;
+$loguser['tpp'] = 20;
+$loguser['timezone'] = 'UTC';
 date_default_timezone_set($loguser['timezone']);
 
 if ($loguser['ppp'] < 1) $loguser['ppp'] = 20;
 if ($loguser['tpp'] < 1) $loguser['tpp'] = 20;
-
-//Unban users whose tempbans have expired.
-$sql->query("UPDATE users SET group_id = ?, title = '', tempbanned = 0 WHERE tempbanned < ? AND tempbanned > 0", [$defaultgroup, time()]);
 
 $dateformat = $loguser['dateformat'].' '.$loguser['timeformat'];
 
@@ -78,27 +64,11 @@ if (str_replace($botlist, "x", strtolower($_SERVER['HTTP_USER_AGENT'])) != strto
 }
 
 if ($log) {
-	$sql->query("UPDATE users SET lastview = ?, ip = ?, url = ? WHERE id = ?",
-		[time(), $userip, addslashes($url), $loguser['id']]);
+	$sql->query("UPDATE users SET lastview = ?, ip = ? WHERE id = ?",
+		[time(), $userip, $loguser['id']]);
 }
 $count = $sql->fetch("SELECT (SELECT COUNT(*) FROM users) u, (SELECT COUNT(*) FROM threads) t, (SELECT COUNT(*) FROM posts) p");
 $date = date("m-d-y", time());
-
-//Config definable theme override
-if ($override_theme) {
-	$theme = $override_theme;
-} elseif (isset($_GET['theme'])) {
-	$theme = $_GET['theme'];
-} else {
-	$theme = $loguser['theme'];
-}
-
-if (is_file("theme/$theme/$theme.css")) {
-	$themefile = "$theme.css";
-} else {
-	$theme = '0';
-	$themefile = "$theme.css";
-}
 
 /**
  * Print page header
@@ -108,7 +78,7 @@ if (is_file("theme/$theme/$theme.css")) {
  * @return void
  */
 function pageheader($pagetitle = '', $fid = null) {
-	global $log, $loguser, $boardtitle, $theme, $themefile, $favicon;
+	global $log, $loguser;
 
 	if ($log) {
 		if ($fid && is_numeric($fid))
@@ -136,12 +106,13 @@ function pageheader($pagetitle = '', $fid = null) {
 	<html>
 		<head>
 			<meta charset="utf-8">
-			<title><?=$pagetitle.$boardtitle?></title>
-			<link rel="icon" type="image/png" href="<?=$favicon?>">
+			<title>Principia - <?=$pagetitle?></title>
+			<link rel="icon" type="image/png" href="theme/fav.png">
 			<link rel="stylesheet" href="../assets/css/style.css" type="text/css">
+			<link rel="stylesheet" href="../assets/css/darkmodehack.css" type="text/css">
 			<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 			<link rel="stylesheet" href="theme/common.css">
-			<link rel="stylesheet" href="theme/<?=$theme?>/<?=$themefile?>">
+			<link rel="stylesheet" href="theme/principia/principia.css">
 			<script src="lib/js/microlight.js"></script>
 			<script src="lib/js/tools.js"></script>
 		</head>
@@ -152,7 +123,8 @@ function pageheader($pagetitle = '', $fid = null) {
 					<li><a href="../selected.php" class="btn">Selected</a></li>
 					<li><a href="../top.php" class="btn">Top</a></li>
 					<li><a href="../latest.php" class="btn">New</a></li>
-					<li><a href="../forum.php" class="btn">Forum</a></li>
+					<li><a href="../chat.php" class="btn">Chat</a></li>
+					<li><a href="./" class="btn">Forum</a></li>
 					<li><a href="../contests.php" class="btn">Contests</a></li>
 					<li><a href="../download.php" class="btn download">Download</a></li>
 					<li><a href="../search.php" class="btn"><img src="../assets/icons/search.svg" class="search"></a></li>

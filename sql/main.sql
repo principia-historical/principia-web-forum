@@ -5,13 +5,6 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-CREATE TABLE `blockedlayouts` (
-  `user` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `blockee` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  KEY `user` (`user`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
 CREATE TABLE `categories` (
   `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
@@ -79,7 +72,6 @@ CREATE TABLE `perm` (
 
 INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('ban-users',	'Ban Users',	''),
-('bypass-lockdown',	'View Board Under Lockdown',	''),
 ('can-edit-group',	'Edit Group Assets',	'group'),
 ('can-edit-group-member',	'Edit User Assets',	'group'),
 ('consecutive-posts',	'Consecutive Posts',	''),
@@ -98,8 +90,6 @@ INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('delete-user-pms',	'Delete User PMs',	''),
 ('edit-all-group',	'Edit All Group Assets',	''),
 ('edit-all-group-member',	'Edit All User Assets',	''),
-('edit-customusercolors',	'Edit Custom Username Colors',	''),
-('edit-displaynames',	'Edit Displaynames',	''),
 ('edit-forum-post',	'Edit Forum Post',	'forums'),
 ('edit-forum-thread',	'Edit Forum Thread',	'forums'),
 ('edit-forums',	'Edit Forums',	''),
@@ -109,8 +99,6 @@ INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('edit-permissions',	'Edit Permissions',	''),
 ('edit-titles',	'Edit Titles',	''),
 ('edit-users',	'Edit Users',	''),
-('has-customusercolor',	'Can Edit Custom Username Color',	''),
-('has-displayname',	'Can Use Displayname',	''),
 ('ignore-thread-time-limit',	'Ignore Thread Time Limit',	''),
 ('manage-board',	'Administration Management Panel',	''),
 ('no-restrictions',	'No Restrictions',	''),
@@ -195,39 +183,18 @@ CREATE TABLE `threadsread` (
 CREATE TABLE `users` (
   `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL,
-  `displayname` varchar(32) NOT NULL DEFAULT '',
-  `pass` varchar(32) NOT NULL,
   `posts` mediumint(9) NOT NULL DEFAULT 0,
   `threads` mediumint(9) NOT NULL DEFAULT 0,
   `regdate` int(11) NOT NULL DEFAULT 0,
   `lastpost` int(11) NOT NULL DEFAULT 0,
   `lastview` int(11) NOT NULL DEFAULT 0,
-  `lastforum` int(10) NOT NULL DEFAULT 0,
   `ip` varchar(15) NOT NULL DEFAULT '0.0.0.0',
-  `url` varchar(255) NOT NULL DEFAULT '',
-  `tempbanned` tinyint(4) NOT NULL DEFAULT 0,
-  `gender` tinyint(4) NOT NULL DEFAULT 2,
-  `dateformat` varchar(15) NOT NULL DEFAULT 'Y-m-d',
-  `timeformat` varchar(15) NOT NULL DEFAULT 'H:i',
-  `ppp` smallint(3) unsigned NOT NULL DEFAULT 20,
-  `tpp` smallint(3) unsigned NOT NULL DEFAULT 20,
-  `theme` varchar(32) NOT NULL DEFAULT '0',
-  `birth` varchar(10) NOT NULL DEFAULT '-1',
-  `rankset` int(10) NOT NULL DEFAULT 1,
   `title` varchar(255) NOT NULL DEFAULT '',
-  `location` varchar(255) NOT NULL DEFAULT '',
-  `email` varchar(255) NOT NULL DEFAULT '',
-  `showemail` tinyint(4) NOT NULL DEFAULT 0,
   `usepic` tinyint(4) NOT NULL DEFAULT 0,
   `head` text DEFAULT NULL,
   `sign` text DEFAULT NULL,
   `signsep` tinyint(1) NOT NULL DEFAULT 0,
-  `bio` text DEFAULT NULL,
   `group_id` tinyint(4) NOT NULL DEFAULT 1,
-  `nick_color` varchar(6) NOT NULL DEFAULT '000000',
-  `enablecolor` tinyint(1) NOT NULL DEFAULT 0,
-  `blocklayouts` tinyint(4) NOT NULL DEFAULT 0,
-  `timezone` varchar(128) NOT NULL DEFAULT 'UTC',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -274,7 +241,6 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (4,	'group',	'delete-forum-thread',	'forums',	2,	0),
 (4,	'group',	'edit-forum-post',	'forums',	2,	0),
 (4,	'group',	'edit-forum-thread',	'forums',	2,	0),
-(4,	'group',	'has-displayname',	'',	0,	0),
 (4,	'group',	'view-private-forum',	'forums',	2,	0),
 (5,	'group',	'ban-users',	'',	0,	0),
 (5,	'group',	'delete-post',	'',	0,	0),
@@ -290,7 +256,6 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (6,	'group',	'edit-permissions',	'',	0,	0),
 (6,	'group',	'edit-titles',	'',	0,	0),
 (6,	'group',	'edit-users',	'',	0,	0),
-(6,	'group',	'has-customusercolor',	'',	0,	0),
 (6,	'group',	'manage-board',	'',	0,	0),
 (6,	'group',	'override-readonly-forums',	'',	0,	0),
 (6,	'group',	'update-profiles',	'',	0,	0),

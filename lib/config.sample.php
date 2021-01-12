@@ -7,24 +7,7 @@ $sqluser = 'sqlusername';
 $sqlpass = 'sqlpassword';
 $sqldb   = 'sqldatabase';
 
-$pwdsalt = 'Please change me!';
-$pwdsalt2 = 'Addtional Salt. Please change me!';
-$ckey = "Cookie key. Please change me!";
-$civ = "Initialization Vector. This should be 16 characters long.";
-
 $trashid = 2; // Designates the id for your trash forum.
-
-$boardtitle = "Insert title here"; // This is what will be displayed at the top of your browser window.
-$favicon = "theme/fav.png"; // Replace with your favicon of choice
-$defaulttheme = "0"; // Select the default theme to be used.
-
-// Registration Bot Protection
-$puzzle = true;
-$puzzleQuestion = "What forum software does this board run?";
-$puzzleAnswer = "Acmlmboard";
-
-$override_theme = ''; // If you want to lock everyone to a specific theme.
-$lockdown = false; // Put board in lockdown mode.
 
 // List of bots (web crawlers)
 $botlist = ['ia_archiver','baidu','yahoo','bot','spider'];

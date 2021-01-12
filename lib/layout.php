@@ -141,10 +141,8 @@ function fieldcheckbox($field, $checked, $label) {
 	return sprintf('<label><input type="checkbox" name="%s" value="1" %s>%s </label>', $field, ($checked ? ' checked' : ''), $label);
 }
 
-function fieldselect($field, $checked, $choices, $onchange = '') {
-	if ($onchange != '')
-		$onchange = ' onchange="'.$onchange.'"';
-	$text = sprintf('<select name="%s"%s>', $field, $onchange);
+function fieldselect($field, $checked, $choices) {
+	$text = sprintf('<select name="%s">', $field);
 	foreach ($choices as $k => $v)
 		$text .= sprintf('<option value="%s"%s>%s</option>', $k, ($k == $checked ? ' selected' : ''), $v);
 	$text .= '</select>';
@@ -193,29 +191,6 @@ function pagelist($total, $limit, $url, $sel = 0, $showall = false, $tree = fals
 		$listhtml = '<div class="pagelist">Pages: %s</div>';
 
 	return sprintf($listhtml, $pagelist);
-}
-
-function themelist() {
-	$themes = glob('theme/*', GLOB_ONLYDIR);
-	sort($themes);
-	foreach ($themes as $f) {
-		$themename = explode("/",$f);
-		if (file_exists("theme/$themename[1]/$themename[1].css")) {
-			if (preg_match("~/* META\n(.*?)\n~s", str_replace("\r\n", "\n", file_get_contents("theme/$themename[1]/$themename[1].css")), $matches)) {
-				$themelist[str_replace('.css', '', str_replace('.php', '', $themename[1]))] = $matches[1];
-			}
-		}
-	}
-
-	return $themelist;
-}
-
-function ranklist() {
-	global $rankset_names;
-	foreach ($rankset_names as $rankset) {
-		$rlist[] = $rankset;
-	}
-	return $rlist;
 }
 
 /**

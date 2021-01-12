@@ -12,7 +12,7 @@ if ($act = $_POST['action']) {
 
 if ($_GET['act'] == 'delete' || $_GET['act'] == 'undelete') {
 	$act = $_GET['act'];
-	$pid = unpacksafenumeric($pid);
+	$pid = $pid;
 }
 
 needs_login();

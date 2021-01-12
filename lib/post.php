@@ -2,7 +2,7 @@
 
 function userlink_by_name($name) {
 	global $sql;
-	$u = $sql->fetch("SELECT ".userfields()." FROM users WHERE UPPER(name)=UPPER(?) OR UPPER(displayname)=UPPER(?)", [$name, $name]);
+	$u = $sql->fetch("SELECT ".userfields()." FROM users WHERE UPPER(name)=UPPER(?)", [$name]);
 	if ($u)
 		return userlink($u, null);
 	else
@@ -132,38 +132,22 @@ function posttoolbar() {
 		. '</tr></table>';
 }
 
-function LoadBlocklayouts() {
-	global $blocklayouts, $loguser, $log, $sql;
-	if (isset($blocklayouts) || !$log) return;
-
-	$blocklayouts = [];
-	$rBlocks = $sql->query("SELECT * FROM blockedlayouts WHERE blockee = ?",[$loguser['id']]);
-	while ($block = $rBlocks->fetch())
-		$blocklayouts[$block['user']] = 1;
-}
-
 function threadpost($post, $pthread = '') {
 	global $dateformat, $loguser;
 
 	$post['uhead'] = str_replace("<!--", "&lt;!--", $post['uhead']);
 
-	$post['ranktext'] = getrank($post['urankset'], $post['uposts']);
+	$post['ranktext'] = getrank(1, $post['uposts']);
 	$post['utitle'] = $post['ranktext']
 			. ((strlen($post['ranktext']) >= 1) ? '<br>' : '')
 			. $post['utitle']
 			. ((strlen($post['utitle']) >= 1) ? '<br>' : '');
 
-	// Blocklayouts, supports user/user ($blocklayouts) and user/world (token).
-	LoadBlockLayouts(); //load the blocklayout data - this is just once per page.
-	$isBlocked = (isset($loguser['blocklayouts']) ? $loguser['blocklayouts'] : '');
-	if ($isBlocked)
-		$post['usign'] = $post['uhead'] = '';
-
 	if (isset($post['deleted']) && $post['deleted']) {
 		$postlinks = '';
 		if (can_edit_forum_posts(getforumbythread($post['thread']))) {
 			$postlinks .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$post[revision]#$post[id]\">Peek</a> | ";
-			$postlinks .= "<a href=\"editpost.php?pid=" . urlencode(packsafenumeric($post['id'])) . "&act=undelete\">Undelete</a>";
+			$postlinks .= "<a href=\"editpost.php?pid=" . $post['id'] . "&act=undelete\">Undelete</a>";
 		}
 
 		if ($post['id'])
@@ -207,7 +191,7 @@ HTML;
 		$postlinks.=($postlinks ? ' | ' : '') . "<a href=\"editpost.php?pid=$post[id]\">Edit</a>";
 
 	if (isset($post['thread']) && isset($post['id']) && can_delete_forum_posts(getforumbythread($post['thread'])))
-		$postlinks.=($postlinks ? ' | ' : '') . "<a href=\"editpost.php?pid=" . urlencode(packsafenumeric($post['id'])) . "&act=delete\">Delete</a>";
+		$postlinks.=($postlinks ? ' | ' : '') . "<a href=\"editpost.php?pid=".$post['id']."&act=delete\">Delete</a>";
 
 	if (isset($post['thread']) && $post['id'])
 		$postlinks.=" | ID: $post[id]";
@@ -221,10 +205,10 @@ HTML;
 			$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";
 	}
 
-	$tbar1 = (!$isBlocked) ? "topbar" . $post['uid'] . "_1" : '';
-	$tbar2 = (!$isBlocked) ? "topbar" . $post['uid'] . "_2" : '';
-	$sbar = (!$isBlocked) ? "sidebar" . $post['uid'] : '';
-	$mbar = (!$isBlocked) ? "mainbar" . $post['uid'] : '';
+	$tbar1 = "topbar" . $post['uid'] . "_1";
+	$tbar2 = "topbar" . $post['uid'] . "_2";
+	$sbar = "sidebar" . $post['uid'];
+	$mbar = "mainbar" . $post['uid'];
 	$ulink = userlink($post, 'u');
 	$pdate = date($dateformat, $post['date']);
 	$text = <<<HTML

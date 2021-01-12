@@ -42,7 +42,7 @@ $action = '';
 $post_c = isset($_POST['c']) ? $_POST['c'] : '';
 $act = isset($_POST['action']) ? $_POST['action'] : '';
 
-if (isset($tid) && $log && $post_c == md5($pwdsalt2 . $loguser['pass'] . $pwdsalt) && (can_edit_forum_threads(getforumbythread($tid)) ||
+if (isset($tid) && $log && $act && (can_edit_forum_threads(getforumbythread($tid)) ||
 		($loguser['id'] == $threadcreator && $act == "rename" && has_perm('rename-own-thread')))) {
 
 	if ($act == 'stick') {
@@ -121,7 +121,7 @@ if ($viewmode == "thread") {
 
 	if ($user == null) noticemsg("Error", "User doesn't exist.", true);
 
-	pageheader("Posts by " . ($user['displayname'] ? $user['displayname'] : $user['name']));
+	pageheader("Posts by " . $user['name']);
 	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
 		. "FROM posts p "
 		. "LEFT JOIN poststext pt ON p.id=pt.id "
@@ -186,7 +186,7 @@ if ($viewmode == "thread") {
 	}
 } elseif ($viewmode == "user") {
 	$topbot = [
-		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "profile.php?id=$uid", 'title' => ($user['displayname'] ? $user['displayname'] : $user['name'])]],
+		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "profile.php?id=$uid", 'title' => $user['name']]],
 		'title' => 'Posts'
 	];
 } elseif ($viewmode == "time") {
@@ -245,7 +245,6 @@ if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($loguser['id'] 
 	$renamefield = addcslashes($renamefield, "'"); //because of javascript, single quotes will gum up the works
 
 	$threadtitle = addcslashes(htmlentities($thread['title'], ENT_COMPAT | ENT_HTML401, 'UTF-8'), "'");
-	$c = md5($pwdsalt2 . $loguser['pass'] . $pwdsalt);
 
 	$modlinks = <<<HTML
 <form action="thread.php" method="post" name="mod" id="mod">
@@ -308,7 +307,6 @@ function trashConfirm(e) {
 		<input type=hidden id="arg" name="arg" value="">
 		<input type=hidden id="id" name="id" value="$tid">
 		<input type=hidden id="action" name="action" value="">
-		<input type=hidden id="c" name="c" value="$c">
 	</td>
 </table>
 </form>

@@ -1,18 +1,5 @@
 <?php
 
-function checkuser($name, $pass) {
-	global $sql;
-	$id = $sql->result("SELECT id FROM users WHERE (name = ? OR displayname = ?) AND pass = ?", [$name, $name, $pass]);
-	if (!$id) $id = 0;
-	return $id;
-}
-
-function checkuid($userid, $pass) {
-	global $sql;
-	$user = $sql->fetch("SELECT * FROM users WHERE id = ? AND pass = ?", [$userid, addslashes($pass)]);
-	return $user;
-}
-
 function checkctitle($uid) {
 	global $loguser, $defaultgroup;
 
@@ -26,36 +13,6 @@ function checkctitle($uid) {
 	}
 
 	if (has_perm('edit-titles')) return true;
-
-	return false;
-}
-
-function checkcusercolor($uid) {
-	global $loguser;
-
-	if (!$loguser['id']) return false;
-	if (has_perm_revoked('has-customusercolor')) return false;
-
-	if ($uid == $loguser['id'] && has_perm('has-customusercolor')) return true;
-
-	if (has_perm('edit-customusercolors')) return true;
-
-	return false;
-}
-
-function checkcdisplayname($uid) {
-	global $loguser, $defaultgroup;
-
-	if (!$loguser['id']) return false;
-	if (has_perm_revoked('has-displayname')) return false;
-
-	if ($uid == $loguser['id'] && has_perm('has-displayname')) {
-		if ($loguser['group_id'] != $defaultgroup) return true;
-
-		return false;
-	}
-
-	if (has_perm('edit-displaynames')) return true;
 
 	return false;
 }
@@ -82,7 +39,7 @@ function getrank($set, $posts) {
 }
 
 function userfields($tbl = '', $pf = '') {
-	$fields = ['id', 'name', 'displayname', 'group_id', 'nick_color', 'enablecolor'];
+	$fields = ['id', 'name', 'group_id'];
 
 	$ret = '';
 	foreach ($fields as $f) {
@@ -99,7 +56,7 @@ function userfields($tbl = '', $pf = '') {
 }
 
 function userfields_post() {
-	$ufields = ['posts','regdate','lastpost','lastview','rankset','title','usepic','head','sign','signsep'];
+	$ufields = ['posts','regdate','lastpost','lastview','title','usepic','head','sign','signsep'];
 	$fieldlist = '';
 	foreach ($ufields as $field)
 		$fieldlist .= "u.$field u$field,";
@@ -121,14 +78,10 @@ function userlink($user, $u = '') {
 function userdisp($user, $u = '') {
 	global $usergroups;
 
-	if ($user[$u.'nick_color'] && $user[$u.'enablecolor']) { //Over-ride for custom colours
-		$nc = $user[$u.'nick_color'];
-	} else {
-		$group = $usergroups[$user[$u.'group_id']];
-		$nc = $group['nc'];
-	}
+	$group = $usergroups[$user[$u.'group_id']];
+	$nc = $group['nc'];
 
-	$n = ($user[$u.'displayname'] ? $user[$u.'displayname'] : $user[$u.'name']);
+	$n = $user[$u.'name'];
 
 	$userdisname = "<span style='color:#$nc;'>".str_replace(" ", "&nbsp;", esc($n)).'</span>';
 

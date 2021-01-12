@@ -8,7 +8,7 @@ $errmsg = '';
 $caneditperms = has_perm('edit-permissions');
 
 if ($act == 'delete') {
-	$id = unpacksafenumeric($_GET['id']);
+	$id = $_GET['id'];
 	$group = $sql->fetch("SELECT * FROM groups WHERE id = ?", [$id]);
 
 	if (!$group)
@@ -138,7 +138,7 @@ if ($act == 'new' || $act == 'edit') {
 		if ($caneditperms) $actions[] = ['href'=>'editperms.php?gid='.$group['id'], 'title'=>'Edit perms'];
 		$actions[] = ['href'=>'editgroups.php?act=edit&id='.$group['id'], 'title'=>'Edit'];
 		if ($caneditperms && $group['id'] > 7)
-			$actions[] = ['href'=>'editgroups.php?act=delete&id='.urlencode(packsafenumeric($group['id'])), 'title'=>'Delete',
+			$actions[] = ['href'=>'editgroups.php?act=delete&id='.$group['id'], 'title'=>'Delete',
 				'confirm'=>'Are you sure you want to delete the group "'.esc($group['title']).'"?'];
 
 		$data[] = [

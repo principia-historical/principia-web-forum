@@ -9,7 +9,7 @@ if (!$user) noticemsg("Error", "This user does not exist!", true);
 
 $group = $sql->fetch("SELECT * FROM groups WHERE id = ?", [$user['group_id']]);
 
-pageheader("Profile for ".($user['displayname'] ? $user['displayname'] : $user['name']));
+pageheader("Profile for ".$user['name']);
 
 $days = (time() - $user['regdate']) / 86400;
 
@@ -26,39 +26,6 @@ if ($thread) {
 } else {
 	$lastpostlink = "<br>in <i>a private forum</i>";
 }
-
-$themes = themelist();
-foreach ($themes as $k => $v) {
-	if ((string)$k == $user['theme']) {
-		$themename = $v;
-		break;
-	}
-}
-
-if ($user['birth'] != -1) {
-	//Crudely done code.
-	$monthnames = [1 => 'January', 'February', 'March', 'April',
-		'May', 'June', 'July', 'August',
-		'September', 'October', 'November', 'December'];
-	$bdec = explode("-", $user['birth']);
-	$bstr = $bdec[2] . "-" . $bdec[0] . "-" . $bdec[1];
-	$mn = intval($bdec[0]);
-	if ($bdec['2'] <= 0 && $bdec['2'] > -2)
-		$birthday = $monthnames[$mn] . " " . $bdec[1];
-	else
-		$birthday = date("F j Y", strtotime($bstr));
-
-	$bd1 = new DateTime($bstr);
-	$bd2 = new DateTime(date("Y-m-d"));
-	if (($bd2 < $bd1 && !$bdec['2'] <= 0) || ($bdec['2'] <= 0 && $bdec['2'] > -2))
-		$age = '';
-	else
-		$age = '('.intval($bd1->diff($bd2)->format("%Y")).' years old)';
-} else {
-	$birthday = $age = '';
-}
-
-$email = ($user['email'] && $user['showemail'] ? str_replace(".", "<b> (dot) </b>", str_replace("@", "<b> (at) </b>", $user['email'])) : '');
 
 $post['date'] = time();
 $post['ip'] = $user['ip'];
@@ -85,23 +52,7 @@ $links = [];
 $links[] = ['url' => "forum.php?user=$uid", 'title' => 'View threads'];
 $links[] = ['url' => "thread.php?user=$uid", 'title' => 'Show posts'];
 
-$rblock = $sql->query("SELECT * FROM blockedlayouts WHERE user = ? AND blockee = ?", [$uid, $loguser['id']]);
-$isblocked = $rblock;
 if ($log) {
-	if (isset($_GET['block'])) {
-		$block = (int)$_GET['block'];
-
-		if ($block && !$isblocked) {
-			$rblock = $sql->query("INSERT INTO blockedlayouts (user, blockee) values (?,?)", [$uid, $loguser['id']]);
-			$isblocked = true;
-		} elseif (!$block && $isblocked) {
-			$rblock = $sql->query("DELETE FROM blockedlayouts WHERE user = ? AND blockee = ?", [$uid, $loguser['id']]);
-			$isblocked = false;
-		}
-	}
-
-	$links[] = ['url' => "profile.php?id=$uid&block=".($isblocked ? 0 : 1), 'title' => ($isblocked ? 'Unblock' : 'Block').' layout'];
-
 	if (has_perm('create-pms'))
 		$links[] = ['url' => "sendprivate.php?uid=$uid", 'title' => 'Send private message'];
 }
@@ -123,15 +74,6 @@ if (has_perm('edit-permissions') && (has_perm('edit-own-permissions') || $loguse
 	$links[] = ['url' => "editperms.php?uid=$uid", 'title' => 'Edit user permissions'];
 }
 
-//timezone calculations
-$now = new DateTime("now");
-$usertz = new DateTimeZone($user['timezone']);
-$userdate = new DateTime("now", $usertz);
-$userct = date_format($userdate, $dateformat);
-$logtz = new DateTimeZone($loguser['timezone']);
-$usertzoff = $usertz->getOffset($now);
-$logtzoff = $logtz->getOffset($now);
-
 $profilefields = [
 	"General information" => [
 		['title' => 'Real handle', 'value' => '<span style="color:#'.$group['nc'].';"><b>'.esc($user['name']).'</b></span>'],
@@ -141,28 +83,15 @@ $profilefields = [
 		['title' => 'Registered on', 'value' => date($dateformat, $user['regdate']).' ('.timeunits($days * 86400).' ago)'],
 		['title' => 'Last post', 'value'=>($user['lastpost'] ? date($dateformat, $user['lastpost'])." (".timeunits(time()-$user['lastpost'])." ago)" : "None").$lastpostlink],
 		['title' => 'Last view', 'value' => sprintf(
-				'%s (%s ago) %s %s',
+				'%s (%s ago) %s',
 			date($dateformat, $user['lastview']), timeunits(time() - $user['lastview']),
-			($user['url'] ? sprintf('<br>at <a href="%s">%s</a>', esc($user['url']), esc($user['url'])) : ''),
 			(has_perm("view-post-ips") ? '<br>from IP: '.$user['ip'] : ''))]
 	],
-	"User information" => [
-		['title' => 'Gender', 'value' => $gender[$user['gender']]],
-		['title' => 'Location', 'value' => ($user['location'] ? esc($user['location']) : '')],
-		['title' => 'Birthday', 'value' => "$birthday $age"],
-		['title' => 'Bio', 'value' => ($user['bio'] ? postfilter($user['bio']) : '')],
-		['title' => 'Email', 'value' => $email]
-	],
-	"User settings" => [
-		['title' => 'Theme', 'value' => esc($themename)],
-		['title' => 'Time offset', 'value' => sprintf("%d:%02d", ($usertzoff - $logtzoff) / 3600, abs(($usertzoff - $logtzoff) / 60) % 60)." from you (Current time: $userct)"],
-		['title' => 'Items per page', 'value' => $user['ppp']." posts, ".$user['tpp']." threads"]
-	]
 ];
 
 $topbot = [
 	'breadcrumb' => [['href' => './', 'title' => 'Main']],
-	'title' => ($user['displayname'] ? $user['displayname'] : $user['name'])
+	'title' => $user['name']
 ];
 
 RenderPageBar($topbot);
@@ -170,7 +99,6 @@ RenderPageBar($topbot);
 foreach ($profilefields as $k => $v) {
 	echo '<br><table class="c1"><tr class="h"><td class="b h" colspan="2">'.$k.'</td></tr>';
 	foreach ($v as $pf) {
-		if ($pf['title'] == 'Real handle' && !$user['displayname']) continue;
 		echo '<tr><td class="b n1" width="130"><b>'.$pf['title'].'</b></td><td class="b n2">'.$pf['value'].'</td>';
 	}
 	echo '</table>';

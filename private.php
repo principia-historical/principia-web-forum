@@ -35,7 +35,7 @@ if (isset($_GET['action']) && $_GET['action'] == "del") {
 
 $ptitle = 'Private messages' . ($sent ? ' (sent)' : '');
 if ($id && has_perm('view-user-pms')) {
-	$user = $sql->fetch("SELECT id,name,displayname,enablecolor,nick_color,group_id FROM users WHERE id = ?", [$id]);
+	$user = $sql->fetch("SELECT id,name,group_id FROM users WHERE id = ?", [$id]);
 	if ($user == null) noticemsg("Error", "User doesn't exist.", true);
 	pageheader($user['name']."'s ".strtolower($ptitle));
 	$title = userlink($user)."'s ".strtolower($ptitle);
