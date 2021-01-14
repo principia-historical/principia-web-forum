@@ -35,7 +35,7 @@ if (isset($_GET['action']) && $_GET['action'] == "del") {
 
 $ptitle = 'Private messages' . ($sent ? ' (sent)' : '');
 if ($id && has_perm('view-user-pms')) {
-	$user = $sql->fetch("SELECT id,name,group_id FROM users WHERE id = ?", [$id]);
+	$user = $sql->fetch("SELECT id,name,group_id FROM principia.users WHERE id = ?", [$id]);
 	if ($user == null) noticemsg("Error", "User doesn't exist.", true);
 	pageheader($user['name']."'s ".strtolower($ptitle));
 	$title = userlink($user)."'s ".strtolower($ptitle);
@@ -47,7 +47,7 @@ if ($id && has_perm('view-user-pms')) {
 
 $pmsgc = $sql->result("SELECT COUNT(*) FROM pmsgs WHERE user$fieldn2 = ? AND del_$fieldn2 = ?", [$id, $showdel]);
 $pmsgs = $sql->query("SELECT ".userfields('u', 'u').", p.* FROM pmsgs p "
-					."LEFT JOIN users u ON u.id = p.user$fieldn "
+					."LEFT JOIN principia.users u ON u.id = p.user$fieldn "
 					."WHERE p.user$fieldn2 = ? "
 				."AND del_$fieldn2 = ? "
 					."ORDER BY p.unread DESC, p.date DESC "

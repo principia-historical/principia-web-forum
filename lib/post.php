@@ -2,7 +2,7 @@
 
 function userlink_by_name($name) {
 	global $sql;
-	$u = $sql->fetch("SELECT ".userfields()." FROM users WHERE UPPER(name)=UPPER(?)", [$name]);
+	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE UPPER(name)=UPPER(?)", [$name]);
 	if ($u)
 		return userlink($u, null);
 	else
@@ -135,7 +135,7 @@ function posttoolbar() {
 function threadpost($post, $pthread = '') {
 	global $dateformat, $loguser;
 
-	$post['uhead'] = str_replace("<!--", "&lt;!--", $post['uhead']);
+	$post['usignature_header'] = str_replace("<!--", "&lt;!--", $post['usignature_header']);
 
 	$post['ranktext'] = getrank(1, $post['uposts']);
 	$post['utitle'] = $post['ranktext']
@@ -226,27 +226,27 @@ HTML;
 HTML;
 
 	$lastpost = ($post['ulastpost'] ? timeunits(time() - $post['ulastpost']) : 'none');
-	$picture = ($post['uusepic'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
+	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
 
-	if ($post['usign']) {
-		$signsep = $post['usignsep'] ? '' : '____________________<br>';
+	if ($post['usignature']) {
+		$signsep = $post['usignature_separator'] ? '' : '____________________<br>';
 
-		if (!$post['uhead'])
-			$post['usign'] = '<br><br><small>' . $signsep . $post['usign'] . '</small>';
+		if (!$post['usignature_header'])
+			$post['usignature'] = '<br><br><small>' . $signsep . $post['usignature'] . '</small>';
 		else
-			$post['usign'] = '<br><br>' . $signsep . $post['usign'];
+			$post['usignature'] = '<br><br>' . $signsep . $post['usignature'];
 	}
 
 	$text .= postfilter($post['utitle'])
 		."$picture
 		<br>Posts: $post[uposts]
 		<br>
-		<br>Since: ".date('Y-m-d', $post['uregdate'])."
+		<br>Since: ".date('Y-m-d', $post['ujoined'])."
 		<br>
 		<br>Last post: $lastpost
 		<br>Last view: ".timeunits(time() - $post['ulastview'])."
 	</td>
-	<td class=\"b n2 $mbar\" id=\"post_".$post['id'].'">'.postfilter($post['uhead'].$post['text'].$post['usign'])."</td>
+	<td class=\"b n2 $mbar\" id=\"post_".$post['id'].'">'.postfilter($post['usignature_header'].$post['text'].$post['usignature'])."</td>
 </table>";
 
 	return $text;

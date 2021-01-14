@@ -14,7 +14,7 @@ if ($act == 'delete') {
 	if (!$group)
 		$errmsg = 'Cannot delete group: invalid group ID';
 	else {
-		$usercount = $sql->result("SELECT COUNT(*) FROM users WHERE group_id = ?", [$group['id']]);
+		$usercount = $sql->result("SELECT COUNT(*) FROM principia.users WHERE group_id = ?", [$group['id']]);
 		if ($usercount > 0) $errmsg = 'This group cannot be deleted because it contains users';
 
 		if (!$errmsg && !$caneditperms) {

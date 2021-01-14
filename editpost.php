@@ -41,7 +41,7 @@ $topbot = [
 
 $post = $sql->fetch("SELECT u.id, p.user, pt.text FROM posts p LEFT JOIN poststext pt ON p.id=pt.id "
 		."JOIN (SELECT id,MAX(revision) toprev FROM poststext GROUP BY id) as pt2 ON pt2.id = pt.id AND pt2.toprev = pt.revision "
-		."LEFT JOIN users u ON p.user = u.id WHERE p.id = ?", [$pid]);
+		."LEFT JOIN principia.users u ON p.user = u.id WHERE p.id = ?", [$pid]);
 
 if (!isset($post)) $err = "Post doesn't exist.";
 
@@ -79,7 +79,7 @@ if (isset($err)) {
 	</table></form>
 <?php
 } else if ($act == 'Preview') {
-	$euser = $sql->fetch("SELECT * FROM users WHERE id = ?", [$post['id']]);
+	$euser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$post['id']]);
 	$post['date'] = time();
 	$post['ip'] = $userip;
 	$post['num'] = $euser['posts']++;

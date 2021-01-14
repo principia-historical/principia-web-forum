@@ -99,7 +99,7 @@ if (isset($err)) {
 		</tr>
 	</table></form><?php
 } elseif ($act == 'Submit') {
-	$sql->query("UPDATE users SET posts = posts + 1,threads = threads + 1,lastpost = ? WHERE id = ?", [time(), $loguser['id']]);
+	$sql->query("UPDATE principia.users SET posts = posts + 1,threads = threads + 1,lastpost = ? WHERE id = ?", [time(), $loguser['id']]);
 	$sql->query("INSERT INTO threads (title,forum,user,lastdate,lastuser) VALUES (?,?,?,?,?)",
 		[$_POST['title'],$fid,$loguser['id'],time(),$loguser['id']]);
 	$tid = $sql->insertid();

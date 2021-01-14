@@ -4,7 +4,7 @@ pageheader('Active users');
 
 $time = (isset($_GET['time']) && is_numeric($_GET['time']) ? $_GET['time'] : 86400);
 
-$users = $sql->query("SELECT ".userfields('u').",u.posts,u.regdate,COUNT(*) num FROM users u LEFT JOIN posts p ON p.user = u.id WHERE p.date > ? GROUP BY u.id ORDER BY num DESC",
+$users = $sql->query("SELECT ".userfields('u').",u.posts,u.joined,COUNT(*) num FROM principia.users u LEFT JOIN posts p ON p.user = u.id WHERE p.date > ? GROUP BY u.id ORDER BY num DESC",
 	[(time() - $time)]);
 ?>
 <table class="c1" style="width:auto">
@@ -25,7 +25,7 @@ for ($i = 1; $user = $users->fetch(); $i++) {
 	?><tr class="n<?=$tr ?> center">
 		<td class="b"><?=$i ?>.</td>
 		<td class="b left"><?=userlink($user) ?></td>
-		<td class="b"><?=date($dateformat,$user['regdate']) ?></td>
+		<td class="b"><?=date($dateformat,$user['joined']) ?></td>
 		<td class="b"><b><?=$user['num'] ?></b></td>
 		<td class="b"><b><?=$user['posts'] ?></b></td>
 	</tr><?php

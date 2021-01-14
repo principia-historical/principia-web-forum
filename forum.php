@@ -21,8 +21,8 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*"
 		. ($log ? ", (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<'$forum[rtime]') isread" : '') . ' '
 		. "FROM threads t "
-		. "LEFT JOIN users u1 ON u1.id=t.user "
-		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
+		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
+		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
 		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$loguser[id])" : '')
 		. "WHERE t.forum = ? "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
@@ -36,7 +36,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if (can_create_forum_thread($forum))
 		$topbot['actions'] = [['href' => "newthread.php?id=$fid", 'title' => 'New thread']];
 } elseif (isset($_GET['user']) && $uid = $_GET['user']) {
-	$user = $sql->fetch("SELECT name FROM users WHERE id = ?", [$uid]);
+	$user = $sql->fetch("SELECT name FROM principia.users WHERE id = ?", [$uid]);
 
 	if (!isset($user)) noticemsg("Error", "User does not exist.", true);
 
@@ -45,8 +45,8 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*, f.id fid, "
 		. ($log ? " (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread, " : ' ')
 		. "f.title ftitle FROM threads t "
-		. "LEFT JOIN users u1 ON u1.id=t.user "
-		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
+		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
+		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
 		. "LEFT JOIN forums f ON f.id=t.forum "
 		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$loguser[id]) "
 			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$loguser[id]) " : '')
@@ -75,8 +75,8 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*, f.id fid,
 		f.title ftitle" . ($log ? ', (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread ' : ' ')
 		. "FROM threads t "
-		. "LEFT JOIN users u1 ON u1.id=t.user "
-		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
+		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
+		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
 		. "LEFT JOIN forums f ON f.id=t.forum "
 		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$loguser[id]) "
 			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$loguser[id]) " : '')

@@ -32,7 +32,7 @@ if ($act == 'Submit') {
 		$err = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
 		$err = "Your post is empty! Enter a message and try again.";
-	if ($loguser['regdate'] > (time() - 2))
+	if ($loguser['joined'] > (time() - 2))
 		$err = "You must wait 2 seconds before posting on a freshly registered account.";
 }
 
@@ -51,7 +51,7 @@ if ($pid) {
 			. "FROM posts p "
 			. "LEFT JOIN poststext pt ON p.id=pt.id "
 			. "LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) "
-			. "LEFT JOIN users u ON p.user=u.id "
+			. "LEFT JOIN principia.users u ON p.user=u.id "
 			. "LEFT JOIN threads t ON t.id=p.thread "
 			. "LEFT JOIN forums f ON f.id=t.forum "
 			. "WHERE p.id = ? AND ISNULL(pt2.id)", [$pid]);
@@ -108,7 +108,7 @@ if ($err) {
 		</tr>
 	</table></form><?php
 } elseif ($act == 'Submit') {
-	$sql->query("UPDATE users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $loguser['id']]);
+	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $loguser['id']]);
 	$sql->query("INSERT INTO posts (user,thread,date,ip,num) VALUES (?,?,?,?,?)",
 		[$loguser['id'],$tid,time(),$userip,$loguser['posts']++]);
 	$pid = $sql->insertid();

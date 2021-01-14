@@ -4,14 +4,14 @@ require("lib/common.php");
 $uid = isset($_GET['id']) ? (int)$_GET['id'] : -1;
 if ($uid < 0) noticemsg("Error", "You must specify a user ID!", true);
 
-$user = $sql->fetch("SELECT * FROM users WHERE id = ?", [$uid]);
+$user = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$uid]);
 if (!$user) noticemsg("Error", "This user does not exist!", true);
 
 $group = $sql->fetch("SELECT * FROM groups WHERE id = ?", [$user['group_id']]);
 
 pageheader("Profile for ".$user['name']);
 
-$days = (time() - $user['regdate']) / 86400;
+$days = (time() - $user['joined']) / 86400;
 
 $thread = $sql->fetch("SELECT p.id, t.title ttitle, f.title ftitle, t.forum, f.private FROM forums f
 	LEFT JOIN threads t ON t.forum = f.id LEFT JOIN posts p ON p.thread = t.id
@@ -80,7 +80,7 @@ $profilefields = [
 		['title' => 'Group', 'value' => $group['title']],
 		['title' => 'Total posts', 'value' => sprintf('%s (%1.02f per day)', $user['posts'], $user['posts'] / $days)],
 		['title' => 'Total threads', 'value' => $user['threads'].' ('.sprintf('%1.02f', $user['threads'] / $days).' per day)'],
-		['title' => 'Registered on', 'value' => date($dateformat, $user['regdate']).' ('.timeunits($days * 86400).' ago)'],
+		['title' => 'Registered on', 'value' => date($dateformat, $user['joined']).' ('.timeunits($days * 86400).' ago)'],
 		['title' => 'Last post', 'value'=>($user['lastpost'] ? date($dateformat, $user['lastpost'])." (".timeunits(time()-$user['lastpost'])." ago)" : "None").$lastpostlink],
 		['title' => 'Last view', 'value' => sprintf(
 				'%s (%s ago) %s',

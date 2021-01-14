@@ -180,26 +180,6 @@ CREATE TABLE `threadsread` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `users` (
-  `id` mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(32) NOT NULL,
-  `posts` mediumint(9) NOT NULL DEFAULT 0,
-  `threads` mediumint(9) NOT NULL DEFAULT 0,
-  `regdate` int(11) NOT NULL DEFAULT 0,
-  `lastpost` int(11) NOT NULL DEFAULT 0,
-  `lastview` int(11) NOT NULL DEFAULT 0,
-  `ip` varchar(15) NOT NULL DEFAULT '0.0.0.0',
-  `title` varchar(255) NOT NULL DEFAULT '',
-  `usepic` tinyint(4) NOT NULL DEFAULT 0,
-  `head` text DEFAULT NULL,
-  `sign` text DEFAULT NULL,
-  `signsep` tinyint(1) NOT NULL DEFAULT 0,
-  `group_id` tinyint(4) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
 CREATE TABLE `x_perm` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `x_id` int(11) NOT NULL,

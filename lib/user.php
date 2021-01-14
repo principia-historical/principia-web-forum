@@ -56,7 +56,7 @@ function userfields($tbl = '', $pf = '') {
 }
 
 function userfields_post() {
-	$ufields = ['posts','regdate','lastpost','lastview','title','usepic','head','sign','signsep'];
+	$ufields = ['posts','joined','lastpost','lastview','title','avatar','signature_header','signature','signature_separator'];
 	$fieldlist = '';
 	foreach ($ufields as $field)
 		$fieldlist .= "u.$field u$field,";
@@ -65,7 +65,7 @@ function userfields_post() {
 
 function userlink_by_id($uid) {
 	global $sql;
-	$u = $sql->fetch("SELECT ".userfields()." FROM users WHERE id=?", [$uid]);
+	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE id=?", [$uid]);
 	return userlink($u);
 }
 

@@ -44,7 +44,7 @@ function is_root_gid($gid) {
 
 function gid_for_user($userid) {
 	global $sql;
-	$row = $sql->fetch("SELECT group_id FROM users WHERE id=?",[$userid]);
+	$row = $sql->fetch("SELECT group_id FROM principia.users WHERE id=?",[$userid]);
 	return $row['group_id'];
 }
 

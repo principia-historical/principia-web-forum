@@ -10,7 +10,7 @@ $pid = (isset($_GET['id']) ? $_GET['id'] : null);
 
 if (!$pid) noticemsg("Error", "Private message does not exist.", true);
 
-$pmsgs = $sql->fetch("SELECT $fieldlist p.* FROM pmsgs p LEFT JOIN users u ON u.id = p.userfrom WHERE p.id = ?", [$pid]);
+$pmsgs = $sql->fetch("SELECT $fieldlist p.* FROM pmsgs p LEFT JOIN principia.users u ON u.id = p.userfrom WHERE p.id = ?", [$pid]);
 if ($pmsgs == null) noticemsg("Error", "Private message does not exist.", true);
 $tologuser = ($pmsgs['userto'] == $loguser['id']);
 

@@ -111,13 +111,13 @@ if ($viewmode == "thread") {
 		. "LEFT JOIN threads t ON t.id = p.thread "
 		. "LEFT JOIN poststext pt ON p.id = pt.id "
 		. "LEFT JOIN poststext pt2 ON pt2.id = pt.id AND pt2.revision = (pt.revision + 1) $pinstr " //SQL barrel roll
-		. "LEFT JOIN users u ON p.user = u.id "
+		. "LEFT JOIN principia.users u ON p.user = u.id "
 		. "WHERE p.thread = ? AND ISNULL(pt2.id) "
 		. "GROUP BY p.id ORDER BY p.id "
 		. "LIMIT ".(($page - 1) * $ppp).",$ppp",
 		[$tid]);
 } elseif ($viewmode == "user") {
-	$user = $sql->fetch("SELECT * FROM users WHERE id = ?", [$uid]);
+	$user = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$uid]);
 
 	if ($user == null) noticemsg("Error", "User doesn't exist.", true);
 
@@ -126,7 +126,7 @@ if ($viewmode == "thread") {
 		. "FROM posts p "
 		. "LEFT JOIN poststext pt ON p.id=pt.id "
 		. "LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
-		. "LEFT JOIN users u ON p.user=u.id "
+		. "LEFT JOIN principia.users u ON p.user=u.id "
 		. "LEFT JOIN threads t ON p.thread=t.id "
 		. "LEFT JOIN forums f ON f.id=t.forum "
 		. "WHERE p.user=$uid AND ISNULL(pt2.id) "
@@ -146,7 +146,7 @@ if ($viewmode == "thread") {
 		. "FROM posts p "
 		. "LEFT JOIN poststext pt ON p.id=pt.id "
 		. "LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
-		. "LEFT JOIN users u ON p.user=u.id "
+		. "LEFT JOIN principia.users u ON p.user=u.id "
 		. "LEFT JOIN threads t ON p.thread=t.id "
 		. "LEFT JOIN forums f ON f.id=t.forum "
 		. "WHERE p.date > ? AND ISNULL(pt2.id) "

@@ -14,12 +14,12 @@ $sortby = ($orderby == 'a' ? " ASC" : " DESC");
 
 $order = 'posts' . $sortby;
 if ($sort == 'name') $order = 'name' . $sortby;
-if ($sort == 'reg') $order = 'regdate' . $sortby;
+if ($sort == 'reg') $order = 'joined' . $sortby;
 
 $where = (is_numeric($pow) ? "WHERE group_id = $pow" : '');
 
-$users = $sql->query("SELECT * FROM users $where ORDER BY $order LIMIT " . ($page - 1) * $ppp . ",$ppp");
-$num = $sql->result("SELECT COUNT(*) FROM users $where");
+$users = $sql->query("SELECT * FROM principia.users $where ORDER BY $order LIMIT " . ($page - 1) * $ppp . ",$ppp");
+$num = $sql->result("SELECT COUNT(*) FROM principia.users $where");
 
 $pagelist = '';
 if ($num >= $ppp) {
@@ -28,7 +28,7 @@ if ($num >= $ppp) {
 		$pagelist .= ($p == $page ? " $p" : ' ' . mlink($p, $sort, $pow, $p, $orderby) . "</a>");
 }
 
-$activegroups = $sql->query("SELECT * FROM groups WHERE id IN (SELECT `group_id` FROM users GROUP BY `group_id`) ORDER BY `sortorder` ASC ");
+$activegroups = $sql->query("SELECT * FROM groups WHERE id IN (SELECT `group_id` FROM principia.users GROUP BY `group_id`) ORDER BY `sortorder` ASC ");
 
 $groups = [];
 $gc = 0;
@@ -69,12 +69,12 @@ while ($group = $activegroups->fetch()) {
 
 for ($i = 1; $user = $users->fetch(); $i++) {
 	$tr = ($i % 2 ? 1 : 2);
-	$picture = ($user['usepic'] ? '<img src="userpic/'.$user['id'].'" width="60" height="60">' : '');
+	$picture = ($user['avatar'] ? '<img src="userpic/'.$user['id'].'" width="60" height="60">' : '');
 	?><tr class="n<?=$tr ?>" style="height:69px">
 		<td class="b center"><?=$user['id'] ?>.</td>
 		<td class="b center"><?=$picture ?></td>
 		<td class="b"><?=userlink($user) ?></td>
-		<td class="b center"><?=date($dateformat,$user['regdate']) ?></td>
+		<td class="b center"><?=date($dateformat,$user['joined']) ?></td>
 		<td class="b center"><?=$user['posts'] ?></td>
 	</tr><?php
 }

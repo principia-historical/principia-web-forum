@@ -1,7 +1,7 @@
 <?php
 
 $sql = new mysql;
-$sql->connect($sqlhost,$sqluser,$sqlpass, $sqldb) or die("Couldn't connect to MySQL server");
+$sql->connect($host,$user,$pass, $db_forum) or die("Couldn't connect to MySQL server");
 
 class mysql {
 	public $db = null;

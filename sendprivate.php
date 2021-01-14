@@ -14,7 +14,7 @@ if (!isset($_POST['action'])) {
 	$userto = '';
 	if (isset($_GET['pid']) && $pid = $_GET['pid']) {
 		$post = $sql->fetch("SELECT u.name name, p.title, p.text "
-			."FROM pmsgs p LEFT JOIN users u ON p.userfrom = u.id "
+			."FROM pmsgs p LEFT JOIN principia.users u ON p.userfrom = u.id "
 			."WHERE p.id = ?" . (!has_perm('view-user-pms') ? " AND (p.userfrom=".$loguser['id']." OR p.userto=".$loguser['id'].")" : ''), [$pid]);
 		if ($post) {
 			$quotetext = '[reply="'.$post['name'].'" id="'.$pid.'"]'.$post['text'].'[/quote]' . PHP_EOL;
@@ -24,7 +24,7 @@ if (!isset($_POST['action'])) {
 	}
 
 	if (isset($_GET['uid']) && $uid = $_GET['uid']) {
-		$userto = $sql->result("SELECT u.name name FROM users WHERE id = ?", [$uid]);
+		$userto = $sql->result("SELECT u.name name FROM principia.users WHERE id = ?", [$uid]);
 	} elseif (!isset($userto)) {
 		$userto = $_POST['userto'];
 	}
@@ -99,7 +99,7 @@ if (!isset($_POST['action'])) {
 	</form>
 	<?php
 } elseif ($_POST['action'] == 'Submit') {
-	$userto = $sql->result("SELECT id FROM users WHERE name LIKE ?", [$_POST['userto']]);
+	$userto = $sql->result("SELECT id FROM principia.users WHERE name LIKE ?", [$_POST['userto']]);
 
 	if ($userto && $_POST['message']) {
 		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP()-30) AND userfrom = ?", [$loguser['id']]);

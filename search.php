@@ -84,7 +84,7 @@ if ($where == 1) {
 		."FROM posts p "
 		."LEFT JOIN poststext pt ON p.id=pt.id "
 		."LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) "
-		."LEFT JOIN users u ON p.user=u.id "
+		."LEFT JOIN principia.users u ON p.user=u.id "
 		."LEFT JOIN threads t ON p.thread=t.id "
 		."LEFT JOIN forums f ON f.id=t.forum "
 		."WHERE $string AND ISNULL(pt2.id) "
@@ -104,7 +104,7 @@ if ($where == 1) {
 	if ($page < 1) $page = 1;
 	$threads = $sql->query("SELECT ".userfields('u', 'u').", t.* "
 		."FROM threads t "
-		."LEFT JOIN users u ON u.id=t.user "
+		."LEFT JOIN principia.users u ON u.id=t.user "
 		."LEFT JOIN forums f ON f.id=t.forum "
 		."WHERE $string AND f.id IN ".forums_with_view_perm()
 		."ORDER BY t.lastdate DESC "

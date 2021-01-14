@@ -21,7 +21,7 @@ while ($group = $allgroups->fetch()) {
 	$listgroup[$group['id']] = $group['title'];
 }
 
-$user = $sql->fetch("SELECT * FROM users WHERE id = ?", [$targetuserid]);
+$user = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$targetuserid]);
 
 if (!$user) noticemsg("Error", "This user doesn't exist!", true);
 
@@ -41,15 +41,15 @@ if ($act == 'Edit profile') {
 	}
 
 	if (!$error) {
-		$sql->query("UPDATE users SET signsep = ?, head = ?, sign = ? WHERE id = ?",
-			[$_POST['signsep'], $_POST['head'], $_POST['sign'], $user['id']]
+		$sql->query("UPDATE principia.users SET signature_separator = ?, signature_header = ?, signature = ? WHERE id = ?",
+			[$_POST['signature_separator'], $_POST['signature_header'], $_POST['signature'], $user['id']]
 		);
 
 		if (checkctitle($targetuserid))
-			$sql->query("UPDATE users SET title = ? WHERE id = ?", [$_POST['title'], $user['id']]);
+			$sql->query("UPDATE principia.users SET title = ? WHERE id = ?", [$_POST['title'], $user['id']]);
 
 		if (has_perm("edit-users") && $targetgroup != 0)
-			$sql->query("UPDATE users SET group_id = ? WHERE id = ?", [$targetgroup, $user['id']]);
+			$sql->query("UPDATE principia.users SET group_id = ? WHERE id = ?", [$targetgroup, $user['id']]);
 
 		redirect("profile.php?id=$user[id]");
 	} else {
@@ -71,12 +71,11 @@ if (has_perm("edit-users"))
 .fieldrow('Group', fieldselect('group_id', $user['group_id'], $listgroup));
 
 echo
-	catheader('Appearance')
-.((checkctitle($targetuserid)) ? fieldrow('Title', fieldinput(40, 255, 'title')) : '')
-.	catheader('Post layout')
-.fieldrow('Header', fieldtext(5, 80, 'head'))
-.fieldrow('Signature', fieldtext(5, 80, 'sign'))
-.fieldrow('Signature line', fieldoption('signsep', $user['signsep'], ['Display', 'Hide']))
+
+catheader('Post layout')
+.fieldrow('Header', fieldtext(5, 80, 'signature_header'))
+.fieldrow('Signature', fieldtext(5, 80, 'signature'))
+.fieldrow('Signature line', fieldoption('signature_separator', $user['signature_separator'], ['Display', 'Hide']))
 .	catheader('&nbsp;'); ?>
 <tr class="n1"><td class="b"></td><td class="b"><input type="submit" name="action" value="Edit profile"></td>
 </table><input type="hidden" name="token" value="<?=$token?>"></form><?php

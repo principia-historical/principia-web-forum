@@ -18,7 +18,7 @@ if (isset($_GET['gid'])) {
 } else if (isset($_GET['uid'])) {
 	$id = (int)$_GET['uid'];
 
-	$tuser = $sql->result("SELECT group_id FROM users WHERE id = ?",[$id]);
+	$tuser = $sql->result("SELECT group_id FROM principia.users WHERE id = ?",[$id]);
 	if ((is_root_gid($tuser) || (!can_edit_user_assets($tuser) && $id != $loguser['id'])) && !has_perm('no-restrictions')) {
 		noticemsg("Error", "You have no permissions to do this!", true);
 	}
@@ -26,7 +26,7 @@ if (isset($_GET['gid'])) {
 	if ($id == $loguser['id'] && !has_perm('edit-own-permissions')) {
 		noticemsg("Error", "You have no permissions to do this!", true);
 	}
-	$permowner = $sql->fetch("SELECT u.id,u.name title,u.group_id,g.title group_title FROM users u LEFT JOIN groups g ON g.id=u.group_id WHERE u.id=?", [$id]);
+	$permowner = $sql->fetch("SELECT u.id,u.name title,u.group_id,g.title group_title FROM principia.users u LEFT JOIN groups g ON g.id=u.group_id WHERE u.id=?", [$id]);
 	$type = 'user';
 } else if (isset($_GET['fid'])) {
 	$id = (int)$_GET['fid'];

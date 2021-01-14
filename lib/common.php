@@ -1,15 +1,53 @@
 <?php
-if (!file_exists('lib/config.php')) {
-	die('Please install Acmlmboard.');
-}
-
 $start = microtime(true);
 
 $rankset_names = ['None'];
 
+// List of bots (web crawlers)
+$botlist = ['ia_archiver','baidu','yahoo','bot','spider'];
+
+// List of smilies
+$smilies = [
+	['text' => '-_-', 'url' => 'img/smilies/annoyed.gif'],
+	['text' => 'o_O', 'url' => 'img/smilies/bigeyes.gif'],
+	['text' => ':D', 'url' => 'img/smilies/biggrin.gif'],
+	['text' => 'o_o', 'url' => 'img/smilies/blank.gif'],
+	['text' => ':x', 'url' => 'img/smilies/crossmouth.gif'],
+	['text' => ';_;', 'url' => 'img/smilies/cry.gif'],
+	['text' => '^_^', 'url' => 'img/smilies/cute.gif'],
+	['text' => '@_@', 'url' => 'img/smilies/dizzy.gif'],
+	['text' => ':@', 'url' => 'img/smilies/dropsmile.gif'],
+	['text' => 'O_O', 'url' => 'img/smilies/eek.gif'],
+	['text' => '>:]', 'url' => 'img/smilies/evil.gif'],
+	['text' => ':eyeshift:', 'url' => 'img/smilies/eyeshift.gif'],
+	['text' => ':(', 'url' => 'img/smilies/frown.gif'],
+	['text' => '8-)', 'url' => 'img/smilies/glasses.gif'],
+	['text' => ':LOL:', 'url' => 'img/smilies/lol.gif'],
+	['text' => '>:[', 'url' => 'img/smilies/mad.gif'],
+	['text' => '<_<', 'url' => 'img/smilies/shiftleft.gif'],
+	['text' => '>_>', 'url' => 'img/smilies/shiftright.gif'],
+	['text' => 'x_x', 'url' => 'img/smilies/sick.gif'],
+	['text' => ':|', 'url' => 'img/smilies/slidemouth.gif'],
+	['text' => ':)', 'url' => 'img/smilies/smile.gif'],
+	['text' => ':P', 'url' => 'img/smilies/tongue.gif'],
+	['text' => ':B', 'url' => 'img/smilies/vamp.gif'],
+	['text' => ';)', 'url' => 'img/smilies/wink.gif'],
+	['text' => ':-3', 'url' => 'img/smilies/wobble.gif'],
+	['text' => ':S', 'url' => 'img/smilies/wobbly.gif'],
+	['text' => '>_<', 'url' => 'img/smilies/yuck.gif'],
+	['text' => ':box:', 'url' => 'img/smilies/box.png'],
+	['text' => ':yes:', 'url' => 'img/smilies/yes.png'],
+	['text' => ':no:', 'url' => 'img/smilies/no.png'],
+	['text' => 'OwO', 'url' => 'img/smilies/owo.png']
+];
+
+// Ranksets
+require('img/ranks/rankset.php'); // Default (Mario) rankset
+
+require('../conf/config.php'); // include principia-web config
+
 foreach (glob("lib/*.php") as $filename)
-	if ($filename != 'lib/config.sample.php')
-		require_once($filename);
+	require_once($filename);
 
 header("Content-type: text/html; charset=utf-8");
 
@@ -25,7 +63,7 @@ if (isset($_COOKIE['user']) || isset($_COOKIE['passenc'])) {
 	if (password_verify(base64_decode($_COOKIE['passenc']), $pass_db)) {
 		// Valid password cookie.
 		$log = true;
-		$loguser = $sql->fetch("SELECT * FROM users WHERE id = ?", [$_COOKIE['user']]);
+		$loguser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$_COOKIE['user']]);
 		load_user_permset();
 	} else {
 		// Invalid password cookie.
@@ -64,7 +102,7 @@ if (str_replace($botlist, "x", strtolower($_SERVER['HTTP_USER_AGENT'])) != strto
 }
 
 if ($log) {
-	$sql->query("UPDATE users SET lastview = ?, ip = ? WHERE id = ?",
+	$sql->query("UPDATE principia.users SET lastview = ?, ip = ? WHERE id = ?",
 		[time(), $userip, $loguser['id']]);
 }
 $count = $sql->fetch("SELECT (SELECT COUNT(*) FROM users) u, (SELECT COUNT(*) FROM threads) t, (SELECT COUNT(*) FROM posts) p");
@@ -95,8 +133,6 @@ function pageheader($pagetitle = '', $fid = null) {
 		if ($log) {
 			if (has_perm('view-own-pms'))
 				$links[] = ['url' => "private.php", 'title' => 'Private messages'];
-			if (has_perm("update-own-profile"))
-				$links[] = ['url' => "editprofile.php", 'title' => 'Edit profile'];
 			if (has_perm('manage-board'))
 				$links[] = ['url' => 'management.php', 'title' => 'Management'];
 		}
@@ -146,33 +182,6 @@ function pageheader($pagetitle = '', $fid = null) {
 			<div class="home content forum">
 	<?php
 }
-/*function pageheader($pagetitle = '', $fid = null) {
-	global $dateformat, $sql, $log, $loguser, $views, $boardtitle,
-	$theme, $themefile, $meta, $favicon, $count, $bot;
-
-	if (isset($fid)) {
-		$count['d'] = $sql->result("SELECT COUNT(*) FROM posts WHERE date > ?", [(time() - 86400)]);
-		$count['h'] = $sql->result("SELECT COUNT(*) FROM posts WHERE date > ?", [(time() - 86400)]);
-		$lastuser = $sql->fetch("SELECT ".userfields()." FROM users ORDER BY id DESC LIMIT 1");
-
-		$onuserlist = "$onusercount user" . ($onusercount != 1 ? 's' : '') . ' online' . ($onusercount > 0 ? ': ' : '') . $onuserlist;
-
-		?><table class="c1">
-			<tr><td class="b n1">
-				<table style="width:100%"><tr>
-					<td class="nb" width="170"></td>
-					<td class="nb center"><span class="white-space:nowrap">
-						<?=$count['t'] ?> threads and <?=$count['p'] ?> posts total.<br><?=$count['d'] ?> new posts
-						today, <?=$count['h'] ?> last hour.<br>
-					</span></td>
-					<td class="nb right" width="170">
-						<?=$count['u'] ?> registered users<br> Newest: <?=userlink($lastuser) ?>
-					</td>
-				</tr></table>
-			</td></tr>
-		</table><br><?php
-	}
-}*/
 
 /**
  * Print a notice message.
@@ -204,7 +213,7 @@ function pagefooter() {
 	global $start;
 	$time = microtime(true) - $start;
 	?></div><br><div class="footer">
-	<a href="about">About</a><br><?=sprintf("Page rendered in %1.3f seconds. (%dKB of memory used)", $time, memory_get_usage(false) / 1024); ?>
+	<a href="../about.php">About</a><br><?=sprintf("Page rendered in %1.3f seconds. (%dKB of memory used)", $time, memory_get_usage(false) / 1024); ?>
 </div>
 <script type="text/javascript" src="assets/base.js"></script>
 </body>
