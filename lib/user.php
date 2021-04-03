@@ -1,22 +1,5 @@
 <?php
 
-function checkctitle($uid) {
-	global $loguser, $defaultgroup;
-
-	if (!$loguser['id']) return false;
-	if (has_perm_revoked('edit-own-title')) return false;
-
-	if ($uid == $loguser['id'] && has_perm('edit-own-title')) {
-		if ($loguser['group_id'] != $defaultgroup) return true;
-
-		return false;
-	}
-
-	if (has_perm('edit-titles')) return true;
-
-	return false;
-}
-
 function getrank($set, $posts) {
 	global $rankset_data, $rankset_names;
 
