@@ -109,27 +109,25 @@ function esc($text) {
 
 function posttoolbutton($name, $title, $leadin, $leadout) {
 	return sprintf(
-		'<td style="text-align:center">
-			<a href="javascript:toolBtn(\'%s\',\'%s\')"><input style="font-size:10pt;" type="button" title="%s" value="%s"></a>
-		</td>',
+		'<button onclick="javascript:toolBtn(\'%s\',\'%s\')" title="%s"><i class="fas %s"></i></button>',
 	$leadin, $leadout, $title, $name);
 }
 
 function posttoolbar() {
-	return '<table><tr>'
-		. posttoolbutton("B", "Bold", "[b]", "[/b]")
-		. posttoolbutton("I", "Italic", "[i]", "[/i]")
-		. posttoolbutton("U", "Underline", "[u]", "[/u]")
-		. posttoolbutton("S", "Strikethrough", "[s]", "[/s]")
-		. "<td>&nbsp;</td>"
-		. posttoolbutton("/", "URL", "[url]", "[/url]")
-		. posttoolbutton("!", "Spoiler", "[spoiler]", "[/spoiler]")
-		. posttoolbutton("&#133;", "Quote", "[quote]", "[/quote]")
-		. posttoolbutton(";", "Code", "[code]", "[/code]")
-		. "<td>&nbsp;</td>"
-		. posttoolbutton("[]", "IMG", "[img]", "[/img]")
-		. posttoolbutton("YT", "YouTube", "[youtube]", "[/youtube]")
-		. '</tr></table>';
+	return '<div class="posttoolbar">'
+		. posttoolbutton('fa-bold', "Bold", "[b]", "[/b]")
+		. posttoolbutton("fa-italic", "Italic", "[i]", "[/i]")
+		. posttoolbutton("fa-underline", "Underline", "[u]", "[/u]")
+		. posttoolbutton("fa-strikethrough", "Strikethrough", "[s]", "[/s]")
+		. "&nbsp;&nbsp;"
+		. posttoolbutton("fa-link", "URL", "[url]", "[/url]")
+		. posttoolbutton("fa-exclamation", "Spoiler", "[spoiler]", "[/spoiler]")
+		. posttoolbutton("fa-quote-left", "Quote", "[quote]", "[/quote]")
+		. posttoolbutton("fa-code", "Code", "[code]", "[/code]")
+		. "&nbsp;&nbsp;"
+		. posttoolbutton("fa-image", "IMG", "[img]", "[/img]")
+		. posttoolbutton("fa-video", "YouTube", "[youtube]", "[/youtube]")
+		. '</div>';
 }
 
 function threadpost($post, $pthread = '') {

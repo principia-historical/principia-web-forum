@@ -147,6 +147,7 @@ function pageheader($pagetitle = '', $fid = null) {
 			<link rel="stylesheet" href="../assets/css/style.css" type="text/css">
 			<link rel="stylesheet" href="../assets/css/darkmodehack.css" type="text/css">
 			<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" crossorigin="anonymous">
 			<link rel="stylesheet" href="theme/common.css">
 			<link rel="stylesheet" href="theme/principia/principia.css">
 			<script src="lib/js/microlight.js"></script>
@@ -215,7 +216,6 @@ function pagefooter() {
 	?></div><br><div class="footer">
 	<a href="../about.php">About</a><br><?=sprintf("Page rendered in %1.3f seconds. (%dKB of memory used)", $time, memory_get_usage(false) / 1024); ?>
 </div>
-<script type="text/javascript" src="assets/base.js"></script>
 </body>
 </html><?php
 }
