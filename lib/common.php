@@ -57,13 +57,13 @@ $log = false;
 $logpermset = [];
 
 // Authentication code.
-if (isset($_COOKIE['user']) || isset($_COOKIE['passenc'])) {
-	$pass_db = $sql->result("SELECT password FROM principia.users WHERE id = ?", [$_COOKIE['user']]);
+if (isset($_COOKIE[$cookieName])) {
+	$user_id = $sql->result("SELECT id FROM principia.users WHERE token = ?", [$_COOKIE[$cookieName]]);
 
-	if (password_verify(base64_decode($_COOKIE['passenc']), $pass_db)) {
+	if ($user_id) {
 		// Valid password cookie.
 		$log = true;
-		$loguser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$_COOKIE['user']]);
+		$loguser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$user_id]);
 		load_user_permset();
 	} else {
 		// Invalid password cookie.
