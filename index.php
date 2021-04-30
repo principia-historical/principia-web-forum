@@ -38,28 +38,29 @@ $forums = $sql->query("SELECT f.*, ".($log ? "r.time rtime, " : '').userfields('
 		. " ORDER BY c.ord,c.id,f.ord,f.id", []);
 $cat = -1;
 
-?>
+$i = 0;
+while ($forum = $forums->fetch()) {
+	if (!can_view_forum($forum)) continue;
+
+	if ($forum['cat'] != $cat) {
+		if ($i != 0) echo '</table><br>';
+
+		$cat = $forum['cat'];
+		?>
 <table class="c1">
 	<tr class="h">
 		<td class="b h" width="17">&nbsp;</td>
-		<td class="b h">Forum</td>
+		<td class="b h"><?=$categ[$cat]['title'] ?></td>
 		<td class="b h" width="50">Threads</td>
 		<td class="b h" width="50">Posts</td>
 		<td class="b h" width="150">Last post</td>
 	</tr>
 <?php
-
-while ($forum = $forums->fetch()) {
-	if (!can_view_forum($forum)) continue;
-
-	if ($forum['cat'] != $cat) {
-		$cat = $forum['cat'];
-		?><tr class="c"><td class="b" colspan="5"><?=$categ[$cat]['title'] ?></td></tr><?php
 	}
 
 	if ($forum['posts'] > 0 && $forum['lastdate'] > 0)
 		$lastpost = sprintf(
-			'<nobr>%s</nobr><br><span class=sfont>by %s<a href="thread.php?pid=%s#%s">&raquo;</a></span>',
+			'<nobr>%s</nobr><br><span class=sfont>by %s <a href="thread.php?pid=%s#%s">&raquo;</a></span>',
 		date($dateformat, $forum['lastdate']), userlink($forum, 'u'), $forum['lastid'], $forum['lastid']);
 	else
 		$lastpost = 'None';
@@ -76,6 +77,7 @@ while ($forum = $forums->fetch()) {
 		<td class="b n1"><?=$forum['posts'] ?></td>
 		<td class="b n2"><?=$lastpost ?></td>
 	</tr><?php
+	$i++;
 }
 ?></table><?php
 pagefooter();

@@ -356,7 +356,7 @@ echo "$pagelist" . (!isset($time) ? '<br>' : '');
 if (isset($thread['id']) && can_create_forum_post($faccess) && !$thread['closed']) {
 	?><table class="c1">
 <form action="newreply.php" method="post">
-	<tr class="h"><td class="b h" colspan=2>Warp Whistle Reply</a></td>
+	<tr class="h"><td class="b h" colspan=2>Quick Reply</a></td>
 	<tr>
 		<td class="b n1 center" width=120>Format:</td>
 		<td class="b n2"><?=posttoolbar() ?></td>

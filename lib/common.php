@@ -142,7 +142,6 @@ function pageheader($pagetitle = '', $fid = null) {
 			<title>Principia - <?=$pagetitle?></title>
 			<link rel="icon" type="image/png" href="theme/fav.png">
 			<link rel="stylesheet" href="../assets/css/style.css" type="text/css">
-			<link rel="stylesheet" href="../assets/css/darkmodehack.css" type="text/css">
 			<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" crossorigin="anonymous">
 			<link rel="stylesheet" href="assets/style.css">
@@ -153,13 +152,12 @@ function pageheader($pagetitle = '', $fid = null) {
 			<div class="top">
 				<a href="../"><img class="picon" src="../assets/icon.png"/></a>
 				<ul class="menu left">
-					<li><a href="../selected.php" class="btn">Selected</a></li>
+					<li><a href="../popular.php" class="btn">Popular</a></li>
 					<li><a href="../top.php" class="btn">Top</a></li>
 					<li><a href="../latest.php" class="btn">New</a></li>
 					<li><a href="../chat.php" class="btn">Chat</a></li>
 					<li><a href="./" class="btn">Forum</a></li>
 					<li><a href="../contests.php" class="btn">Contests</a></li>
-					<li><a href="../download.php" class="btn download">Download</a></li>
 					<li><a href="../search.php" class="btn"><img src="../assets/icons/search.svg" class="search"></a></li>
 				</ul>
 				<ul class="menu right">

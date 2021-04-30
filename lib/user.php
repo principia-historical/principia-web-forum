@@ -3,7 +3,7 @@
 function getrank($set, $posts) {
 	global $rankset_data, $rankset_names;
 
-	if ($set == 0) return '';
+	if ($set == 0 || $set == 1) return '';
 
 	$i = 1;
 	foreach ($rankset_data[$rankset_names[$set]] as $ranksetname => $rankset) {
