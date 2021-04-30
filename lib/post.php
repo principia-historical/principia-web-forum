@@ -133,8 +133,6 @@ function posttoolbar() {
 function threadpost($post, $pthread = '') {
 	global $dateformat, $loguser;
 
-	$post['usignature_header'] = str_replace("<!--", "&lt;!--", $post['usignature_header']);
-
 	$post['ranktext'] = getrank(1, $post['uposts']);
 	$post['utitle'] = $post['ranktext']
 			. ((strlen($post['ranktext']) >= 1) ? '<br>' : '')
@@ -227,12 +225,7 @@ HTML;
 	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
 
 	if ($post['usignature']) {
-		$signsep = $post['usignature_separator'] ? '' : '____________________<br>';
-
-		if (!$post['usignature_header'])
-			$post['usignature'] = '<br><br><small>' . $signsep . $post['usignature'] . '</small>';
-		else
-			$post['usignature'] = '<br><br>' . $signsep . $post['usignature'];
+		$post['usignature'] = '<br><br><small>____________________<br>' . $post['usignature'] . '</small>';
 	}
 
 	$text .= postfilter($post['utitle'])
@@ -244,7 +237,7 @@ HTML;
 		<br>Last post: $lastpost
 		<br>Last view: ".timeunits(time() - $post['ulastview'])."
 	</td>
-	<td class=\"b n2 $mbar\" id=\"post_".$post['id'].'">'.postfilter($post['usignature_header'].$post['text'].$post['usignature'])."</td>
+	<td class=\"b n2 $mbar\" id=\"post_".$post['id'].'">'.postfilter($post['text'].$post['usignature'])."</td>
 </table>";
 
 	return $text;

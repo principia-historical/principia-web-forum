@@ -27,27 +27,6 @@ if ($thread) {
 	$lastpostlink = "<br>in <i>a private forum</i>";
 }
 
-$post['date'] = time();
-$post['ip'] = $user['ip'];
-$post['num'] = $post['id'] = $post['thread'] = 0;
-
-$post['text'] = <<<HTML
-[b]This[/b] is a [i]sample message.[/i] It shows how [u]your posts[/u] will look on the board.
-[quote=Anonymous][spoiler]Hello![/spoiler][/quote]
-[code]if (true) {\r\n
-	print "The world isn't broken.";\r\n
-} else {\r\n
-	print "Something is very wrong.";\r\n
-}[/code]
-[irc]This is like code tags but without formatting.
-<Anonymous> I said something![/irc]
-[url=]Test Link. Ooh![/url]
-HTML;
-
-foreach ($user as $field => $val) {
-	$post['u'.$field] = $val;
-}
-
 $links = [];
 $links[] = ['url' => "forum.php?user=$uid", 'title' => 'View threads'];
 $links[] = ['url' => "thread.php?user=$uid", 'title' => 'Show posts'];
@@ -76,8 +55,6 @@ if (has_perm('edit-permissions') && (has_perm('edit-own-permissions') || $loguse
 
 $profilefields = [
 	"General information" => [
-		['title' => 'Real handle', 'value' => '<span style="color:#'.$group['nc'].';"><b>'.esc($user['name']).'</b></span>'],
-		['title' => 'Group', 'value' => $group['title']],
 		['title' => 'Total posts', 'value' => sprintf('%s (%1.02f per day)', $user['posts'], $user['posts'] / $days)],
 		['title' => 'Total threads', 'value' => $user['threads'].' ('.sprintf('%1.02f', $user['threads'] / $days).' per day)'],
 		['title' => 'Registered on', 'value' => date($dateformat, $user['joined']).' ('.timeunits($days * 86400).' ago)'],
@@ -105,9 +82,6 @@ foreach ($profilefields as $k => $v) {
 }
 
 ?><br>
-<table class="c1"><tr class="h"><td class="b h">Sample post</td><tr></table>
-<?=threadpost($post)?>
-<br>
 <table class="c1">
 	<tr class="h"><td class="b n3">
 		<?php
