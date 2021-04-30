@@ -55,7 +55,7 @@ function rendernewstatus($type) {
 		break;
 	}
 
-	return "<img src=\"img/status/$statusimg\" alt=\"$text\">";
+	return "<img src=\"assets/status/$statusimg\" alt=\"$text\">";
 }
 
 function RenderActions($actions, $ret = false) {

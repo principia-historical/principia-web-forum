@@ -8,41 +8,38 @@ $botlist = ['ia_archiver','baidu','yahoo','bot','spider'];
 
 // List of smilies
 $smilies = [
-	['text' => '-_-', 'url' => 'img/smilies/annoyed.gif'],
-	['text' => 'o_O', 'url' => 'img/smilies/bigeyes.gif'],
-	['text' => ':D', 'url' => 'img/smilies/biggrin.gif'],
-	['text' => 'o_o', 'url' => 'img/smilies/blank.gif'],
-	['text' => ':x', 'url' => 'img/smilies/crossmouth.gif'],
-	['text' => ';_;', 'url' => 'img/smilies/cry.gif'],
-	['text' => '^_^', 'url' => 'img/smilies/cute.gif'],
-	['text' => '@_@', 'url' => 'img/smilies/dizzy.gif'],
-	['text' => ':@', 'url' => 'img/smilies/dropsmile.gif'],
-	['text' => 'O_O', 'url' => 'img/smilies/eek.gif'],
-	['text' => '>:]', 'url' => 'img/smilies/evil.gif'],
-	['text' => ':eyeshift:', 'url' => 'img/smilies/eyeshift.gif'],
-	['text' => ':(', 'url' => 'img/smilies/frown.gif'],
-	['text' => '8-)', 'url' => 'img/smilies/glasses.gif'],
-	['text' => ':LOL:', 'url' => 'img/smilies/lol.gif'],
-	['text' => '>:[', 'url' => 'img/smilies/mad.gif'],
-	['text' => '<_<', 'url' => 'img/smilies/shiftleft.gif'],
-	['text' => '>_>', 'url' => 'img/smilies/shiftright.gif'],
-	['text' => 'x_x', 'url' => 'img/smilies/sick.gif'],
-	['text' => ':|', 'url' => 'img/smilies/slidemouth.gif'],
-	['text' => ':)', 'url' => 'img/smilies/smile.gif'],
-	['text' => ':P', 'url' => 'img/smilies/tongue.gif'],
-	['text' => ':B', 'url' => 'img/smilies/vamp.gif'],
-	['text' => ';)', 'url' => 'img/smilies/wink.gif'],
-	['text' => ':-3', 'url' => 'img/smilies/wobble.gif'],
-	['text' => ':S', 'url' => 'img/smilies/wobbly.gif'],
-	['text' => '>_<', 'url' => 'img/smilies/yuck.gif'],
-	['text' => ':box:', 'url' => 'img/smilies/box.png'],
-	['text' => ':yes:', 'url' => 'img/smilies/yes.png'],
-	['text' => ':no:', 'url' => 'img/smilies/no.png'],
-	['text' => 'OwO', 'url' => 'img/smilies/owo.png']
+	['text' => '-_-', 'url' => 'assets/smilies/annoyed.gif'],
+	['text' => 'o_O', 'url' => 'assets/smilies/bigeyes.gif'],
+	['text' => ':D', 'url' => 'assets/smilies/biggrin.gif'],
+	['text' => 'o_o', 'url' => 'assets/smilies/blank.gif'],
+	['text' => ':x', 'url' => 'assets/smilies/crossmouth.gif'],
+	['text' => ';_;', 'url' => 'assets/smilies/cry.gif'],
+	['text' => '^_^', 'url' => 'assets/smilies/cute.gif'],
+	['text' => '@_@', 'url' => 'assets/smilies/dizzy.gif'],
+	['text' => ':@', 'url' => 'assets/smilies/dropsmile.gif'],
+	['text' => 'O_O', 'url' => 'assets/smilies/eek.gif'],
+	['text' => '>:]', 'url' => 'assets/smilies/evil.gif'],
+	['text' => ':eyeshift:', 'url' => 'assets/smilies/eyeshift.gif'],
+	['text' => ':(', 'url' => 'assets/smilies/frown.gif'],
+	['text' => '8-)', 'url' => 'assets/smilies/glasses.gif'],
+	['text' => ':LOL:', 'url' => 'assets/smilies/lol.gif'],
+	['text' => '>:[', 'url' => 'assets/smilies/mad.gif'],
+	['text' => '<_<', 'url' => 'assets/smilies/shiftleft.gif'],
+	['text' => '>_>', 'url' => 'assets/smilies/shiftright.gif'],
+	['text' => 'x_x', 'url' => 'assets/smilies/sick.gif'],
+	['text' => ':|', 'url' => 'assets/smilies/slidemouth.gif'],
+	['text' => ':)', 'url' => 'assets/smilies/smile.gif'],
+	['text' => ':P', 'url' => 'assets/smilies/tongue.gif'],
+	['text' => ':B', 'url' => 'assets/smilies/vamp.gif'],
+	['text' => ';)', 'url' => 'assets/smilies/wink.gif'],
+	['text' => ':-3', 'url' => 'assets/smilies/wobble.gif'],
+	['text' => ':S', 'url' => 'assets/smilies/wobbly.gif'],
+	['text' => '>_<', 'url' => 'assets/smilies/yuck.gif'],
+	['text' => ':box:', 'url' => 'assets/smilies/box.png'],
+	['text' => ':yes:', 'url' => 'assets/smilies/yes.png'],
+	['text' => ':no:', 'url' => 'assets/smilies/no.png'],
+	['text' => 'OwO', 'url' => 'assets/smilies/owo.png']
 ];
-
-// Ranksets
-require('img/ranks/rankset.php'); // Default (Mario) rankset
 
 require('../conf/config.php'); // include principia-web config
 
@@ -148,8 +145,7 @@ function pageheader($pagetitle = '', $fid = null) {
 			<link rel="stylesheet" href="../assets/css/darkmodehack.css" type="text/css">
 			<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" crossorigin="anonymous">
-			<link rel="stylesheet" href="theme/common.css">
-			<link rel="stylesheet" href="theme/principia/principia.css">
+			<link rel="stylesheet" href="assets/style.css">
 			<script src="lib/js/microlight.js"></script>
 			<script src="lib/js/tools.js"></script>
 		</head>

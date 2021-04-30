@@ -96,7 +96,7 @@ RenderPageBar($topbot);
 		?>
 		<tr class="<?=$tr ?> center">
 			<td class="b n2">
-				<a href="private.php?action=del&id=<?=$pmsg['id'] ?>&view=<?=$view ?>"><img src="img/smilies/no.png" align="absmiddle"></a>
+				<a href="private.php?action=del&id=<?=$pmsg['id'] ?>&view=<?=$view ?>"><img src="assets/smilies/no.png" align="absmiddle"></a>
 			</td>
 			<td class="b n1"><?=$status ?></td>
 			<td class="b left" style="word-break:break-word"><a href="showprivate.php?id=<?=$pmsg['id'] ?>"><?=esc($pmsg['title']) ?></a></td>
