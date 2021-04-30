@@ -55,18 +55,9 @@ function userlink_by_id($uid) {
 function userlink($user, $u = '') {
 	if (!$user[$u.'name']) $user[$u.'name'] = 'null';
 
-	return '<a href="profile.php?id='.$user[$u.'id'] . '">'.userdisp($user, $u).'</a>';
+	return sprintf('<a href="../user.php?id=%s">%s</a>', $user[$u.'id'], userdisp($user, $u));
 }
 
 function userdisp($user, $u = '') {
-	global $usergroups;
-
-	$group = $usergroups[$user[$u.'group_id']];
-	$nc = $group['nc'];
-
-	$n = $user[$u.'name'];
-
-	$userdisname = "<span style='color:#$nc;'>".str_replace(" ", "&nbsp;", esc($n)).'</span>';
-
-	return $userdisname;
+	return sprintf('<span class="t_user">%s</span>', esc($user[$u.'name']));
 }
