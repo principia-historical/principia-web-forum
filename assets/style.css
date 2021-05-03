@@ -1,34 +1,61 @@
-	/* common styles */
-
-/* Spoiler shizzazle */
-.spoiler1 {
-	border: 1px dotted rgba(255,255,255,0.5);
-}
-.spoiler2 {
-	opacity: 0;
-}
-.spoiler2:hover {
-	opacity: 1;
-}
-
-table.c1 {
-	border-spacing: 0px;
-	border-collapse: collapse;
-	width: 100%;
-}
-tr.h, tr.c {
-	text-align: center;
-}
-td.nb {
-	border: 0px none;
-}
-.sfont {
-	font-size: 0.9em;
+/* forum specific styling uwu */
+body {
+	color: black;
 }
 
 .left	{ text-align: left; }
 .center	{ text-align: center; }
 .right	{ text-align: right; }
+
+table.c1 {
+	border: #000000 1px solid;
+	border-spacing: 0px;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+tr.h, tr.c {
+	text-align: center;
+}
+
+tr.h {
+	background: #3367aa;
+	font-size: 1em;
+	color: #ffffff;
+}
+
+tr.c {
+	background: #55b4cc;
+}
+
+td.b {
+	border: #000000 1px solid;
+	padding: 5px;
+}
+
+td.nb {
+	padding: 1px;
+	border: 0px none;
+}
+
+tr.n1, td.n1 { background: #f5f5f5; }
+tr.n2, td.n2 { background: #ebebeb; }
+tr.n3, td.n3 { background: #d4d4d4; }
+
+.sfont {
+	font-size: 1em;
+}
+
+textarea, input, select, button {
+	border: #000000 solid 1px;
+	padding: 3px;
+	background: #ddf3ff;
+	color: #000000;
+}
+
+.submit {
+	font-weight: bold;
+}
 
 .pagelist {
 	margin-left: 4px;
@@ -49,52 +76,4 @@ td.nb {
 	height: 2em;
 	width: 2em;
 	padding: 0 1px 2px;
-}
-
-	/* stuff from theme */
-
-body {
-	color: black;
-}
-
-table.c1 {
-	border: #000000 1px solid;
-}
-
-tr.h {
-	background: #3367aa;
-	font-size: 1em;
-	color: #ffffff;
-}
-
-tr.c {
-	background: #55b4cc;
-}
-
-td.b {
-	border: #000000 1px solid;
-	padding: 5px;
-}
-
-td.nb {
-	padding: 1px;
-}
-
-tr.n1, td.n1 { background: #f5f5f5; }
-tr.n2, td.n2 { background: #ebebeb; }
-tr.n3, td.n3 { background: #d4d4d4; }
-
-.sfont {
-	font-size: 1em;
-}
-
-textarea, input, select, button {
-	border: #000000 solid 1px;
-	padding: 3px;
-	background: #ddf3ff;
-	color: #000000;
-}
-
-.submit {
-	font-weight: bold;
 }

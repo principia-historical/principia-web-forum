@@ -140,13 +140,12 @@ function pageheader($pagetitle = '', $fid = null) {
 		<head>
 			<meta charset="utf-8">
 			<title>Principia - <?=$pagetitle?></title>
-			<link rel="icon" type="image/png" href="theme/fav.png">
 			<link rel="stylesheet" href="../assets/css/style.css" type="text/css">
 			<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" crossorigin="anonymous">
 			<link rel="stylesheet" href="assets/style.css">
-			<script src="lib/js/microlight.js"></script>
-			<script src="lib/js/tools.js"></script>
+			<script src="assets/js/microlight.js"></script>
+			<script src="assets/js/tools.js"></script>
 		</head>
 		<body>
 			<div class="top">
