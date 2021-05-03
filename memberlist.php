@@ -2,10 +2,9 @@
 require('lib/common.php');
 pageheader('Memberlist');
 
-$sort = isset($_REQUEST['sort']) ? $_REQUEST['sort'] : 'posts';
-$pow = isset($_REQUEST['pow']) ? $_REQUEST['pow'] : '';
-$page = isset($_REQUEST['page']) ? $_REQUEST['page'] : '';
-$orderby = isset($_REQUEST['orderby']) ? $_REQUEST['orderby'] : '';
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'posts';
+$page = isset($_GET['page']) ? $_GET['page'] : '';
+$orderby = isset($_GET['orderby']) ? $_GET['orderby'] : '';
 
 $ppp = 50;
 if ($page < 1) $page = 1;
@@ -16,25 +15,14 @@ $order = 'posts' . $sortby;
 if ($sort == 'name') $order = 'name' . $sortby;
 if ($sort == 'reg') $order = 'joined' . $sortby;
 
-$where = (is_numeric($pow) ? "WHERE group_id = $pow" : '');
-
-$users = $sql->query("SELECT * FROM principia.users $where ORDER BY $order LIMIT " . ($page - 1) * $ppp . ",$ppp");
-$num = $sql->result("SELECT COUNT(*) FROM principia.users $where");
+$users = $sql->query("SELECT * FROM principia.users ORDER BY $order LIMIT " . ($page - 1) * $ppp . ",$ppp");
+$num = $sql->result("SELECT COUNT(*) FROM principia.users");
 
 $pagelist = '';
 if ($num >= $ppp) {
 	$pagelist = 'Pages:';
 	for ($p = 1; $p <= 1 + floor(($num - 1) / $ppp); $p++)
-		$pagelist .= ($p == $page ? " $p" : ' ' . mlink($p, $sort, $pow, $p, $orderby) . "</a>");
-}
-
-$activegroups = $sql->query("SELECT * FROM groups WHERE id IN (SELECT `group_id` FROM principia.users GROUP BY `group_id`) ORDER BY `sortorder` ASC ");
-
-$groups = [];
-$gc = 0;
-while ($group = $activegroups->fetch()) {
-	$grouptitle = '<span style="color:#' . $group['nc'] . '">' . $group['title'] . '</span>';
-	$groups[$gc++] = mlink($grouptitle, $sort, $group['id'], $page, $orderby);
+		$pagelist .= ($p == $page ? " $p" : ' ' . mlink($p, $sort, $p, $orderby) . "</a>");
 }
 
 ?>
@@ -43,17 +31,11 @@ while ($group = $activegroups->fetch()) {
 	<tr>
 		<td class="b n1" width="80">Sort by:</td>
 		<td class="b n2 center">
-			<?=mlink('Posts', '', $pow, $page, $orderby) ?> |
-			<?=mlink('Username', 'name', $pow, $page, $orderby) ?> |
-			<?=mlink('Registration date', 'reg', $pow, $page, $orderby) ?> |
-			<?=mlink('[ &#x25BC; ]', $sort, $pow, $page, 'd') ?>
-			<?=mlink('[ &#x25B2; ]', $sort, $pow, $page, 'a') ?>
-		</td>
-	</tr><tr>
-		<td class="b n1">Group:</td>
-		<td class="b n2 center">
-			<?php foreach ($groups as $group) echo $group.' | ' ?>
-			<?=mlink('All', $sort, '', $page, $orderby) ?>
+			<?=mlink('Posts', '', $page, $orderby) ?> |
+			<?=mlink('Username', 'name', $page, $orderby) ?> |
+			<?=mlink('Registration date', 'reg', $page, $orderby) ?> |
+			<?=mlink('[ &#x25BC; ]', $sort, $page, 'd') ?>
+			<?=mlink('[ &#x25B2; ]', $sort, $page, 'a') ?>
 		</td>
 	</tr>
 </table><br>
@@ -85,9 +67,9 @@ if ($pagelist)
 	echo '<br>'.$pagelist.'<br>';
 pagefooter();
 
-function mlink($name, $sort, $pow, $page, $orderby) {
+function mlink($name, $sort, $page, $orderby) {
 	return '<a href="memberlist.php?'.
-		($sort ? "sort=$sort" : '').($pow != '' ? "&pow=$pow" : '').($page != 1 ? "&page=$page" : '').
+		($sort ? "sort=$sort" : '').($page != 1 ? "&page=$page" : '').
 		($orderby != '' ? "&orderby=$orderby" : '').'">'
 		.$name.'</a>';
 }
