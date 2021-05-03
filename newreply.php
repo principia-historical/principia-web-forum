@@ -73,7 +73,6 @@ if ($err) {
 	noticemsg("Error", $err."<br><a href=\"thread.php?id=$tid\">Back to thread</a>");
 } elseif ($act == 'Preview' || !$act) {
 	$post['date'] = time();
-	$post['ip'] = $userip;
 	$post['num'] = $loguser['posts']++;
 	$post['text'] = ($act == 'Preview' ? $_POST['message'] : $quotetext);
 	foreach ($loguser as $field => $val)
@@ -109,8 +108,8 @@ if ($err) {
 	</table></form><?php
 } elseif ($act == 'Submit') {
 	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $loguser['id']]);
-	$sql->query("INSERT INTO posts (user,thread,date,ip,num) VALUES (?,?,?,?,?)",
-		[$loguser['id'],$tid,time(),$userip,$loguser['posts']++]);
+	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?,?)",
+		[$loguser['id'],$tid,time(),$loguser['posts']++]);
 	$pid = $sql->insertid();
 	$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
 		[$pid,$_POST['message']]);

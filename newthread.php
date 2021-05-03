@@ -64,7 +64,6 @@ if (isset($err)) {
 	<?php
 } elseif ($act == 'Preview') {
 	$post['date'] = time();
-	$post['ip'] = $userip;
 	$post['num'] = $loguser['posts']++;
 	$post['text'] = $_POST['message'];
 	foreach ($loguser as $field => $val)
@@ -103,8 +102,8 @@ if (isset($err)) {
 	$sql->query("INSERT INTO threads (title,forum,user,lastdate,lastuser) VALUES (?,?,?,?,?)",
 		[$_POST['title'],$fid,$loguser['id'],time(),$loguser['id']]);
 	$tid = $sql->insertid();
-	$sql->query("INSERT INTO posts (user,thread,date,ip,num) VALUES (?,?,?,?,?)",
-		[$loguser['id'],$tid,time(),$userip,$loguser['posts']++]);
+	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?,?)",
+		[$loguser['id'],$tid,time(),$loguser['posts']++]);
 	$pid = $sql->insertid();
 	$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
 		[$pid,$_POST['message']]);

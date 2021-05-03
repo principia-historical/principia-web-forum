@@ -60,9 +60,9 @@ $profilefields = [
 		['title' => 'Registered on', 'value' => date($dateformat, $user['joined']).' ('.timeunits($days * 86400).' ago)'],
 		['title' => 'Last post', 'value'=>($user['lastpost'] ? date($dateformat, $user['lastpost'])." (".timeunits(time()-$user['lastpost'])." ago)" : "None").$lastpostlink],
 		['title' => 'Last view', 'value' => sprintf(
-				'%s (%s ago) %s',
-			date($dateformat, $user['lastview']), timeunits(time() - $user['lastview']),
-			(has_perm("view-post-ips") ? '<br>from IP: '.$user['ip'] : ''))]
+				'%s (%s ago)',
+			date($dateformat, $user['lastview']), timeunits(time() - $user['lastview'])
+		)]
 	],
 ];
 

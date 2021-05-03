@@ -103,15 +103,13 @@ function can_edit_post($post) {
 	return false;
 }
 
-function can_edit_group_assets($gid) {
+function can_edit_group_assets() {
 	if (has_perm('edit-all-group')) return true;
-	else if (has_perm_with_bindvalue('can-edit-group', $gid)) return true;
 	return false;
 }
 
-function can_edit_user_assets($gid) {
+function can_edit_user_assets() {
 	if (has_perm('edit-all-group-member')) return true;
-	else if (has_perm_with_bindvalue('can-edit-group-member', $gid)) return true;
 	return false;
 }
 
@@ -120,7 +118,7 @@ function can_edit_user($uid) {
 
 	$gid = gid_for_user($uid);
 	if (is_root_gid($gid) && !has_perm('no-restrictions')) return false;
-	if ((!can_edit_user_assets($gid) && $uid!=$loguser['id']) && !has_perm('no-restrictions')) return false;
+	if ((!can_edit_user_assets() && $uid!=$loguser['id']) && !has_perm('no-restrictions')) return false;
 
 	if ($uid == $loguser['id'] && has_perm('update-own-profile')) return true;
 	else if (has_perm('update-profiles')) return true;
@@ -217,15 +215,6 @@ function has_perm($permid) {
 	foreach ($logpermset as $k => $v) {
 		if ($v['id'] == 'no-restrictions') return true;
 		if ($permid == $v['id'] && !$v['revoke']) return true;
-	}
-	return false;
-}
-
-function has_perm_revoked($permid) {
-	global $logpermset;
-	foreach ($logpermset as $k => $v) {
-		if ($v['id'] == 'no-restrictions') return false;
-		if ($permid == $v['id'] && $v['revoke']) return true;
 	}
 	return false;
 }

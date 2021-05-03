@@ -59,7 +59,6 @@ if (!isset($_POST['action'])) {
 	<?php
 } elseif ($_POST['action'] == 'Preview') {
 	$post['date'] = time();
-	$post['ip'] = $userip;
 	$post['num'] = 0;
 	$post['text'] = $_POST['message'];
 	foreach ($loguser as $field => $val)
@@ -109,8 +108,8 @@ if (!isset($_POST['action'])) {
 		} else if ($secafterpm && (has_perm('consecutive-posts'))) {
 			$msg = "You can't send more than one PM within 2 seconds!";
 		} else {
-			$sql->query("INSERT INTO pmsgs (date,ip,userto,userfrom,title,text) VALUES (?,?,?,?,?,?)",
-				[time(),$userip,$userto,$loguser['id'],$_POST['title'],$_POST['message']]);
+			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?,?)",
+				[time(),$userto,$loguser['id'],$_POST['title'],$_POST['message']]);
 
 			redirect("private.php");
 		}

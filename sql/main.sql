@@ -72,8 +72,6 @@ CREATE TABLE `perm` (
 
 INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('ban-users',	'Ban Users',	''),
-('can-edit-group',	'Edit Group Assets',	'group'),
-('can-edit-group-member',	'Edit User Assets',	'group'),
 ('consecutive-posts',	'Consecutive Posts',	''),
 ('create-all-private-forum-posts',	'Create All Private Forum Posts',	''),
 ('create-all-private-forum-threads',	'Create All Private Forum Threads',	''),
@@ -97,10 +95,7 @@ INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('edit-own-permissions',	'Edit Own Permissions',	''),
 ('edit-own-title',	'Edit Own Title',	''),
 ('edit-permissions',	'Edit Permissions',	''),
-('edit-titles',	'Edit Titles',	''),
-('edit-users',	'Edit Users',	''),
 ('ignore-thread-time-limit',	'Ignore Thread Time Limit',	''),
-('manage-board',	'Administration Management Panel',	''),
 ('no-restrictions',	'No Restrictions',	''),
 ('override-closed',	'Post in Closed Threads',	''),
 ('override-readonly-forums',	'Override Read Only Forums',	''),
@@ -110,11 +105,8 @@ INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('update-post',	'Update Post',	''),
 ('update-profiles',	'Update Profiles',	''),
 ('update-thread',	'Update Thread',	''),
-('use-post-layout',	'Use Post Layout',	''),
 ('view-all-private-forums',	'View All Private Forums',	''),
-('view-own-pms',	'View Own PMs',	''),
 ('view-post-history',	'View Post History',	''),
-('view-post-ips',	'View Post IP Addresses',	''),
 ('view-private-forum',	'View Private Forum',	'forums'),
 ('view-user-pms',	'View User PMs',	'');
 
@@ -123,7 +115,6 @@ CREATE TABLE `pmsgs` (
   `title` varchar(255) NOT NULL,
   `text` text NOT NULL,
   `date` int(11) NOT NULL DEFAULT 0,
-  `ip` char(15) NOT NULL,
   `userto` mediumint(9) unsigned NOT NULL,
   `userfrom` mediumint(9) unsigned NOT NULL,
   `unread` tinyint(4) NOT NULL DEFAULT 1,
@@ -138,7 +129,6 @@ CREATE TABLE `posts` (
   `user` mediumint(9) unsigned NOT NULL DEFAULT 0,
   `thread` mediumint(9) unsigned NOT NULL DEFAULT 0,
   `date` int(11) NOT NULL DEFAULT 0,
-  `ip` char(15) NOT NULL,
   `num` mediumint(9) NOT NULL DEFAULT 0,
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
@@ -213,8 +203,6 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (3,	'group',	'rename-own-thread',	'',	0,	0),
 (3,	'group',	'update-own-post',	'',	0,	0),
 (3,	'group',	'update-own-profile',	'',	0,	0),
-(3,	'group',	'use-post-layout',	'',	0,	0),
-(3,	'group',	'view-own-pms',	'',	0,	0),
 (4,	'group',	'create-private-forum-post',	'forums',	2,	0),
 (4,	'group',	'create-private-forum-thread',	'forums',	2,	0),
 (4,	'group',	'delete-forum-post',	'forums',	2,	0),
@@ -234,13 +222,9 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (6,	'group',	'edit-all-group',	'',	0,	0),
 (6,	'group',	'edit-forums',	'',	0,	0),
 (6,	'group',	'edit-permissions',	'',	0,	0),
-(6,	'group',	'edit-titles',	'',	0,	0),
-(6,	'group',	'edit-users',	'',	0,	0),
-(6,	'group',	'manage-board',	'',	0,	0),
 (6,	'group',	'override-readonly-forums',	'',	0,	0),
 (6,	'group',	'update-profiles',	'',	0,	0),
 (6,	'group',	'view-all-private-forums',	'',	0,	0),
-(6,	'group',	'view-post-ips',	'',	0,	0),
 (7,	'group',	'no-restrictions',	'',	0,	0);
 
 -- 2020-12-21 17:21:49

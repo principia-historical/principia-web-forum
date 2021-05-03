@@ -17,9 +17,9 @@ if ($view == 'sent') {
 	$sent = false;
 }
 
-$id = (has_perm('view-user-pms') ? (isset($_GET['id']) ? $_GET['id'] : 0) : 0);
+$id = (has_perm('view-user-pms') ? (isset($_GET['id']) ? $_GET['id'] : null) : 0);
 
-if (!has_perm('view-own-pms') && $id == 0) noticemsg("Error", "You are not allowed to do this!", true);
+if ($id === 0 && $id !== null) noticemsg("Error", "You are not allowed to do this!", true);
 
 $showdel = isset($_GET['showdel']);
 

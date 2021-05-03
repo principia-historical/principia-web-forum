@@ -2,8 +2,6 @@
 require('lib/common.php');
 needs_login();
 
-if (!has_perm('view-own-pms')) noticemsg("Error", "You have no permissions to do this!", true);
-
 $fieldlist = userfields('u', 'u').','.userfields_post();
 
 $pid = (isset($_GET['id']) ? $_GET['id'] : null);
