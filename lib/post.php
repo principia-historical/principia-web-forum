@@ -131,7 +131,7 @@ function posttoolbar() {
 function threadpost($post, $pthread = '') {
 	global $dateformat, $loguser;
 
-	$post['ranktext'] = getrank(1, $post['uposts']);
+	$post['ranktext'] = getrank(0, $post['uposts']);
 	$post['utitle'] = $post['ranktext']
 			. ((strlen($post['ranktext']) >= 1) ? '<br>' : '')
 			. $post['utitle']
@@ -190,53 +190,48 @@ HTML;
 	if (isset($post['thread']) && $post['id'])
 		$postlinks.=" | ID: $post[id]";
 
-	if (isset($post['thread']) && has_perm('view-post-ips'))
-		$postlinks.=($postlinks ? ' | ' : '') . "IP: $post[ip]";
-
 	if (isset($post['maxrevision']) && isset($post['thread']) && has_perm('view-post-history') && $post['maxrevision'] > 1) {
 		$revisionstr.=" | Revision ";
 		for ($i = 1; $i <= $post['maxrevision']; $i++)
 			$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";
 	}
 
-	$tbar1 = "topbar" . $post['uid'] . "_1";
-	$tbar2 = "topbar" . $post['uid'] . "_2";
-	$sbar = "sidebar" . $post['uid'];
-	$mbar = "mainbar" . $post['uid'];
 	$ulink = userlink($post, 'u');
 	$pdate = date($dateformat, $post['date']);
+	$lastpost = ($post['ulastpost'] ? timeunits(time() - $post['ulastpost']) : 'none');
+	$lastview = timeunits(time() - $post['ulastview']);
+	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
+	if ($post['usignature']) {
+		$post['usignature'] = '<br><br><small>____________________<br>' . $post['usignature'] . '</small>';
+	}
+	$utitle = postfilter($post['utitle']);
+	$ujoined = date('Y-m-d', $post['ujoined']);
+	$posttext = postfilter($post['text'].$post['usignature']);
 	$text = <<<HTML
 <table class="c1" id="{$post['id']}">
 	$postheaderrow
 	<tr>
-		<td class="b n1 $tbar1" style="border-bottom:0;border-right:0;min-width:180px;text-align:center" height="17">$ulink</td>
-		<td class="b n1 $tbar2" style="border-left:0;width:100%">
+		<td class="b n1 topbar_1" style="border-bottom:0;border-right:0;min-width:180px;text-align:center" height="15">$ulink</td>
+		<td class="b n1 topbar_2" style="border-left:0;width:100%">
 			<table style="width:100%">
 				<tr><td class="nb sfont">Posted on $pdate$threadlink $revisionstr</td><td class="nb sfont right">$postlinks</td></tr>
 			</table>
 		</td>
 	</tr><tr valign="top">
-		<td class="b n1 sfont $sbar" style="border-top:0;text-align:center">
+		<td class="b n1 sfont sidebar" style="border-top:0;text-align:center">
+			$utitle
+			$picture
+			<br>Posts: {$post['uposts']}
+			<br>
+			<br>Since: $ujoined
+			<br>
+			<br>Last post: $lastpost
+			<br>Last view: $lastview
+		</td>
+		<td class="b n2 mainbar" id="post_{$post['id']}">$posttext</td>
+	</tr>
+</table>
 HTML;
-
-	$lastpost = ($post['ulastpost'] ? timeunits(time() - $post['ulastpost']) : 'none');
-	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
-
-	if ($post['usignature']) {
-		$post['usignature'] = '<br><br><small>____________________<br>' . $post['usignature'] . '</small>';
-	}
-
-	$text .= postfilter($post['utitle'])
-		."$picture
-		<br>Posts: $post[uposts]
-		<br>
-		<br>Since: ".date('Y-m-d', $post['ujoined'])."
-		<br>
-		<br>Last post: $lastpost
-		<br>Last view: ".timeunits(time() - $post['ulastview'])."
-	</td>
-	<td class=\"b n2 $mbar\" id=\"post_".$post['id'].'">'.postfilter($post['text'].$post['usignature'])."</td>
-</table>";
 
 	return $text;
 }
