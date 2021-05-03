@@ -128,10 +128,7 @@ function pageheader($pagetitle = '', $fid = null) {
 		$links[] = ['url' => "thread.php?time=86400", 'title' => 'Latest posts'];
 
 		if ($log) {
-			if (has_perm('view-own-pms'))
-				$links[] = ['url' => "private.php", 'title' => 'Private messages'];
-			if (has_perm('manage-board'))
-				$links[] = ['url' => 'management.php', 'title' => 'Management'];
+			$links[] = ['url' => "private.php", 'title' => 'Private messages'];
 		}
 	}
 

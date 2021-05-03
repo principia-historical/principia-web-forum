@@ -74,7 +74,7 @@ pageheader('Edit groups');
 
 if ($act == 'new' || $act == 'edit') {
 	$pagebar = [
-		'breadcrumb' => [['href'=>'./', 'title'=>'Main'], ['href'=>'management.php', 'title'=>'Management'], ['href'=>'editgroups.php', 'title'=>'Edit groups']],
+		'breadcrumb' => [['href'=>'./', 'title'=>'Main'], ['href'=>'editgroups.php', 'title'=>'Edit groups']],
 		'title' => '',
 		'actions' => [['href'=>'editgroups.php?act=new', 'title'=>'New group']],
 		'message' => $errmsg
@@ -109,7 +109,7 @@ if ($act == 'new' || $act == 'edit') {
 	}
 } else {
 	$pagebar = [
-		'breadcrumb' => [['href'=>'./', 'title'=>'Main'], ['href'=>'management.php', 'title'=>'Management']],
+		'breadcrumb' => [['href'=>'./', 'title'=>'Main']],
 		'title' => 'Edit groups',
 		'actions' => [['href'=>'editgroups.php?act=new', 'title'=>'New group']],
 		'message' => $errmsg
