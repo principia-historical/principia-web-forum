@@ -38,8 +38,6 @@ if ($log) {
 
 if (has_perm('view-user-pms'))
 	$links[] = ['url' => "private.php?id=$uid", 'title' => 'View private messages'];
-if (has_perm('edit-users'))
-	$links[] = ['url' => "editprofile.php?id=$uid", 'title' => 'Edit user'];
 
 if (has_perm('edit-permissions') && has_perm('ban-users')) {
 	if ($user['group_id'] != $bannedgroup)

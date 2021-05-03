@@ -80,7 +80,6 @@ function postfilter($msg) {
 
 	$msg = preg_replace("'\[(b|i|u|s)\]'si", '<\\1>', $msg);
 	$msg = preg_replace("'\[/(b|i|u|s)\]'si", '</\\1>', $msg);
-	$msg = preg_replace("'\[spoiler\](.*?)\[/spoiler\]'si", '<span class="spoiler1" onclick=""><span class="spoiler2">\\1</span></span>', $msg);
 	$msg = preg_replace("'\[url\](.*?)\[/url\]'si", '<a href=\\1>\\1</a>', $msg);
 	$msg = preg_replace("'\[url=(.*?)\](.*?)\[/url\]'si", '<a href=\\1>\\2</a>', $msg);
 	$msg = preg_replace("'\[img\](.*?)\[/img\]'si", '<img src=\\1>', $msg);
@@ -121,7 +120,6 @@ function posttoolbar() {
 		. posttoolbutton("fa-strikethrough", "Strikethrough", "[s]", "[/s]")
 		. "&nbsp;&nbsp;"
 		. posttoolbutton("fa-link", "URL", "[url]", "[/url]")
-		. posttoolbutton("fa-exclamation", "Spoiler", "[spoiler]", "[/spoiler]")
 		. posttoolbutton("fa-quote-left", "Quote", "[quote]", "[/quote]")
 		. posttoolbutton("fa-code", "Code", "[code]", "[/code]")
 		. "&nbsp;&nbsp;"

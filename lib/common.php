@@ -3,9 +3,6 @@ $start = microtime(true);
 
 $rankset_names = ['None'];
 
-// List of bots (web crawlers)
-$botlist = ['ia_archiver','baidu','yahoo','bot','spider'];
-
 // List of smilies
 $smilies = [
 	['text' => '-_-', 'url' => 'assets/smilies/annoyed.gif'],
@@ -91,19 +88,10 @@ if ($loguser['tpp'] < 1) $loguser['tpp'] = 20;
 
 $dateformat = $loguser['dateformat'].' '.$loguser['timeformat'];
 
-if (str_replace($botlist, "x", strtolower($_SERVER['HTTP_USER_AGENT'])) != strtolower($_SERVER['HTTP_USER_AGENT'])) {
-	$bot = 1;
-	load_bot_permset();
-} else {
-	$bot = 0;
-}
-
 if ($log) {
 	$sql->query("UPDATE principia.users SET lastview = ?, ip = ? WHERE id = ?",
 		[time(), $userip, $loguser['id']]);
 }
-$count = $sql->fetch("SELECT (SELECT COUNT(*) FROM users) u, (SELECT COUNT(*) FROM threads) t, (SELECT COUNT(*) FROM posts) p");
-$date = date("m-d-y", time());
 
 /**
  * Print page header

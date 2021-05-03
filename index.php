@@ -38,12 +38,11 @@ $forums = $sql->query("SELECT f.*, ".($log ? "r.time rtime, " : '').userfields('
 		. " ORDER BY c.ord,c.id,f.ord,f.id", []);
 $cat = -1;
 
-$i = 0;
 while ($forum = $forums->fetch()) {
 	if (!can_view_forum($forum)) continue;
 
 	if ($forum['cat'] != $cat) {
-		if ($i != 0) echo '</table><br>';
+		if ($cat != -1) echo '</table><br>';
 
 		$cat = $forum['cat'];
 		?>
@@ -77,7 +76,6 @@ while ($forum = $forums->fetch()) {
 		<td class="b n1"><?=$forum['posts'] ?></td>
 		<td class="b n2"><?=$lastpost ?></td>
 	</tr><?php
-	$i++;
 }
 ?></table><?php
 pagefooter();
