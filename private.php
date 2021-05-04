@@ -25,7 +25,7 @@ $showdel = isset($_GET['showdel']);
 
 if (isset($_GET['action']) && $_GET['action'] == "del") {
 	$owner = $sql->result("SELECT user$fieldn2 FROM pmsgs WHERE id = ?", [$id]);
-	if (has_perm('delete-user-pms') || ($owner == $loguser['id'] && has_perm('delete-own-pms'))) {
+	if (has_perm('delete-user-pms') || ($owner == $userdata['id'] && has_perm('delete-own-pms'))) {
 		$sql->query("UPDATE pmsgs SET del_$fieldn2 = ? WHERE id = ?", [!$showdel, $id]);
 	} else {
 		noticemsg("Error", "You are not allowed to (un)delete that message.", true);
@@ -40,7 +40,7 @@ if ($id && has_perm('view-user-pms')) {
 	pageheader($user['name']."'s ".strtolower($ptitle));
 	$title = userlink($user)."'s ".strtolower($ptitle);
 } else {
-	$id = $loguser['id'];
+	$id = $userdata['id'];
 	pageheader($ptitle);
 	$title = $ptitle;
 }
@@ -51,7 +51,7 @@ $pmsgs = $sql->query("SELECT ".userfields('u', 'u').", p.* FROM pmsgs p "
 					."WHERE p.user$fieldn2 = ? "
 				."AND del_$fieldn2 = ? "
 					."ORDER BY p.unread DESC, p.date DESC "
-					."LIMIT " . (($page - 1) * $loguser['tpp']) . ", " . $loguser['tpp'],
+					."LIMIT " . (($page - 1) * $userdata['tpp']) . ", " . $userdata['tpp'],
 				[$id, $showdel]);
 
 $topbot = [
@@ -60,20 +60,20 @@ $topbot = [
 ];
 
 if ($sent)
-	$topbot['actions'] = [['href' => 'private.php'.($id != $loguser['id'] ? "?id=$id&" : ''), 'title' => "View received"]];
+	$topbot['actions'] = [['href' => 'private.php'.($id != $userdata['id'] ? "?id=$id&" : ''), 'title' => "View received"]];
 else
-	$topbot['actions'] = [['href' => 'private.php?'.($id != $loguser['id'] ? "id=$id&" : '').'view=sent', 'title' => "View sent"]];
+	$topbot['actions'] = [['href' => 'private.php?'.($id != $userdata['id'] ? "id=$id&" : '').'view=sent', 'title' => "View sent"]];
 
 $topbot['actions'][] = ['href' => 'sendprivate.php', 'title' => 'Send new'];
 
-if ($pmsgc <= $loguser['tpp'])
+if ($pmsgc <= $userdata['tpp'])
 	$fpagelist = '<br>';
 else {
-	if ($id != $loguser['id'])
+	if ($id != $userdata['id'])
 		$furl = "private.php?id=$id&view=$view";
 	else
 		$furl = "private.php?view=$view";
-	$fpagelist = pagelist($pmsgc, $loguser['tpp'], $furl, $page).'<br>';
+	$fpagelist = pagelist($pmsgc, $userdata['tpp'], $furl, $page).'<br>';
 }
 
 RenderPageBar($topbot);

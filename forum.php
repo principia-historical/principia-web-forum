@@ -8,7 +8,7 @@ $uid = isset($_GET['user']) ? (int)$_GET['user'] : 0;
 if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if ($log) {
 		$forum = $sql->fetch("SELECT f.*, r.time rtime FROM forums f LEFT JOIN forumsread r ON (r.fid = f.id AND r.uid = ?) "
-			. "WHERE f.id = ? AND f.id IN " . forums_with_view_perm(), [$loguser['id'], $fid]);
+			. "WHERE f.id = ? AND f.id IN " . forums_with_view_perm(), [$userdata['id'], $fid]);
 		if (!$forum['rtime']) $forum['rtime'] = 0;
 	} else
 		$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN " . forums_with_view_perm(), [$fid]);
@@ -23,10 +23,10 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "FROM threads t "
 		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
 		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
-		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$loguser[id])" : '')
+		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id])" : '')
 		. "WHERE t.forum = ? "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
-		. "LIMIT " . (($page - 1) * $loguser['tpp']) . "," . $loguser['tpp'],
+		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 		[$fid]);
 
 	$topbot = [
@@ -48,12 +48,12 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
 		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
 		. "LEFT JOIN forums f ON f.id=t.forum "
-		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$loguser[id]) "
-			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$loguser[id]) " : '')
+		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
+			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.user = ? "
 		. "AND f.id IN " . forums_with_view_perm() . " "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
-		. "LIMIT " . (($page - 1) * $loguser['tpp']) . "," . $loguser['tpp'],
+		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 		[$uid]);
 
 	$forum['threads'] = $sql->result("SELECT count(*) FROM threads t "
@@ -78,12 +78,12 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
 		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
 		. "LEFT JOIN forums f ON f.id=t.forum "
-		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$loguser[id]) "
-			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$loguser[id]) " : '')
+		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
+			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.lastdate>$mintime "
 		. " AND f.id IN " . forums_with_view_perm() . " "
 		. "ORDER BY t.lastdate DESC "
-		. "LIMIT " . (($page - 1) * $loguser['tpp']) . "," . $loguser['tpp']);
+		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp']);
 	$forum['threads'] = $sql->result("SELECT count(*) "
 		. "FROM threads t "
 		. "LEFT JOIN forums f ON f.id=t.forum "
@@ -97,7 +97,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 $showforum = (isset($time) ? $time : $uid);
 
-if ($forum['threads'] <= $loguser['tpp']) {
+if ($forum['threads'] <= $userdata['tpp']) {
 	$fpagelist = '';
 } else {
 	if ($fid)
@@ -106,7 +106,7 @@ if ($forum['threads'] <= $loguser['tpp']) {
 		$furl = "forum.php?user=$uid";
 	elseif ($time)
 		$furl = "forum.php?time=$time";
-	$fpagelist = '<br>'.pagelist($forum['threads'], $loguser['tpp'], $furl, $page);
+	$fpagelist = '<br>'.pagelist($forum['threads'], $userdata['tpp'], $furl, $page);
 }
 
 RenderPageBar($topbot);
@@ -135,7 +135,7 @@ if (isset($time)) {
 $lsticky = 0;
 
 for ($i = 1; $thread = $threads->fetch(); $i++) {
-	$pagelist = ' '.pagelist($thread['replies'], $loguser['ppp'], 'thread.php?id='.$thread['id'], 0, false, true);
+	$pagelist = ' '.pagelist($thread['replies'], $userdata['ppp'], 'thread.php?id='.$thread['id'], 0, false, true);
 
 	$status = '';
 	if ($thread['closed']) $status .= 'o';

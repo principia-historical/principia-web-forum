@@ -10,9 +10,9 @@ if (!$pid) noticemsg("Error", "Private message does not exist.", true);
 
 $pmsgs = $sql->fetch("SELECT $fieldlist p.* FROM pmsgs p LEFT JOIN principia.users u ON u.id = p.userfrom WHERE p.id = ?", [$pid]);
 if ($pmsgs == null) noticemsg("Error", "Private message does not exist.", true);
-$tologuser = ($pmsgs['userto'] == $loguser['id']);
+$tologuser = ($pmsgs['userto'] == $userdata['id']);
 
-if ((!$tologuser && $pmsgs['userfrom'] != $loguser['id']) && !has_perm('view-user-pms'))
+if ((!$tologuser && $pmsgs['userfrom'] != $userdata['id']) && !has_perm('view-user-pms'))
 	noticemsg("Error", "Private message does not exist.", true);
 elseif ($tologuser && $pmsgs['unread'])
 	$sql->query("UPDATE pmsgs SET unread = 0 WHERE id = ?", [$pid]);

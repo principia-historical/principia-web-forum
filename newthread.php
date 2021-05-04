@@ -16,9 +16,9 @@ if (!$forum)
 	noticemsg("Error", "Forum does not exist.", true);
 else if (!can_create_forum_thread($forum))
 	$err = "You have no permissions to create threads in this forum!";
-else if ($loguser['lastpost'] > time() - 30 && $act == 'Submit' && !has_perm('ignore-thread-time-limit'))
+else if ($userdata['lastpost'] > time() - 30 && $act == 'Submit' && !has_perm('ignore-thread-time-limit'))
 	$err = "Don't post threads so fast, wait a little longer.";
-else if ($loguser['lastpost'] > time() - 2 && $act == 'Submit' && has_perm('ignore-thread-time-limit'))
+else if ($userdata['lastpost'] > time() - 2 && $act == 'Submit' && has_perm('ignore-thread-time-limit'))
 	$err = "You must wait 2 seconds before posting a thread.";
 
 if ($act == 'Submit') {
@@ -64,9 +64,9 @@ if (isset($err)) {
 	<?php
 } elseif ($act == 'Preview') {
 	$post['date'] = time();
-	$post['num'] = $loguser['posts']++;
+	$post['num'] = $userdata['posts']++;
 	$post['text'] = $_POST['message'];
-	foreach ($loguser as $field => $val)
+	foreach ($userdata as $field => $val)
 		$post['u' . $field] = $val;
 	$post['ulastpost'] = time();
 
@@ -98,17 +98,17 @@ if (isset($err)) {
 		</tr>
 	</table></form><?php
 } elseif ($act == 'Submit') {
-	$sql->query("UPDATE principia.users SET posts = posts + 1,threads = threads + 1,lastpost = ? WHERE id = ?", [time(), $loguser['id']]);
+	$sql->query("UPDATE principia.users SET posts = posts + 1,threads = threads + 1,lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
 	$sql->query("INSERT INTO threads (title,forum,user,lastdate,lastuser) VALUES (?,?,?,?,?)",
-		[$_POST['title'],$fid,$loguser['id'],time(),$loguser['id']]);
+		[$_POST['title'],$fid,$userdata['id'],time(),$userdata['id']]);
 	$tid = $sql->insertid();
-	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?,?)",
-		[$loguser['id'],$tid,time(),$loguser['posts']++]);
+	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?)",
+		[$userdata['id'],$tid,time(),$userdata['posts']++]);
 	$pid = $sql->insertid();
 	$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
 		[$pid,$_POST['message']]);
 
-	$sql->query("UPDATE forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?", [time(), $loguser['id'], $pid, $fid]);
+	$sql->query("UPDATE forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?", [time(), $userdata['id'], $pid, $fid]);
 
 	$sql->query("UPDATE threads SET lastid = ? WHERE id = ?", [$pid, $tid]);
 

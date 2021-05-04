@@ -26,13 +26,13 @@ if (!$thread) {
 }
 if ($act == 'Submit') {
 	$lastpost = $sql->fetch("SELECT id,user,date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
-	if ($lastpost['user'] == $loguser['id'] && $lastpost['date'] >= (time() - 86400) && !has_perm('consecutive-posts'))
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && !has_perm('consecutive-posts'))
 		$err = "You can't double post until it's been at least one day!";
-	if ($lastpost['user'] == $loguser['id'] && $lastpost['date'] >= (time() - 2) && !has_perm('consecutive-posts'))
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !has_perm('consecutive-posts'))
 		$err = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
 		$err = "Your post is empty! Enter a message and try again.";
-	if ($loguser['joined'] > (time() - 2))
+	if ($userdata['joined'] > (time() - 2))
 		$err = "You must wait 2 seconds before posting on a freshly registered account.";
 }
 
@@ -73,9 +73,9 @@ if ($err) {
 	noticemsg("Error", $err."<br><a href=\"thread.php?id=$tid\">Back to thread</a>");
 } elseif ($act == 'Preview' || !$act) {
 	$post['date'] = time();
-	$post['num'] = $loguser['posts']++;
+	$post['num'] = $userdata['posts']++;
 	$post['text'] = ($act == 'Preview' ? $_POST['message'] : $quotetext);
-	foreach ($loguser as $field => $val)
+	foreach ($userdata as $field => $val)
 		$post['u' . $field] = $val;
 	$post['ulastpost'] = time();
 
@@ -107,19 +107,19 @@ if ($err) {
 		</tr>
 	</table></form><?php
 } elseif ($act == 'Submit') {
-	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $loguser['id']]);
-	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?,?)",
-		[$loguser['id'],$tid,time(),$loguser['posts']++]);
+	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
+	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?)",
+		[$userdata['id'],$tid,time(),$userdata['posts']++]);
 	$pid = $sql->insertid();
 	$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
 		[$pid,$_POST['message']]);
 	$sql->query("UPDATE threads SET replies = replies + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
-		[time(), $loguser['id'], $pid, $tid]);
+		[time(), $userdata['id'], $pid, $tid]);
 	$sql->query("UPDATE forums SET posts = posts + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
-		[[time(), $loguser['id'], $pid, $thread['forum']]]);
+		[[time(), $userdata['id'], $pid, $thread['forum']]]);
 
 	// nuke entries of this thread in the "threadsread" table
-	$sql->query("DELETE FROM threadsread WHERE tid = ? AND NOT (uid = ?)", [$thread['id'], $loguser['id']]);
+	$sql->query("DELETE FROM threadsread WHERE tid = ? AND NOT (uid = ?)", [$thread['id'], $userdata['id']]);
 
 	redirect("thread.php?pid=$pid#$pid");
 }

@@ -6,7 +6,7 @@ if ($page < 0) noticemsg("Error", "Invalid page number", true);
 
 $fieldlist = userfields('u', 'u') . ',' . userfields_post();
 
-$ppp = isset($_REQUEST['ppp']) ? (int)$_REQUEST['ppp'] : $loguser['ppp'];
+$ppp = isset($_REQUEST['ppp']) ? (int)$_REQUEST['ppp'] : $userdata['ppp'];
 if ($ppp < 0) noticemsg("Error", "Invalid posts per page number", true);
 
 if (isset($_REQUEST['id'])) {
@@ -43,7 +43,7 @@ $post_c = isset($_POST['c']) ? $_POST['c'] : '';
 $act = isset($_POST['action']) ? $_POST['action'] : '';
 
 if (isset($tid) && $log && $act && (can_edit_forum_threads(getforumbythread($tid)) ||
-		($loguser['id'] == $threadcreator && $act == "rename" && has_perm('rename-own-thread')))) {
+		($userdata['id'] == $threadcreator && $act == "rename" && has_perm('rename-own-thread')))) {
 
 	if ($act == 'stick') {
 		$action = ',sticky=1';
@@ -81,7 +81,7 @@ if ($viewmode == "thread") {
 
 	$thread = $sql->fetch("SELECT t.*, f.title ftitle, t.forum fid".($log ? ', r.time frtime' : '').' '
 			. "FROM threads t LEFT JOIN forums f ON f.id=t.forum "
-			. ($log ? "LEFT JOIN forumsread r ON (r.fid=f.id AND r.uid=$loguser[id]) " : '')
+			. ($log ? "LEFT JOIN forumsread r ON (r.fid=f.id AND r.uid=$userdata[id]) " : '')
 			. "WHERE t.id = ? AND t.forum IN ".forums_with_view_perm(),
 			[$tid]);
 
@@ -92,17 +92,17 @@ if ($viewmode == "thread") {
 
 	//mark thread as read
 	if ($log && $thread['lastdate'] > $thread['frtime'])
-		$sql->query("REPLACE INTO threadsread VALUES (?,?,?)", [$loguser['id'], $thread['id'], time()]);
+		$sql->query("REPLACE INTO threadsread VALUES (?,?,?)", [$userdata['id'], $thread['id'], time()]);
 
 	//check for having to mark the forum as read too
 	if ($log) {
 		$readstate = $sql->fetch("SELECT ((NOT ISNULL(r.time)) OR t.lastdate < ?) n FROM threads t LEFT JOIN threadsread r ON (r.tid = t.id AND r.uid = ?) "
 			. "WHERE t.forum = ? GROUP BY ((NOT ISNULL(r.time)) OR t.lastdate < ?) ORDER BY n ASC",
-			[$thread['frtime'], $loguser['id'], $thread['fid'], $thread['frtime']]);
+			[$thread['frtime'], $userdata['id'], $thread['fid'], $thread['frtime']]);
 		//if $readstate[n] is 1, MySQL did not create a group for threads where ((NOT ISNULL(r.time)) OR t.lastdate<'$thread[frtime]') is 0;
 		//thus, all threads in the forum are read. Mark it as such.
 		if ($readstate['n'] == 1)
-			$sql->query("REPLACE INTO forumsread VALUES (?,?,?)", [$loguser['id'], $thread['fid'], time()]);
+			$sql->query("REPLACE INTO forumsread VALUES (?,?,?)", [$userdata['id'], $thread['fid'], time()]);
 	}
 
 	//select top revision
@@ -199,7 +199,7 @@ if ($viewmode == "thread") {
 }
 
 $modlinks = '';
-if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($loguser['id'] == $thread['user'] && !$thread['closed'] && has_perm('rename-own-thread')))) {
+if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($userdata['id'] == $thread['user'] && !$thread['closed'] && has_perm('rename-own-thread')))) {
 	$link = "<a href=javascript:submitmod";
 	if (can_edit_forum_threads($thread['forum'])) {
 		$stick = ($thread['sticky'] ? "$link('unstick')>Unstick</a>" : "$link('stick')>Stick</a>");

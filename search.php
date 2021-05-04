@@ -108,7 +108,7 @@ if ($where == 1) {
 		."LEFT JOIN forums f ON f.id=t.forum "
 		."WHERE $string AND f.id IN ".forums_with_view_perm()
 		."ORDER BY t.lastdate DESC "
-		."LIMIT ".(($page-1)*$loguser['tpp']).",".$loguser['tpp']);
+		."LIMIT ".(($page-1)*$userdata['tpp']).",".$userdata['tpp']);
 	$threadcount = $sql->result("SELECT COUNT(*) "
 		."FROM threads t "
 		."LEFT JOIN forums f ON f.id=t.forum "
@@ -136,7 +136,7 @@ if ($where == 1) {
 	if_empty_query($i, "No threads found.", 6);
 
 	$query = urlencode($query);
-	$fpagelist = pagelist($threadcount, $loguser['tpp'], "search.php?q=$query&action=Search&w=0&f=$forum", $page);
+	$fpagelist = pagelist($threadcount, $userdata['tpp'], "search.php?q=$query&action=Search&w=0&f=$forum", $page);
 	?></table><?php echo $fpagelist;
 }
 

@@ -1,5 +1,6 @@
 <?php
 $start = microtime(true);
+$acmlm = true;
 
 $rankset_names = ['None'];
 
@@ -38,8 +39,12 @@ $smilies = [
 	['text' => 'OwO', 'url' => 'assets/smilies/owo.png']
 ];
 
-require('../conf/config.php'); // include principia-web config
+chdir('../');
+require_once('conf/config.php'); // include principia-web config
+require_once('vendor/autoload.php');
+require_once('lib/common.php');
 
+chdir('forum/');
 foreach (glob("lib/*.php") as $filename)
 	require_once($filename);
 
@@ -47,50 +52,30 @@ header("Content-type: text/html; charset=utf-8");
 
 $userip = $_SERVER['REMOTE_ADDR'];
 
-$log = false;
 $logpermset = [];
 
-// Authentication code.
-if (isset($_COOKIE[$cookieName])) {
-	$user_id = $sql->result("SELECT id FROM principia.users WHERE token = ?", [$_COOKIE[$cookieName]]);
-
-	if ($user_id) {
-		// Valid password cookie.
-		$log = true;
-		$loguser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$user_id]);
-		load_user_permset();
-	} else {
-		// Invalid password cookie.
-		$log = false;
-		load_guest_permset();
-	}
+if ($log) {
+	load_user_permset();
 } else {
-	// No password cookie.
-	$log = false;
 	load_guest_permset();
-}
 
-if (!$log) {
-	$loguser = [];
-	$loguser['id'] = 0;
+	$userdata['id'] = 0;
 }
 
 // todo
-$loguser['dateformat'] = "Y-m-d";
-$loguser['timeformat'] = "H:i";
-$loguser['ppp'] = 20;
-$loguser['tpp'] = 20;
-$loguser['timezone'] = 'UTC';
-date_default_timezone_set($loguser['timezone']);
+$userdata['dateformat'] = "Y-m-d";
+$userdata['timeformat'] = "H:i";
+$userdata['ppp'] = 20;
+$userdata['tpp'] = 20;
 
-if ($loguser['ppp'] < 1) $loguser['ppp'] = 20;
-if ($loguser['tpp'] < 1) $loguser['tpp'] = 20;
+if ($userdata['ppp'] < 1) $userdata['ppp'] = 20;
+if ($userdata['tpp'] < 1) $userdata['tpp'] = 20;
 
-$dateformat = $loguser['dateformat'].' '.$loguser['timeformat'];
+$dateformat = $userdata['dateformat'].' '.$userdata['timeformat'];
 
 if ($log) {
 	$sql->query("UPDATE principia.users SET lastview = ?, ip = ? WHERE id = ?",
-		[time(), $userip, $loguser['id']]);
+		[time(), $userip, $userdata['id']]);
 }
 
 /**
@@ -101,19 +86,19 @@ if ($log) {
  * @return void
  */
 function pageheader($pagetitle = '', $fid = null) {
-	global $log, $loguser;
+	global $log, $userdata;
+
+	$links = [];
+
+	$links[] = ['url' => "./", 'title' => 'Forum'];
+	$links[] = ['url' => "activeusers.php", 'title' => 'Active users'];
+	$links[] = ['url' => "thread.php?time=86400", 'title' => 'Latest posts'];
 
 	if ($log) {
 		if ($fid && is_numeric($fid))
 			$markread = '<a href="./?action=markread&fid='.$fid.'">Mark forum read</a>';
 		else
 			$markread = '<a href="./?action=markread&fid=all">Mark all forums read</a>';
-
-		$links = [];
-
-		$links[] = ['url' => "./", 'title' => 'Forum'];
-		$links[] = ['url' => "activeusers.php", 'title' => 'Active users'];
-		$links[] = ['url' => "thread.php?time=86400", 'title' => 'Latest posts'];
 
 		if ($log) {
 			$links[] = ['url' => "private.php", 'title' => 'Private messages'];
@@ -145,7 +130,7 @@ function pageheader($pagetitle = '', $fid = null) {
 					<li><a href="../search.php" class="btn"><img src="../assets/icons/search.svg" class="search"></a></li>
 				</ul>
 				<ul class="menu right">
-					<li><em><?=($log ? userlink($loguser) : '<a href="../login.php">Login</a>')?></em></li>
+					<li><em><?=($log ? userlink($userdata) : '<a href="../login.php">Login</a>')?></em></li>
 				</ul>
 			</div>
 			<div class="top">

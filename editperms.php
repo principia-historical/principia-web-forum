@@ -7,10 +7,10 @@ if (!has_perm('edit-permissions')) noticemsg("Error", "You have no permissions t
 
 if (isset($_GET['gid'])) {
 	$id = (int)$_GET['gid'];
-	if ((is_root_gid($id) || (!can_edit_group_assets() && $id!=$loguser['group_id'])) && !has_perm('no-restrictions')) {
+	if ((is_root_gid($id) || (!can_edit_group_assets() && $id!=$userdata['group_id'])) && !has_perm('no-restrictions')) {
 		noticemsg("Error", "You have no permissions to do this!", true);
 	}
-	if ($loguser['group_id'] == $id && !has_perm('edit-own-permissions')) {
+	if ($userdata['group_id'] == $id && !has_perm('edit-own-permissions')) {
 		noticemsg("Error", "You have no permissions to do this!", true);
 	}
 	$permowner = $sql->fetch("SELECT id,title,inherit_group_id FROM groups WHERE id=?", [$id]);
@@ -19,11 +19,11 @@ if (isset($_GET['gid'])) {
 	$id = (int)$_GET['uid'];
 
 	$tuser = $sql->result("SELECT group_id FROM principia.users WHERE id = ?",[$id]);
-	if ((is_root_gid($tuser) || (!can_edit_user_assets() && $id != $loguser['id'])) && !has_perm('no-restrictions')) {
+	if ((is_root_gid($tuser) || (!can_edit_user_assets() && $id != $userdata['id'])) && !has_perm('no-restrictions')) {
 		noticemsg("Error", "You have no permissions to do this!", true);
 	}
 
-	if ($id == $loguser['id'] && !has_perm('edit-own-permissions')) {
+	if ($id == $userdata['id'] && !has_perm('edit-own-permissions')) {
 		noticemsg("Error", "You have no permissions to do this!", true);
 	}
 	$permowner = $sql->fetch("SELECT u.id,u.name title,u.group_id,g.title group_title FROM principia.users u LEFT JOIN groups g ON g.id=u.group_id WHERE u.id=?", [$id]);

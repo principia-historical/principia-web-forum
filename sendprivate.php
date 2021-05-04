@@ -15,7 +15,7 @@ if (!isset($_POST['action'])) {
 	if (isset($_GET['pid']) && $pid = $_GET['pid']) {
 		$post = $sql->fetch("SELECT u.name name, p.title, p.text "
 			."FROM pmsgs p LEFT JOIN principia.users u ON p.userfrom = u.id "
-			."WHERE p.id = ?" . (!has_perm('view-user-pms') ? " AND (p.userfrom=".$loguser['id']." OR p.userto=".$loguser['id'].")" : ''), [$pid]);
+			."WHERE p.id = ?" . (!has_perm('view-user-pms') ? " AND (p.userfrom=".$userdata['id']." OR p.userto=".$userdata['id'].")" : ''), [$pid]);
 		if ($post) {
 			$quotetext = '[reply="'.$post['name'].'" id="'.$pid.'"]'.$post['text'].'[/quote]' . PHP_EOL;
 			$title = 'Re:' . $post['title'];
@@ -61,7 +61,7 @@ if (!isset($_POST['action'])) {
 	$post['date'] = time();
 	$post['num'] = 0;
 	$post['text'] = $_POST['message'];
-	foreach ($loguser as $field => $val)
+	foreach ($userdata as $field => $val)
 		$post['u' . $field] = $val;
 	$post['ulastpost'] = time();
 
@@ -101,15 +101,15 @@ if (!isset($_POST['action'])) {
 	$userto = $sql->result("SELECT id FROM principia.users WHERE name LIKE ?", [$_POST['userto']]);
 
 	if ($userto && $_POST['message']) {
-		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP()-30) AND userfrom = ?", [$loguser['id']]);
-		$secafterpm = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 2) AND userfrom = ?", [$loguser['id']]);
+		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP()-30) AND userfrom = ?", [$userdata['id']]);
+		$secafterpm = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 2) AND userfrom = ?", [$userdata['id']]);
 		if ($recentpms && (!has_perm('consecutive-posts'))) {
 			$msg = "You can't send more than one PM within 30 seconds!";
 		} else if ($secafterpm && (has_perm('consecutive-posts'))) {
 			$msg = "You can't send more than one PM within 2 seconds!";
 		} else {
-			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?,?)",
-				[time(),$userto,$loguser['id'],$_POST['title'],$_POST['message']]);
+			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
+				[time(),$userto,$userdata['id'],$_POST['title'],$_POST['message']]);
 
 			redirect("private.php");
 		}

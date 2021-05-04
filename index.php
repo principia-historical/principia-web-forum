@@ -12,13 +12,13 @@ if ($log && $action == 'markread') {
 	$fid = $_GET['fid'];
 	if ($fid != 'all') {
 		//delete obsolete threadsread entries
-		$sql->query("DELETE r FROM threadsread r LEFT JOIN threads t ON t.id = r.tid WHERE t.forum = ? AND r.uid = ?", [$fid, $loguser['id']]);
+		$sql->query("DELETE r FROM threadsread r LEFT JOIN threads t ON t.id = r.tid WHERE t.forum = ? AND r.uid = ?", [$fid, $userdata['id']]);
 		//add new forumsread entry
-		$sql->query("REPLACE INTO forumsread VALUES (?,?,?)", [$loguser['id'], $fid, time()]);
+		$sql->query("REPLACE INTO forumsread VALUES (?,?,?)", [$userdata['id'], $fid, time()]);
 	} else {
 		//mark all read
-		$sql->query("DELETE FROM threadsread WHERE uid=" . $loguser['id']);
-		$sql->query("REPLACE INTO forumsread (uid,fid,time) SELECT " . $loguser['id'] . ",f.id," . time() . " FROM forums f");
+		$sql->query("DELETE FROM threadsread WHERE uid=" . $userdata['id']);
+		$sql->query("REPLACE INTO forumsread (uid,fid,time) SELECT " . $userdata['id'] . ",f.id," . time() . " FROM forums f");
 	}
 	redirect('index.php');
 }
@@ -34,7 +34,7 @@ $forums = $sql->query("SELECT f.*, ".($log ? "r.time rtime, " : '').userfields('
 		. "FROM forums f "
 		. "LEFT JOIN principia.users u ON u.id=f.lastuser "
 		. "LEFT JOIN categories c ON c.id=f.cat "
-		. ($log ? "LEFT JOIN forumsread r ON r.fid = f.id AND r.uid = ".$loguser['id'] : '')
+		. ($log ? "LEFT JOIN forumsread r ON r.fid = f.id AND r.uid = ".$userdata['id'] : '')
 		. " ORDER BY c.ord,c.id,f.ord,f.id", []);
 $cat = -1;
 

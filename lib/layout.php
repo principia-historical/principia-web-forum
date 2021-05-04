@@ -1,10 +1,5 @@
 <?php
 
-function redirect($url) {
-	header("Location: ".$url);
-	die();
-}
-
 /**
  * Renders a table in HTML using $headers for column definition and $data to fill cells with data.
  *

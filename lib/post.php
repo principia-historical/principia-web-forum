@@ -129,7 +129,7 @@ function posttoolbar() {
 }
 
 function threadpost($post, $pthread = '') {
-	global $dateformat, $loguser;
+	global $dateformat, $userdata;
 
 	$post['ranktext'] = getrank(0, $post['uposts']);
 	$post['utitle'] = $post['ranktext']
@@ -176,7 +176,7 @@ HTML;
 		$revisionstr = " (rev. {$post['revision']} of " . date($dateformat, $post['ptdate']) . " by " . userlink_by_id($post['ptuser']) . ")";
 
 	// I have no way to tell if it's closed (or otherwise impostable (hah)) so I can't hide it in those circumstances...
-	if (isset($post['thread']) && $post['id'] && $loguser['id'] != 0) {
+	if (isset($post['thread']) && $post['id'] && $userdata['id'] != 0) {
 		$postlinks .= ($postlinks ? ' | ' : '') . "<a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Reply</a>";
 	}
 

@@ -16,11 +16,11 @@ while ($g = $r->fetch())
 //-user's primary group permissions, then the parent group's permissions, recursively until it reaches the top
 //first encountered occurence of a permission has precendence (+/-)
 function load_user_permset() {
-	global $logpermset, $loguser;
+	global $logpermset, $userdata;
 
 	//load user specific permissions
-	$logpermset = perms_for_x('user',$loguser['id']);
-	$logpermset = apply_group_permissions($logpermset,$loguser['group_id']);
+	$logpermset = perms_for_x('user',$userdata['id']);
+	$logpermset = apply_group_permissions($logpermset,$userdata['group_id']);
 }
 
 //Badge permset
@@ -96,8 +96,8 @@ function in_permset($permset,$perm) {
 }
 
 function can_edit_post($post) {
-	global $loguser;
-	if (isset($post['user']) && $post['user'] == $loguser['id'] && has_perm('update-own-post')) return true;
+	global $userdata;
+	if (isset($post['user']) && $post['user'] == $userdata['id'] && has_perm('update-own-post')) return true;
 	else if (has_perm('update-post')) return true;
 	else if (isset($post['tforum']) && can_edit_forum_posts($post['tforum'])) return true;
 	return false;
@@ -114,13 +114,13 @@ function can_edit_user_assets() {
 }
 
 function can_edit_user($uid) {
-	global $loguser;
+	global $userdata;
 
 	$gid = gid_for_user($uid);
 	if (is_root_gid($gid) && !has_perm('no-restrictions')) return false;
-	if ((!can_edit_user_assets() && $uid!=$loguser['id']) && !has_perm('no-restrictions')) return false;
+	if ((!can_edit_user_assets() && $uid!=$userdata['id']) && !has_perm('no-restrictions')) return false;
 
-	if ($uid == $loguser['id'] && has_perm('update-own-profile')) return true;
+	if ($uid == $userdata['id'] && has_perm('update-own-profile')) return true;
 	else if (has_perm('update-profiles')) return true;
 	return false;
 }
