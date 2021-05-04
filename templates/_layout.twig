@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Principia - {% block title %}Forum{% endblock %}</title>
+		<base href="{{ basepath }}forum/">
+		<link rel="stylesheet" href="../assets/css/style.css" type="text/css">
+		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" crossorigin="anonymous">
+		<link rel="stylesheet" href="assets/style.css">
+		<script src="assets/js/microlight.js"></script>
+		<script src="assets/js/tools.js"></script>
+	</head>
+	<body {% if is_android_webview() %}style="zoom:0.6"{% endif %}>
+		<div class="top">
+			<a href="../"><img class="picon" src="../assets/icon.png"/></a>
+			<ul class="menu left">
+				<li><a href="../popular.php" class="btn">Popular</a></li>
+				<li><a href="../top.php" class="btn">Top</a></li>
+				<li><a href="../latest.php" class="btn">New</a></li>
+				<li><a href="../chat.php" class="btn">Chat</a></li>
+				<li><a href="./" class="btn">Forum</a></li>
+				<li><a href="../contests.php" class="btn">Contests</a></li>
+				<li><a href="search.php" class="btn"><img src="../assets/icons/search.svg" class="search"></a></li>
+			</ul>
+			<ul class="menu right">
+				<li><em>
+					{% if log %}
+						{{ userlink(userdata) }}
+						{% if notification_count > 0 %}
+							<span class="notifs">[{{ notification_count }}]</span>
+						{% endif %}
+					{% else %}
+						<a href="../login.php">Login</a>
+					{% endif %}
+				</em></li>
+			</ul>
+		</div>
+		<div class="top">
+			<ul class="menu left">
+				<li><a href="./" class="btn">Forum</a></li>
+				<li><a href="activeusers.php" class="btn">Active users</a></li>
+				<li><a href="thread.php?time=86400" class="btn">Latest posts</a></li>
+				<li><a href="private.php" class="btn">Private messages</a></li>
+			</ul>
+			<ul class="menu right">
+				<li><a href="./?action=markread&fid=all">Mark all forums read</a></li>
+			</ul>
+		</div><br>
+		<div class="home content forum">
+			{% block content %}{% endblock %}
+		</div><br>
+		<div class="footer">
+			<a href="about">About</a>
+			{{ custom_info() }}
+			<br>
+			Running <a href="https://github.com/principia-preservation-project/principia-web">principia-web</a>,
+			on commit <a href="https://github.com/principia-preservation-project/principia-web/commit/{{ git_commit(false) }}">{{ git_commit() }}</a>
+		</div>
+		<script type="text/javascript" src="assets/base.js"></script>
+		{% block custom_footer %}{% endblock %}
+	</body>
+</html>

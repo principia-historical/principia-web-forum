@@ -198,3 +198,27 @@ function if_empty_query($result, $message, $colspan = 0, $table = false) {
 		if ($table) echo '</table>';
 	}
 }
+
+function if_empty_query2($message, $colspan = 0, $table = false) {
+	if ($table) echo '<table class="c1">';
+	echo '<tr><td class="b n1 center" '.($colspan != 0 ? "colspan=$colspan" : '')."><p>$message</p></td></tr>";
+	if ($table) echo '</table>';
+}
+
+function _twigloader($subfolder = '') {
+	global $dateformat;
+
+	$twig = twigloader($subfolder, function () use ($subfolder) {
+		return new \Twig\Loader\FilesystemLoader('templates/' . $subfolder);
+	}, function ($loader, $doCache) {
+		return new \Twig\Environment($loader, [
+			'cache' => $doCache,
+		]);
+	});
+
+	$twig->addExtension(new PrincipiaForumExtension());
+
+	$twig->addGlobal('forum_dateformat', $dateformat);
+
+	return $twig;
+}
