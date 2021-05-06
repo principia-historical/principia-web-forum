@@ -156,6 +156,7 @@ function pageheader($pagetitle = '', $fid = null) {
  * @return void
  */
 function noticemsg($name, $msg, $error = false) {
+	trigger_error("noticemsg() is deprecated", E_USER_DEPRECATED);
 	if ($error) {
 		pageheader('Error');
 	}

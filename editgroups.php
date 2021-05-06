@@ -1,7 +1,7 @@
 <?php
 require('lib/common.php');
 
-if (!has_perm('edit-groups')) noticemsg("Error", "You have no permissions to do this!", true);
+if (!has_perm('edit-groups')) error('Error', 'You have no permissions to do this!');
 
 $act = (isset($_GET['act']) ? $_GET['act'] : '');
 $errmsg = '';
@@ -70,7 +70,7 @@ if ($act == 'delete') {
 	}
 }
 
-pageheader('Edit groups');
+
 
 if ($act == 'new' || $act == 'edit') {
 	$pagebar = [
@@ -85,9 +85,11 @@ if ($act == 'new' || $act == 'edit') {
 		$pagebar['title'] = 'New group';
 	} else {
 		$group = $sql->fetch("SELECT * FROM groups WHERE id = ?",[$_GET['id']]);
-		if (!$group) { noticemsg("Error", "Invalid group ID."); pagefooter(); die(); }
+		if (!$group) error("Error", "Invalid group ID.");
 		$pagebar['title'] = 'Edit group';
 	}
+
+	pageheader('Edit groups');
 
 	if ($group) {
 		$grouplist = [0 => '(none)'];
@@ -114,6 +116,8 @@ if ($act == 'new' || $act == 'edit') {
 		'actions' => [['href'=>'editgroups.php?act=new', 'title'=>'New group']],
 		'message' => $errmsg
 	];
+
+	pageheader('Edit groups');
 
 	RenderPageBar($pagebar);
 	echo '<br>';

@@ -1,7 +1,7 @@
 <?php
 require('lib/common.php');
 
-if (!has_perm('edit-forums')) noticemsg("Error", "You have no permissions to do this!", true);
+if (!has_perm('edit-forums')) error('Error', 'You have no permissions to do this!');
 
 $error = '';
 
@@ -68,6 +68,8 @@ if (isset($_POST['savecat'])) {
 	redirect('manageforums.php');
 }
 
+if ($error) error("Error", $error);
+
 pageheader('Forum management');
 
 ?>
@@ -77,8 +79,6 @@ pageheader('Forum management');
 }</script>
 <style type="text/css">label { white-space: nowrap; } input:disabled { opacity: 0.5; }</style>
 <?php
-
-if ($error) noticemsg("Error", $error);
 
 if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 	// category editor

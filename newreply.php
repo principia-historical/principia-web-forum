@@ -18,7 +18,7 @@ $thread = $sql->fetch("SELECT t.*, f.title ftitle, f.private fprivate, f.readonl
 
 $err = '';
 if (!$thread) {
-	noticemsg("Error", "Thread does not exist.", true);
+	error("Error", "Thread does not exist.");
 } else if (!can_create_forum_post(['id' => $thread['forum'], 'private' => $thread['fprivate'], 'readonly' => $thread['freadonly']])) {
 	$err = "You have no permissions to create posts in this forum!";
 } elseif ($thread['closed'] && !has_perm('override-closed')) {
@@ -66,11 +66,7 @@ if ($pid) {
 }
 
 if ($err) {
-	pageheader('New reply', $thread['forum']);
-	$topbot['title'] .= ' (Error)';
-	RenderPageBar($topbot);
-	echo '<br>';
-	noticemsg("Error", $err."<br><a href=\"thread.php?id=$tid\">Back to thread</a>");
+	error("Error", $err."<br><a href=\"thread.php?id=$tid\">Back to thread</a>");
 } elseif ($act == 'Preview' || !$act) {
 	$post['date'] = time();
 	$post['num'] = $userdata['posts']++;

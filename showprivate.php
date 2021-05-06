@@ -6,14 +6,14 @@ $fieldlist = userfields('u', 'u').','.userfields_post();
 
 $pid = (isset($_GET['id']) ? $_GET['id'] : null);
 
-if (!$pid) noticemsg("Error", "Private message does not exist.", true);
+if (!$pid) error("Error", "Private message does not exist.");
 
 $pmsgs = $sql->fetch("SELECT $fieldlist p.* FROM pmsgs p LEFT JOIN principia.users u ON u.id = p.userfrom WHERE p.id = ?", [$pid]);
-if ($pmsgs == null) noticemsg("Error", "Private message does not exist.", true);
+if ($pmsgs == null) error("Error", "Private message does not exist.");
 $tologuser = ($pmsgs['userto'] == $userdata['id']);
 
 if ((!$tologuser && $pmsgs['userfrom'] != $userdata['id']) && !has_perm('view-user-pms'))
-	noticemsg("Error", "Private message does not exist.", true);
+	error("Error", "Private message does not exist.");
 elseif ($tologuser && $pmsgs['unread'])
 	$sql->query("UPDATE pmsgs SET unread = 0 WHERE id = ?", [$pid]);
 

@@ -2,10 +2,10 @@
 require("lib/common.php");
 
 $uid = isset($_GET['id']) ? (int)$_GET['id'] : -1;
-if ($uid < 0) noticemsg("Error", "You must specify a user ID!", true);
+if ($uid < 0) error("Error", "You must specify a user ID!");
 
 $user = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$uid]);
-if (!$user) noticemsg("Error", "This user does not exist!", true);
+if (!$user) error("Error", "This user does not exist!");
 
 $group = $sql->fetch("SELECT * FROM groups WHERE id = ?", [$user['group_id']]);
 

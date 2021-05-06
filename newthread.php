@@ -13,7 +13,7 @@ if ($act = $_POST['action']) {
 $forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN ".forums_with_view_perm(), [$fid]);
 
 if (!$forum)
-	noticemsg("Error", "Forum does not exist.", true);
+	error("Error", "Forum does not exist.");
 else if (!can_create_forum_thread($forum))
 	$err = "You have no permissions to create threads in this forum!";
 else if ($userdata['lastpost'] > time() - 30 && $act == 'Submit' && !has_perm('ignore-thread-time-limit'))
@@ -32,11 +32,7 @@ $topbot = [
 ];
 
 if (isset($err)) {
-	pageheader("New thread", $forum['id']);
-	$topbot['title'] .= ' (Error)';
-	RenderPageBar($topbot);
-	echo '<br>';
-	noticemsg("Error", $err."<a href=\"forum.php?id=$fid\">Back to forum</a>");
+	error("Error", $err."<a href=\"forum.php?id=$fid\">Back to forum</a>");
 } elseif (!$act) {
 	pageheader("New thread", $forum['id']);
 	RenderPageBar($topbot);

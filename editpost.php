@@ -51,11 +51,7 @@ if ($act == "Submit" && $post['text'] == $_POST['message']) {
 }
 
 if (isset($err)) {
-	pageheader('Edit post',$thread['forum']);
-	$topbot['title'] .= ' (Error)';
-	RenderPageBar($topbot);
-	echo '<br>';
-	noticemsg("Error", $err);
+	error("Error", $err);
 } else if (!$act) {
 	pageheader('Edit post',$thread['forum']);
 	RenderPageBar($topbot);
@@ -119,11 +115,7 @@ if (isset($err)) {
 	redirect("thread.php?pid=$pid#edit");
 } else if ($act == 'delete' || $act == 'undelete') {
 	if (!(can_delete_forum_posts($thread['forum']))) {
-		pageheader('Edit post',$thread['forum']);
-		$topbot['title'] .= ' (Error)';
-		RenderPageBar($topbot);
-		echo '<br>';
-		noticemsg("Error", "You do not have the permission to do this.");
+		error("Error", "You do not have the permission to do this.");
 	} else {
 		$sql->query("UPDATE posts SET deleted = ? WHERE id = ?", [($act == 'delete' ? 1 : 0), $pid]);
 		redirect("thread.php?pid=$pid#edit");

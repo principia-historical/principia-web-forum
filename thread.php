@@ -2,12 +2,12 @@
 require('lib/common.php');
 
 $page = isset($_REQUEST['page']) ? (int)$_REQUEST['page'] : 1;
-if ($page < 0) noticemsg("Error", "Invalid page number", true);
+if ($page < 0) error("Error", "Invalid page number");
 
 $fieldlist = userfields('u', 'u') . ',' . userfields_post();
 
 $ppp = isset($_REQUEST['ppp']) ? (int)$_REQUEST['ppp'] : $userdata['ppp'];
-if ($ppp < 0) noticemsg("Error", "Invalid posts per page number", true);
+if ($ppp < 0) error("Error", "Invalid posts per page number");
 
 if (isset($_REQUEST['id'])) {
 	$tid = (int)$_REQUEST['id'];
@@ -23,13 +23,13 @@ if (isset($_REQUEST['id'])) {
 elseif (isset($_GET['pid'])) {
 	$pid = (int)$_GET['pid'];
 	$numpid = $sql->fetch("SELECT t.id tid FROM posts p LEFT JOIN threads t ON p.thread = t.id WHERE p.id = ?", [$pid]);
-	if (!$numpid) noticemsg("Error", "Thread post does not exist.", true);
+	if (!$numpid) error("Error", "Thread post does not exist.");
 
 	$tid = $sql->result("SELECT thread FROM posts WHERE id = ?", [$pid]);
 	$page = floor($sql->result("SELECT COUNT(*) FROM posts WHERE thread = ? AND id < ?", [$tid, $pid]) / $ppp) + 1;
 	$viewmode = "thread";
 } else {
-	noticemsg("Error", "Thread does not exist.", true);
+	error("Error", "Thread does not exist.");
 }
 
 if ($viewmode == "thread")
@@ -60,7 +60,7 @@ if (isset($tid) && $log && $act && (can_edit_forum_threads(getforumbythread($tid
 	} elseif ($act == 'move') {
 		editthread($tid, '', $_POST['arg']);
 	} else {
-		noticemsg("Error", "Unknown action.", true);
+		error("Error", "Unknown action.");
 	}
 }
 
@@ -85,7 +85,7 @@ if ($viewmode == "thread") {
 			. "WHERE t.id = ? AND t.forum IN ".forums_with_view_perm(),
 			[$tid]);
 
-	if (!isset($thread['id'])) noticemsg("Error", "Thread does not exist.", true);
+	if (!isset($thread['id'])) error("Error", "Thread does not exist.");
 
 	//append thread's title to page title
 	pageheader($thread['title'], $thread['fid']);
@@ -119,7 +119,7 @@ if ($viewmode == "thread") {
 } elseif ($viewmode == "user") {
 	$user = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$uid]);
 
-	if ($user == null) noticemsg("Error", "User doesn't exist.", true);
+	if ($user == null) error("Error", "User doesn't exist.");
 
 	pageheader("Posts by " . $user['name']);
 	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "

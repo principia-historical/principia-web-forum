@@ -8,7 +8,7 @@ $topbot = [
 	'title' => 'Send'
 ];
 
-if (!has_perm('create-pms')) noticemsg("Error", "You have no permissions to do this!", true);
+if (!has_perm('create-pms')) error('Error', 'You have no permissions to do this!');
 
 if (!isset($_POST['action'])) {
 	$userto = '';
@@ -119,11 +119,7 @@ if (!isset($_POST['action'])) {
 		$msg = "You can't send a blank message!<br>Go back or <a href=sendprivate.php>try again</a>";
 	}
 
-	pageheader('Send private message');
-	$topbot['title'] .= ' (Error)';
-	RenderPageBar($topbot);
-	echo '<br>';
-	noticemsg("Error", $msg);
+	error("Error", $msg);
 }
 
 echo '<br>';
