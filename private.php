@@ -37,11 +37,11 @@ $ptitle = 'Private messages' . ($sent ? ' (sent)' : '');
 if ($id && has_perm('view-user-pms')) {
 	$user = $sql->fetch("SELECT id,name,group_id FROM principia.users WHERE id = ?", [$id]);
 	if ($user == null) error("Error", "User doesn't exist.");
-	pageheader($user['name']."'s ".strtolower($ptitle));
+	//pageheader($user['name']."'s ".strtolower($ptitle));
 	$title = userlink($user)."'s ".strtolower($ptitle);
 } else {
 	$id = $userdata['id'];
-	pageheader($ptitle);
+	//pageheader($ptitle);
 	$title = $ptitle;
 }
 
@@ -76,39 +76,11 @@ else {
 	$fpagelist = pagelist($pmsgc, $userdata['tpp'], $furl, $page).'<br>';
 }
 
-RenderPageBar($topbot);
-?><br>
-<table class="c1">
-	<tr class="h">
-		<td class="b" width="17">&nbsp;</td>
-		<td class="b" width="17">&nbsp;</td>
-		<td class="b">Title</td>
-		<td class="b" width="130"><?=ucfirst($fieldn) ?></td>
-		<td class="b" width="130">Sent on</td>
-	</tr>
-	<?php
-	for ($i = 1; $pmsg = $pmsgs->fetch(); $i++) {
-		$status = ($pmsg['unread'] ? rendernewstatus("n") : '');
-		if (!$pmsg['title'])
-			$pmsg['title'] = '(untitled)';
-
-		$tr = ($i % 2 ? 'n2' : 'n3');
-		?>
-		<tr class="<?=$tr ?> center">
-			<td class="b n2">
-				<a href="private.php?action=del&id=<?=$pmsg['id'] ?>&view=<?=$view ?>"><img src="assets/smilies/no.png" align="absmiddle"></a>
-			</td>
-			<td class="b n1"><?=$status ?></td>
-			<td class="b left" style="word-break:break-word"><a href="showprivate.php?id=<?=$pmsg['id'] ?>"><?=esc($pmsg['title']) ?></a></td>
-			<td class="b"><?=userlink($pmsg, 'u') ?></td>
-			<td class="b"><nobr><?=date($dateformat, $pmsg['date']) ?></nobr></td>
-		</tr>
-		<?php
-	}
-	if_empty_query($i, "There are no private messages.", 5);
-	?>
-</table>
-<?php
-echo $fpagelist;
-RenderPageBar($topbot);
-pagefooter();
+$twig = _twigloader();
+echo $twig->render('private.twig', [
+	'id' => $id,
+	'pmsgs' => $pmsgs,
+	'topbot' => $topbot,
+	'fieldn' => $fieldn,
+	'fpagelist' => $fpagelist
+]);
