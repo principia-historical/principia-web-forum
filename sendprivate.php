@@ -1,6 +1,8 @@
 <?php
 require('lib/common.php');
 
+$action = (isset($_POST['action']) ? $_POST['action'] : null);
+
 needs_login();
 
 $topbot = [
@@ -10,7 +12,36 @@ $topbot = [
 
 if (!has_perm('create-pms')) error('Error', 'You have no permissions to do this!');
 
-if (!isset($_POST['action'])) {
+// Submitting a PM
+if ($action == 'Submit') {
+	$userto = $sql->result("SELECT id FROM principia.users WHERE name LIKE ?", [$_POST['userto']]);
+
+	if ($userto && $_POST['message']) {
+		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP()-30) AND userfrom = ?", [$userdata['id']]);
+		$secafterpm = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 2) AND userfrom = ?", [$userdata['id']]);
+		if ($recentpms && (!has_perm('consecutive-posts'))) {
+			$msg = "You can't send more than one PM within 30 seconds!";
+		} else if ($secafterpm && (has_perm('consecutive-posts'))) {
+			$msg = "You can't send more than one PM within 2 seconds!";
+		} else {
+			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
+				[time(),$userto,$userdata['id'],$_POST['title'],$_POST['message']]);
+
+			redirect("private.php");
+		}
+	} elseif (!$userto) {
+		$msg = "That user doesn't exist!<br>Go back or <a href=sendprivate.php>try again</a>";
+	} elseif (!$_POST['message']) {
+		$msg = "You can't send a blank message!<br>Go back or <a href=sendprivate.php>try again</a>";
+	}
+
+	error("Error", $msg);
+}
+
+ob_start();
+
+// Default
+if (!$action) {
 	$userto = '';
 	if (isset($_GET['pid']) && $pid = $_GET['pid']) {
 		$post = $sql->fetch("SELECT u.name name, p.title, p.text "
@@ -29,7 +60,6 @@ if (!isset($_POST['action'])) {
 		$userto = $_POST['userto'];
 	}
 
-	pageheader('Send private message');
 	RenderPageBar($topbot);
 	?><br>
 	<form action="sendprivate.php" method="post">
@@ -57,7 +87,7 @@ if (!isset($_POST['action'])) {
 		</table>
 	</form>
 	<?php
-} elseif ($_POST['action'] == 'Preview') {
+} else if ($action == 'Preview') { // Previewing PM
 	$post['date'] = time();
 	$post['num'] = 0;
 	$post['text'] = $_POST['message'];
@@ -65,7 +95,6 @@ if (!isset($_POST['action'])) {
 		$post['u' . $field] = $val;
 	$post['ulastpost'] = time();
 
-	pageheader('Send private message');
 	$topbot['title'] .= ' (Preview)';
 	RenderPageBar($topbot);
 	?><br>
@@ -97,32 +126,16 @@ if (!isset($_POST['action'])) {
 		</table>
 	</form>
 	<?php
-} elseif ($_POST['action'] == 'Submit') {
-	$userto = $sql->result("SELECT id FROM principia.users WHERE name LIKE ?", [$_POST['userto']]);
-
-	if ($userto && $_POST['message']) {
-		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP()-30) AND userfrom = ?", [$userdata['id']]);
-		$secafterpm = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 2) AND userfrom = ?", [$userdata['id']]);
-		if ($recentpms && (!has_perm('consecutive-posts'))) {
-			$msg = "You can't send more than one PM within 30 seconds!";
-		} else if ($secafterpm && (has_perm('consecutive-posts'))) {
-			$msg = "You can't send more than one PM within 2 seconds!";
-		} else {
-			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
-				[time(),$userto,$userdata['id'],$_POST['title'],$_POST['message']]);
-
-			redirect("private.php");
-		}
-	} elseif (!$userto) {
-		$msg = "That user doesn't exist!<br>Go back or <a href=sendprivate.php>try again</a>";
-	} elseif (!$_POST['message']) {
-		$msg = "You can't send a blank message!<br>Go back or <a href=sendprivate.php>try again</a>";
-	}
-
-	error("Error", $msg);
 }
 
 echo '<br>';
 RenderPageBar($topbot);
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => 'Send private message',
+	'content' => $content
+]);

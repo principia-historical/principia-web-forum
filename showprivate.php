@@ -17,8 +17,6 @@ if ((!$tologuser && $pmsgs['userfrom'] != $userdata['id']) && !has_perm('view-us
 elseif ($tologuser && $pmsgs['unread'])
 	$sql->query("UPDATE pmsgs SET unread = 0 WHERE id = ?", [$pid]);
 
-pageheader($pmsgs['title']);
-
 $pagebar = [
 	'breadcrumb' => [
 		['href' => './', 'title' => 'Main'],
@@ -30,8 +28,17 @@ $pagebar = [
 
 $pmsgs['id'] = $pmsgs['num'] = 0;
 
+ob_start();
+
 RenderPageBar($pagebar);
 echo '<br>' . threadpost($pmsgs) . '<br>';
 RenderPageBar($pagebar);
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => $pmsgs['title'],
+	'content' => $content
+]);

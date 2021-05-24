@@ -88,7 +88,7 @@ if ($viewmode == "thread") {
 	if (!isset($thread['id'])) error("Error", "Thread does not exist.");
 
 	//append thread's title to page title
-	pageheader($thread['title'], $thread['fid']);
+	$title = $thread['title'];
 
 	//mark thread as read
 	if ($log && $thread['lastdate'] > $thread['frtime'])
@@ -121,7 +121,7 @@ if ($viewmode == "thread") {
 
 	if ($user == null) error("Error", "User doesn't exist.");
 
-	pageheader("Posts by " . $user['name']);
+	$title = "Posts by " . $user['name'];
 	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
 		. "FROM posts p "
 		. "LEFT JOIN poststext pt ON p.id=pt.id "
@@ -140,7 +140,7 @@ if ($viewmode == "thread") {
 	else
 		$mintime = 86400;
 
-	pageheader('Latest posts');
+	$title = 'Latest posts';
 
 	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
 		. "FROM posts p "
@@ -155,7 +155,7 @@ if ($viewmode == "thread") {
 
 	$thread['replies'] = $sql->result("SELECT count(*) FROM posts WHERE date > ?", [$mintime]) - 1;
 } else
-	pageheader();
+	$title = '';
 
 if ($thread['replies'] <= $ppp) {
 	$pagelist = '';
@@ -197,6 +197,8 @@ if ($viewmode == "thread") {
 	pagefooter();
 	die();
 }
+
+ob_start();
 
 $modlinks = '';
 if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($userdata['id'] == $thread['user'] && !$thread['closed'] && has_perm('rename-own-thread')))) {
@@ -376,4 +378,11 @@ if (isset($thread['id']) && can_create_forum_post($faccess) && !$thread['closed'
 
 RenderPageBar($topbot);
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => $title,
+	'content' => $content
+]);

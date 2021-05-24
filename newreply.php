@@ -3,14 +3,8 @@ require('lib/common.php');
 
 needs_login();
 
-$_POST['action'] = (isset($_POST['action']) ? $_POST['action'] : null);
-
-if ($act = $_POST['action']) {
-	$tid = $_POST['tid'];
-} else {
-	$tid = $_GET['id'];
-}
-$act = (isset($act) ? $act : null);
+$action = (isset($_POST['action']) ? $_POST['action'] : null);
+$tid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['tid']) ? $_POST['tid'] : null));
 
 $thread = $sql->fetch("SELECT t.*, f.title ftitle, f.private fprivate, f.readonly freadonly
 	FROM threads t LEFT JOIN forums f ON f.id=t.forum
@@ -24,7 +18,7 @@ if (!$thread) {
 } elseif ($thread['closed'] && !has_perm('override-closed')) {
 	$err = "You can't post in closed threads!";
 }
-if ($act == 'Submit') {
+if ($action == 'Submit') {
 	$lastpost = $sql->fetch("SELECT id,user,date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
 	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && !has_perm('consecutive-posts'))
 		$err = "You can't double post until it's been at least one day!";
@@ -67,15 +61,15 @@ if ($pid) {
 
 if ($err) {
 	error("Error", $err."<br><a href=\"thread.php?id=$tid\">Back to thread</a>");
-} elseif ($act == 'Preview' || !$act) {
+} elseif ($action == 'Preview' || !$action) {
 	$post['date'] = time();
 	$post['num'] = $userdata['posts']++;
-	$post['text'] = ($act == 'Preview' ? $_POST['message'] : $quotetext);
+	$post['text'] = ($action == 'Preview' ? $_POST['message'] : $quotetext);
 	foreach ($userdata as $field => $val)
 		$post['u' . $field] = $val;
 	$post['ulastpost'] = time();
 
-	if ($act == 'Preview') {
+	if ($action == 'Preview') {
 		pageheader('New reply', $thread['forum']);
 		$topbot['title'] .= ' (Preview)';
 		RenderPageBar($topbot);
@@ -102,7 +96,7 @@ if ($err) {
 			</td>
 		</tr>
 	</table></form><?php
-} elseif ($act == 'Submit') {
+} elseif ($action == 'Submit') {
 	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
 	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?)",
 		[$userdata['id'],$tid,time(),$userdata['posts']++]);

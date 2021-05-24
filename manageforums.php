@@ -70,7 +70,7 @@ if (isset($_POST['savecat'])) {
 
 if ($error) error("Error", $error);
 
-pageheader('Forum management');
+ob_start();
 
 ?>
 <script>function toggleAll(cls, enable) {
@@ -172,7 +172,7 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 
 	$catlist = ''; $c = 1;
 	foreach ($cats as $cat) {
-		$catlist .= sprintf('<tr><td class="b n%s"><a href="?cid=%s">%s</a></td></tr>', $c, $cat['id'], $cat['title']);
+		$catlist .= sprintf('<tr><td class="b n%s"><a href="manageforums.php?cid=%s">%s</a></td></tr>', $c, $cat['id'], $cat['title']);
 		$c = ($c == 1) ? 2 : 1;
 	}
 
@@ -182,7 +182,7 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 			$lc = $forum['cat'];
 			$forumlist .= sprintf('<tr class="c"><td class="b c">%s</td></tr>', $cats[$forum['cat']]['title']);
 		}
-		$forumlist .= sprintf('<tr><td class="b n%s"><a href="?fid=%s">%s</a></td></tr>', $c, $forum['id'], $forum['title']);
+		$forumlist .= sprintf('<tr><td class="b n%s"><a href="manageforums.php?fid=%s">%s</a></td></tr>', $c, $forum['id'], $forum['title']);
 		$c = ($c == 1) ? 2 : 1;
 	}
 
@@ -193,7 +193,7 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 					<tr class="h"><td class="b">Categories</td></tr>
 					<?=$catlist ?>
 					<tr class="h"><td class="b">&nbsp;</td></tr>
-					<tr><td class="b n1"><a href="?cid=new">New category</a></td></tr>
+					<tr><td class="b n1"><a href="manageforums.php?cid=new">New category</a></td></tr>
 				</table>
 			</td>
 			<td class="nb" style="width:50%; vertical-align:top;">
@@ -201,14 +201,22 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 					<tr class="h"><td class="b">Forums</td></tr>
 					<?=$forumlist ?>
 					<tr class="h"><td class="b">&nbsp;</td></tr>
-					<tr><td class="b n1"><a href="?fid=new">New forum</a></td></tr>
+					<tr><td class="b n1"><a href="manageforums.php?fid=new">New forum</a></td></tr>
 				</table>
 			</td>
 		</tr>
 	</table><?php
 }
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => 'Forum management',
+	'content' => $content
+]);
+
 
 function rec_grouplist($parent, $level, $tgroups, $groups) {
 	foreach ($tgroups as $g) {

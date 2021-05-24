@@ -3,27 +3,42 @@ require('lib/common.php');
 
 needs_login();
 
-if (!isset($_POST['action'])) $_POST['action'] = '';
-if ($act = $_POST['action']) {
-	$fid = $_POST['fid'];
-} else {
-	$fid = (isset($_GET['id']) ? $_GET['id'] : 0);
-}
+$action = (isset($_POST['action']) ? $_POST['action'] : null);
+$fid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['fid']) ? $_POST['fid'] : null));
 
 $forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN ".forums_with_view_perm(), [$fid]);
 
 if (!$forum)
 	error("Error", "Forum does not exist.");
-else if (!can_create_forum_thread($forum))
-	$err = "You have no permissions to create threads in this forum!";
-else if ($userdata['lastpost'] > time() - 30 && $act == 'Submit' && !has_perm('ignore-thread-time-limit'))
-	$err = "Don't post threads so fast, wait a little longer.";
-else if ($userdata['lastpost'] > time() - 2 && $act == 'Submit' && has_perm('ignore-thread-time-limit'))
-	$err = "You must wait 2 seconds before posting a thread.";
+if (!can_create_forum_thread($forum))
+	error("Error", "You have no permissions to create threads in this forum!");
 
-if ($act == 'Submit') {
-	if (strlen(trim(str_replace(' ', '', $_POST['title']))) < 4)
-		$err = "You need to enter a longer title.";
+if ($action == 'Submit') {
+	if (strlen(trim($_POST['title'])) < 4)
+		error("Error", "You need to enter a longer title.");
+	if ($userdata['lastpost'] > time() - 30 && $action == 'Submit' && !has_perm('ignore-thread-time-limit'))
+		error("Error", "Don't post threads so fast, wait a little longer.");
+	if ($userdata['lastpost'] > time() - 2 && $action == 'Submit' && has_perm('ignore-thread-time-limit'))
+		error("Error", "You must wait 2 seconds before posting a thread.");
+
+	$sql->query("UPDATE principia.users SET posts = posts + 1, threads = threads + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
+
+	$sql->query("INSERT INTO threads (title, forum, user, lastdate, lastuser) VALUES (?,?,?,?,?)",
+		[$_POST['title'], $fid, $userdata['id'], time(), $userdata['id']]);
+
+	$tid = $sql->insertid();
+	$sql->query("INSERT INTO posts (user, thread, date, num) VALUES (?,?,?,?)",
+		[$userdata['id'], $tid, time(), $userdata['posts']++]);
+
+	$pid = $sql->insertid();
+	$sql->query("INSERT INTO poststext (id, text) VALUES (?,?)",
+		[$pid, $_POST['message']]);
+
+	$sql->query("UPDATE forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?", [time(), $userdata['id'], $pid, $fid]);
+
+	$sql->query("UPDATE threads SET lastid = ? WHERE id = ?", [$pid, $tid]);
+
+	redirect("thread.php?id=$tid");
 }
 
 $topbot = [
@@ -31,10 +46,9 @@ $topbot = [
 	'title' => "New thread"
 ];
 
-if (isset($err)) {
-	error("Error", $err."<a href=\"forum.php?id=$fid\">Back to forum</a>");
-} elseif (!$act) {
-	pageheader("New thread", $forum['id']);
+ob_start();
+
+if (!$action) {
 	RenderPageBar($topbot);
 	?><br>
 	<form action="newthread.php" method="post"><table class="c1">
@@ -58,7 +72,7 @@ if (isset($err)) {
 		</tr>
 	</table></form>
 	<?php
-} elseif ($act == 'Preview') {
+} elseif ($action == 'Preview') {
 	$post['date'] = time();
 	$post['num'] = $userdata['posts']++;
 	$post['text'] = $_POST['message'];
@@ -66,7 +80,6 @@ if (isset($err)) {
 		$post['u' . $field] = $val;
 	$post['ulastpost'] = time();
 
-	pageheader("New thread", $forum['id']);
 	$topbot['title'] .= ' (Preview)';
 	RenderPageBar($topbot);
 	?><br>
@@ -93,25 +106,16 @@ if (isset($err)) {
 			</td>
 		</tr>
 	</table></form><?php
-} elseif ($act == 'Submit') {
-	$sql->query("UPDATE principia.users SET posts = posts + 1,threads = threads + 1,lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
-	$sql->query("INSERT INTO threads (title,forum,user,lastdate,lastuser) VALUES (?,?,?,?,?)",
-		[$_POST['title'],$fid,$userdata['id'],time(),$userdata['id']]);
-	$tid = $sql->insertid();
-	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?)",
-		[$userdata['id'],$tid,time(),$userdata['posts']++]);
-	$pid = $sql->insertid();
-	$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
-		[$pid,$_POST['message']]);
-
-	$sql->query("UPDATE forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?", [time(), $userdata['id'], $pid, $fid]);
-
-	$sql->query("UPDATE threads SET lastid = ? WHERE id = ?", [$pid, $tid]);
-
-	redirect("thread.php?id=$tid");
 }
 
 echo '<br>';
 RenderPageBar($topbot);
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => 'New Thread',
+	'content' => $content
+]);

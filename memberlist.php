@@ -1,6 +1,5 @@
 <?php
 require('lib/common.php');
-pageheader('Memberlist');
 
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'posts';
 $page = isset($_GET['page']) ? $_GET['page'] : '';
@@ -24,6 +23,8 @@ if ($num >= $ppp) {
 	for ($p = 1; $p <= 1 + floor(($num - 1) / $ppp); $p++)
 		$pagelist .= ($p == $page ? " $p" : ' ' . mlink($p, $sort, $p, $orderby) . "</a>");
 }
+
+ob_start();
 
 ?>
 <table class="c1">
@@ -65,7 +66,6 @@ echo '</table>';
 
 if ($pagelist)
 	echo '<br>'.$pagelist.'<br>';
-pagefooter();
 
 function mlink($name, $sort, $page, $orderby) {
 	return '<a href="memberlist.php?'.
@@ -73,3 +73,12 @@ function mlink($name, $sort, $page, $orderby) {
 		($orderby != '' ? "&orderby=$orderby" : '').'">'
 		.$name.'</a>';
 }
+
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => 'Memberlist',
+	'content' => $content
+]);
