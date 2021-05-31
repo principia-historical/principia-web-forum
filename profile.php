@@ -39,13 +39,6 @@ if ($log) {
 if (has_perm('view-user-pms'))
 	$links[] = ['url' => "private.php?id=$uid", 'title' => 'View private messages'];
 
-if (has_perm('edit-permissions') && has_perm('ban-users')) {
-	if ($user['group_id'] != $bannedgroup)
-		$links[] = ['url' => "banmanager.php?id=$uid", 'title' => 'Ban user'];
-	else
-		$links[] = ['url' => "banmanager.php?unban&id=$uid", 'title' => 'Unban user'];
-}
-
 //More indepth test to not show the link if you can't edit your own perms
 if (has_perm('edit-permissions') && (has_perm('edit-own-permissions') || $userdata['id'] != $uid)) {
 	$links[] = ['url' => "editperms.php?uid=$uid", 'title' => 'Edit user permissions'];

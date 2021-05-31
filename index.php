@@ -1,7 +1,6 @@
 <?php
 if (isset($_GET['p'])) redirect("thread.php?pid={$_GET['p']}#{$_GET['p']}");
 if (isset($_GET['t'])) redirect("thread.php?id={$_GET['t']}");
-if (isset($_GET['u'])) redirect("profile.php?id={$_GET['u']}");
 
 require('lib/common.php');
 
