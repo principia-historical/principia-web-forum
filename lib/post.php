@@ -18,82 +18,15 @@ function get_username_link($matches) {
 		return $matches[0];
 }
 
-function securityfilter($msg) {
-	$tags = 'script|iframe|embed|object|textarea|noscript|meta|xmp|plaintext|base';
-	$msg = preg_replace("'<(/?)({$tags})'si", "&lt;$1$2", $msg);
-
-	$msg = preg_replace('@(on)(\w+\s*)=@si', '$1$2&#x3D;', $msg);
-
-	$msg = preg_replace("'-moz-binding'si", ' -mo<z>z-binding', $msg);
-	$msg = str_ireplace("expression", "ex<z>pression", $msg);
-	$msg = preg_replace("'filter:'si", 'filter&#58;>', $msg);
-	$msg = preg_replace("'javascript:'si", 'javascript&#58;>', $msg);
-	$msg = preg_replace("'transform:'si", 'transform&#58;>', $msg);
-
-	return $msg;
-}
-
-function makecode($match) {
-	$code = esc($match[1]);
-	$list = ["[", ":", ")", "_", "@", "-"];
-	$list2 = ["&#91;", "&#58;", "&#41;", "&#95;", "&#64;", "&#45;"];
-	return '<code class="microlight">' . str_replace($list, $list2, $code) . '</code>';
-}
-
-function makeirc($match) {
-	$code = esc($match[1]);
-	$list = ["\r\n", "[", ":", ")", "_", "@", "-"];
-	$list2 = ["<br>", "&#91;", "&#58;", "&#41;", "&#95;", "&#64;", "&#45;"];
-	return '<table style="width:90%;min-width:90%;"><tr><td class="b n3"><code>' . str_replace($list, $list2, $code) . '</code></table>';
-}
-
-function filterstyle($match) {
-	$style = $match[2];
-
-	// remove newlines.
-	// this will prevent them being replaced with <br> tags and breaking the CSS
-	$style = str_replace("\n", '', $style);
-
-	return $match[1] . $style . $match[3];
-}
-
 function postfilter($msg) {
-	global $smilies;
+	$markdown = new Parsedown();
+	$markdown->setSafeMode(true);
+	$msg = $markdown->text($msg);
 
-	//[code] tag
-	$msg = preg_replace_callback("'\[code\](.*?)\[/code\]'si", 'makecode', $msg);
-
-	//[irc] variant of [code]
-	$msg = preg_replace_callback("'\[irc\](.*?)\[/irc\]'si", 'makeirc', $msg);
-
-	$msg = preg_replace_callback("@(<style.*?>)(.*?)(</style.*?>)@si", 'filterstyle', $msg);
-
-	$msg = securityfilter($msg);
-
-	$msg = str_replace("\n", '<br>', $msg);
-
-	foreach ($smilies as $smiley)
-		$msg = str_replace($smiley['text'], sprintf('<img src="%s" align=absmiddle alt="%s" title="%s">', $smiley['url'], $smiley['text'], $smiley['text']), $msg);
-
-	//Relocated here due to conflicts with specific smilies.
-	$msg = preg_replace("@(</?(?:table|caption|col|colgroup|thead|tbody|tfoot|tr|th|td|ul|ol|li|div|p|style|link).*?>)\r?\n@si", '$1', $msg);
-
-	$msg = preg_replace("'\[(b|i|u|s)\]'si", '<\\1>', $msg);
-	$msg = preg_replace("'\[/(b|i|u|s)\]'si", '</\\1>', $msg);
-	$msg = preg_replace("'\[url\](.*?)\[/url\]'si", '<a href=\\1>\\1</a>', $msg);
-	$msg = preg_replace("'\[url=(.*?)\](.*?)\[/url\]'si", '<a href=\\1>\\2</a>', $msg);
-	$msg = preg_replace("'\[img\](.*?)\[/img\]'si", '<img src=\\1>', $msg);
 	$msg = preg_replace("'\[quote\](.*?)\[/quote\]'si", '<blockquote><hr>\\1<hr></blockquote>', $msg);
-	$msg = preg_replace("'\[color=([a-f0-9]{6})\](.*?)\[/color\]'si", '<span style="color: #\\1">\\2</span>', $msg);
-
-	$msg = preg_replace_callback('\'@\"((([^"]+))|([A-Za-z0-9_\-%]+))\"\'si', "get_username_link", $msg);
-
 	$msg = preg_replace("'\[reply=\"(.*?)\" id=\"(.*?)\"\]'si", '<blockquote><span class="quotedby"><small><i><a href=showprivate.php?id=\\2>Sent by \\1</a></i></small></span><hr>', $msg);
 	$msg = preg_replace("'\[quote=\"(.*?)\" id=\"(.*?)\"\](.*?)\[/quote\]'si", '<blockquote><span class="quotedby"><small><i><a href=thread.php?pid=\\2#\\2>Posted by \\1</a></i></small></span><hr>\\3<hr></blockquote>', $msg);
 	$msg = preg_replace("'\[quote=(.*?)\](.*?)\[/quote\]'si", '<blockquote><span class="quotedby"><i>Posted by \\1</i></span><hr>\\2<hr></blockquote>', $msg);
-	$msg = preg_replace("'>>([0-9]+)'si", '>><a href=thread.php?pid=\\1#\\1>\\1</a>', $msg);
-
-	$msg = preg_replace("'\[youtube\]([\-0-9_a-zA-Z]*?)\[/youtube\]'si", '<iframe width="427" height="240" src="http://www.youtube.com/embed/\\1" frameborder="0" allowfullscreen></iframe>', $msg);
 
 	return $msg;
 }
@@ -113,7 +46,7 @@ function posttoolbutton($name, $title, $leadin, $leadout) {
 }
 
 function posttoolbar() {
-	return '<div class="posttoolbar">'
+	/*return '<div class="posttoolbar">'
 		. posttoolbutton('fa-bold', "Bold", "[b]", "[/b]")
 		. posttoolbutton("fa-italic", "Italic", "[i]", "[/i]")
 		. posttoolbutton("fa-underline", "Underline", "[u]", "[/u]")
@@ -125,7 +58,8 @@ function posttoolbar() {
 		. "&nbsp;&nbsp;"
 		. posttoolbutton("fa-image", "IMG", "[img]", "[/img]")
 		. posttoolbutton("fa-video", "YouTube", "[youtube]", "[/youtube]")
-		. '</div>';
+		. '</div>';*/
+	return 'todo';
 }
 
 function threadpost($post, $pthread = '') {
@@ -202,11 +136,11 @@ HTML;
 	$lastview = timeunits(time() - $post['ulastview']);
 	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
 	if ($post['usignature']) {
-		$post['usignature'] = '<br><br><small>____________________<br>' . $post['usignature'] . '</small>';
+		$post['usignature'] = '<div class="siggy">' . postfilter($post['usignature']) . '</div>';
 	}
-	$utitle = postfilter($post['utitle']);
+	$utitle = esc($post['utitle']);
 	$ujoined = date('Y-m-d', $post['ujoined']);
-	$posttext = postfilter($post['text'].$post['usignature']);
+	$posttext = postfilter($post['text']);
 	$text = <<<HTML
 <table class="c1" id="{$post['id']}">
 	$postheaderrow
@@ -228,7 +162,7 @@ HTML;
 			<br>Last post: $lastpost
 			<br>Last view: $lastview
 		</td>
-		<td class="b n2 mainbar" id="post_{$post['id']}">$posttext</td>
+		<td class="b n2 mainbar" id="post_{$post['id']}">$posttext{$post['usignature']}</td>
 	</tr>
 </table>
 HTML;
