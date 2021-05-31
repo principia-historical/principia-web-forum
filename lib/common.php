@@ -180,6 +180,7 @@ function pagefooter() {
 	?></div><br><div class="footer">
 	<a href="../about.php">About</a><br><?=sprintf("Page rendered in %1.3f seconds. (%dKB of memory used)", $time, memory_get_usage(false) / 1024); ?>
 </div>
+<div class="center"><span style="color:red">This page is using the legacy forum layout.</span></div>
 </body>
 </html><?php
 }
