@@ -5,39 +5,7 @@ $acmlm = true;
 $rankset_names = ['None'];
 
 // List of smilies
-$smilies = [
-	['text' => '-_-', 'url' => 'assets/smilies/annoyed.gif'],
-	['text' => 'o_O', 'url' => 'assets/smilies/bigeyes.gif'],
-	['text' => ':D', 'url' => 'assets/smilies/biggrin.gif'],
-	['text' => 'o_o', 'url' => 'assets/smilies/blank.gif'],
-	['text' => ':x', 'url' => 'assets/smilies/crossmouth.gif'],
-	['text' => ';_;', 'url' => 'assets/smilies/cry.gif'],
-	['text' => '^_^', 'url' => 'assets/smilies/cute.gif'],
-	['text' => '@_@', 'url' => 'assets/smilies/dizzy.gif'],
-	['text' => ':@', 'url' => 'assets/smilies/dropsmile.gif'],
-	['text' => 'O_O', 'url' => 'assets/smilies/eek.gif'],
-	['text' => '>:]', 'url' => 'assets/smilies/evil.gif'],
-	['text' => ':eyeshift:', 'url' => 'assets/smilies/eyeshift.gif'],
-	['text' => ':(', 'url' => 'assets/smilies/frown.gif'],
-	['text' => '8-)', 'url' => 'assets/smilies/glasses.gif'],
-	['text' => ':LOL:', 'url' => 'assets/smilies/lol.gif'],
-	['text' => '>:[', 'url' => 'assets/smilies/mad.gif'],
-	['text' => '<_<', 'url' => 'assets/smilies/shiftleft.gif'],
-	['text' => '>_>', 'url' => 'assets/smilies/shiftright.gif'],
-	['text' => 'x_x', 'url' => 'assets/smilies/sick.gif'],
-	['text' => ':|', 'url' => 'assets/smilies/slidemouth.gif'],
-	['text' => ':)', 'url' => 'assets/smilies/smile.gif'],
-	['text' => ':P', 'url' => 'assets/smilies/tongue.gif'],
-	['text' => ':B', 'url' => 'assets/smilies/vamp.gif'],
-	['text' => ';)', 'url' => 'assets/smilies/wink.gif'],
-	['text' => ':-3', 'url' => 'assets/smilies/wobble.gif'],
-	['text' => ':S', 'url' => 'assets/smilies/wobbly.gif'],
-	['text' => '>_<', 'url' => 'assets/smilies/yuck.gif'],
-	['text' => ':box:', 'url' => 'assets/smilies/box.png'],
-	['text' => ':yes:', 'url' => 'assets/smilies/yes.png'],
-	['text' => ':no:', 'url' => 'assets/smilies/no.png'],
-	['text' => 'OwO', 'url' => 'assets/smilies/owo.png']
-];
+$smilies = [];
 
 chdir('../');
 require_once('conf/config.php'); // include principia-web config
