@@ -37,11 +37,11 @@ $ptitle = 'Private messages' . ($sent ? ' (sent)' : '');
 if ($id && has_perm('view-user-pms')) {
 	$user = $sql->fetch("SELECT id,name,group_id FROM principia.users WHERE id = ?", [$id]);
 	if ($user == null) error("Error", "User doesn't exist.");
-	//pageheader($user['name']."'s ".strtolower($ptitle));
+	$headtitle = $user['name']."'s ".strtolower($ptitle);
 	$title = userlink($user)."'s ".strtolower($ptitle);
 } else {
 	$id = $userdata['id'];
-	//pageheader($ptitle);
+	$headtitle = $ptitle;
 	$title = $ptitle;
 }
 
@@ -82,5 +82,6 @@ echo $twig->render('private.twig', [
 	'pmsgs' => $pmsgs,
 	'topbot' => $topbot,
 	'fieldn' => $fieldn,
-	'fpagelist' => $fpagelist
+	'fpagelist' => $fpagelist,
+	'headtitle' => $headtitle
 ]);
