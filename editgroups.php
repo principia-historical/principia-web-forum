@@ -70,7 +70,7 @@ if ($act == 'delete') {
 	}
 }
 
-
+ob_start();
 
 if ($act == 'new' || $act == 'edit') {
 	$pagebar = [
@@ -88,8 +88,6 @@ if ($act == 'new' || $act == 'edit') {
 		if (!$group) error("Error", "Invalid group ID.");
 		$pagebar['title'] = 'Edit group';
 	}
-
-	pageheader('Edit groups');
 
 	if ($group) {
 		$grouplist = [0 => '(none)'];
@@ -116,8 +114,6 @@ if ($act == 'new' || $act == 'edit') {
 		'actions' => [['href'=>'editgroups.php?act=new', 'title'=>'New group']],
 		'message' => $errmsg
 	];
-
-	pageheader('Edit groups');
 
 	RenderPageBar($pagebar);
 	echo '<br>';
@@ -160,4 +156,11 @@ if ($act == 'new' || $act == 'edit') {
 	RenderPageBar($pagebar);
 }
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => 'Edit groups',
+	'content' => $content
+]);

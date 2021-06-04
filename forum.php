@@ -15,8 +15,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	if (!isset($forum['id'])) error("Error", "Forum does not exist.");
 
-	//append the forum's title to the site title
-	pageheader($forum['title'], $fid);
+	$title = $forum['title'];
 
 	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*"
 		. ($log ? ", (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<'$forum[rtime]') isread" : '') . ' '
@@ -40,7 +39,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	if (!isset($user)) error("Error", "User does not exist.");
 
-	pageheader("Threads by " . $user['name']);
+	$title = "Threads by " . $user['name'];
 
 	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*, f.id fid, "
 		. ($log ? " (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread, " : ' ')
@@ -70,7 +69,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	else
 		$mintime = 86400;
 
-	pageheader('Latest posts');
+	$title = 'Latest posts';
 
 	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*, f.id fid,
 		f.title ftitle" . ($log ? ', (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread ' : ' ')
@@ -108,6 +107,8 @@ if ($forum['threads'] <= $userdata['tpp']) {
 		$furl = "forum.php?time=$time";
 	$fpagelist = '<br>'.pagelist($forum['threads'], $userdata['tpp'], $furl, $page);
 }
+
+ob_start();
 
 RenderPageBar($topbot);
 
@@ -182,4 +183,11 @@ echo "</table>$fpagelist".(!isset($time) ? '<br>' : '');
 
 RenderPageBar($topbot);
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => $title,
+	'content' => $content
+]);
