@@ -1,11 +1,11 @@
 <?php
 require("lib/common.php");
 
-pageheader("Search");
-
 $query = (isset($_GET['q']) ? $_GET['q'] : '');
 $where = (isset($_GET['w']) ? $_GET['w'] : 0);
 $forum = (isset($_GET['f']) ? $_GET['f'] : 0);
+
+ob_start();
 
 ?>
 <table class="c1">
@@ -31,7 +31,15 @@ if (!isset($_GET['action']) || strlen($query) < 3) {
 	if (isset($_GET['action']) && strlen($query) < 3) {
 		echo '<br><table class="c1"><tr><td class="b n1 center">Please enter more than 2 characters!</td></tr></table>';
 	}
-	pagefooter();
+	$content = ob_get_contents();
+	ob_end_clean();
+
+	$twig = _twigloader();
+	echo $twig->render('_legacy.twig', [
+		'page_title' => "Search",
+		'content' => $content
+	]);
+
 	die();
 }
 
@@ -140,4 +148,11 @@ if ($where == 1) {
 	?></table><?php echo $fpagelist;
 }
 
-pagefooter();
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => "Search",
+	'content' => $content
+]);

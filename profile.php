@@ -9,7 +9,6 @@ if (!$user) error("Error", "This user does not exist!");
 
 $group = $sql->fetch("SELECT * FROM groups WHERE id = ?", [$user['group_id']]);
 
-pageheader("Profile for ".$user['name']);
 
 $days = (time() - $user['joined']) / 86400;
 
@@ -62,6 +61,8 @@ $topbot = [
 	'title' => $user['name']
 ];
 
+ob_start();
+
 RenderPageBar($topbot);
 
 foreach ($profilefields as $k => $v) {
@@ -84,4 +85,12 @@ foreach ($profilefields as $k => $v) {
 </table><br>
 <?php
 RenderPageBar($topbot);
-pagefooter();
+
+$content = ob_get_contents();
+ob_end_clean();
+
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => "Profile for ".$user['name'],
+	'content' => $content
+]);
