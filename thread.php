@@ -193,9 +193,7 @@ if ($viewmode == "thread") {
 	$topbot = [];
 	$time = $_GET['time'];
 } else {
-	noticemsg("Error", "Thread does not exist.<br><a href=./>Back to main</a>");
-	pagefooter();
-	die();
+	error("Error", "Thread does not exist.<br><a href=./>Back to main</a>");
 }
 
 ob_start();
