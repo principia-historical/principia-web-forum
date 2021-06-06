@@ -80,7 +80,7 @@ if (isset($_POST['addnew'])) {
 	}
 }
 
-pageheader('Edit permissions');
+ob_start();
 
 $pagebar = [
 	'breadcrumb' => [['href'=>'./', 'title'=>'Main']],
@@ -161,7 +161,11 @@ echo '<br>';
 $pagebar['message'] = '';
 RenderPageBar($pagebar);
 
-pagefooter();
+$twig = _twigloader();
+echo $twig->render('_legacy.twig', [
+	'page_title' => 'Edit perms',
+	'content' => $content
+]);
 
 function PermSelect($name, $sel) {
 	global $sql, $permlist;
