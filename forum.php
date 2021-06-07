@@ -60,7 +60,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "WHERE t.user = ? AND f.id IN " . forums_with_view_perm(), [$uid]);
 
 	$topbot = [
-		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "profile.php?id=$uid", 'title' => $user['name']]],
+		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "../user.php?id=$uid", 'title' => $user['name']]],
 		'title' => 'Threads'
 	];
 } elseif ($time = $_GET['time']) {
