@@ -22,7 +22,7 @@ function getrank($set, $posts) {
 }
 
 function userfields($tbl = '', $pf = '') {
-	$fields = ['id', 'name', 'group_id'];
+	$fields = ['id', 'name', 'customcolor'];
 
 	$ret = '';
 	foreach ($fields as $f) {
@@ -50,14 +50,4 @@ function userlink_by_id($uid) {
 	global $sql;
 	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE id=?", [$uid]);
 	return userlink($u);
-}
-
-function userlink($user, $u = '') {
-	if (!$user[$u.'name']) $user[$u.'name'] = 'null';
-
-	return sprintf('<a href="../user.php?id=%s">%s</a>', $user[$u.'id'], userdisp($user, $u));
-}
-
-function userdisp($user, $u = '') {
-	return sprintf('<span class="t_user">%s</span>', esc($user[$u.'name']));
 }
