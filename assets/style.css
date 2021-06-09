@@ -59,15 +59,6 @@ textarea, input, select, button {
 	margin-bottom: 4px;
 }
 
-.microlight {
-	background-color: #2f3640;
-	color: #ffd66f;
-	display: block;
-	font-family: Monaco, Consolas, monospace;
-	padding: 5px;
-	white-space: pre;
-}
-
 .posttoolbar button {
 	height: 2em;
 	width: 2em;
