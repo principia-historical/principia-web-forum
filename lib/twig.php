@@ -11,6 +11,7 @@ class PrincipiaForumExtension extends \Twig\Extension\AbstractExtension {
 			// layout.php
 			new \Twig\TwigFunction('rendernewstatus', 'rendernewstatus', ['is_safe' => ['html']]),
 			new \Twig\TwigFunction('render_page_bar', 'RenderPageBar', ['is_safe' => ['html']]),
+			new \Twig\TwigFunction('if_empty_query2', 'if_empty_query2', ['is_safe' => ['html']]),
 
 			// perm.php
 			new \Twig\TwigFunction('load_user_permset', 'load_user_permset'),
@@ -39,9 +40,9 @@ class PrincipiaForumExtension extends \Twig\Extension\AbstractExtension {
 			new \Twig\TwigFunction('parent_group_for_group', 'parent_group_for_group'),
 			new \Twig\TwigFunction('perms_for_x', 'perms_for_x'),
 
-
-			new \Twig\TwigFunction('if_empty_query2', 'if_empty_query2', ['is_safe' => ['html']]),
-
+			// post.php
+			new \Twig\TwigFunction('threadpost', 'threadpost', ['is_safe' => ['html']]),
+			new \Twig\TwigFunction('posttoolbar', 'posttoolbar', ['is_safe' => ['html']]),
 		];
 	}
 	public function getFilters() {
