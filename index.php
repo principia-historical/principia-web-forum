@@ -22,9 +22,9 @@ if ($log && $action == 'markread') {
 	redirect('index.php');
 }
 
-$categs = $sql->query("SELECT * FROM categories ORDER BY ord,id");
+$categs = $sql->query("SELECT id,title FROM categories ORDER BY ord,id");
 while ($c = $categs->fetch()) {
-	$categ[$c['id']] = $c;
+	$categ[$c['id']] = $c['title'];
 }
 
 $forums = $sql->query("SELECT f.*, ".($log ? "r.time rtime, " : '').userfields('u', 'u')." "
@@ -37,5 +37,5 @@ $forums = $sql->query("SELECT f.*, ".($log ? "r.time rtime, " : '').userfields('
 $twig = _twigloader();
 echo $twig->render('index.twig', [
 	'forums' => $forums,
-	'categories' => $categs
+	'categories' => $categ
 ]);
