@@ -247,25 +247,13 @@ if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($userdata['id']
 	$threadtitle = addcslashes(htmlentities($thread['title'], ENT_COMPAT | ENT_HTML401, 'UTF-8'), "'");
 
 	$modlinks = <<<HTML
-<form action="thread.php" method="post" name="mod" id="mod">
+<br><form action="thread.php" method="post" name="mod" id="mod">
 <table class="c1"><tr class="n2">
 	<td class="b n2">
 		<span id="moptions">Thread options: $stick $close $trash $edit </span>
 		<span id="mappend"></span>
 		<span id="canceledit"></span>
 		<script>
-function submitmod(act){
-	document.getElementById('action').value=act;
-	document.getElementById('mod').submit();
-}
-function submitrename(name){
-	document.mod.arg.value=name;
-	submitmod('rename')
-}
-function submitmove(fid){
-	document.mod.arg.value=fid;
-	submitmod('move')
-}
 function showrbox(){
 	document.getElementById('moptions').innerHTML='Rename thread:';
 	document.getElementById('mappend').innerHTML='$renamefield';
@@ -276,34 +264,11 @@ function showmove(){
 	document.getElementById('mappend').innerHTML='$fmovelinks';
 	document.getElementById('mappend').style.display = '';
 }
-function submit_on_return(event,act){
-	a=event.keyCode?event.keyCode:event.which?event.which:event.charCode;
-	document.mod.action.value=act;
-	document.mod.arg.value=document.mod.tmp.value;
-	if (a==13) document.mod.submit();
-}
 function hidethreadedit() {
 	document.getElementById('moptions').innerHTML = 'Thread options: $stick2 $close2 $trash2 $edit';
 	document.getElementById('mappend').innerHTML = '<input type=hidden name=tmp style="width:80%!important;border-width:0px!important;padding:0px!important" onkeypress="submit_on_return(event,\'rename\')" value="$threadtitle" maxlength="100">';
 	document.getElementById('canceledit').style.display = 'none';
-}
-function movetid() {
-	var x = document.getElementById('forumselect').selectedIndex;
-	document.getElementById('move').innerHTML = document.getElementsByTagName('option')[x].value;
-	return document.getElementsByTagName('option')[x].value;
-}
-function renametitle() {
-	var x = document.getElementById('title').value;
-	document.getElementById('rename').innerHTML = document.getElementsByTagName('input')[x].value;
-	return document.getElementsByTagName('input')[x].value;
-}
-function trashConfirm(e) {
-	if (confirm('Are you sure you want to trash this thread?'));
-	else {
-		e.preventDefault();
-	}
-}
-		</script>
+}		</script>
 		<input type=hidden id="arg" name="arg" value="">
 		<input type=hidden id="id" name="id" value="$tid">
 		<input type=hidden id="action" name="action" value="">
