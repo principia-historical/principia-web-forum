@@ -26,19 +26,10 @@ $pagebar = [
 	'actions' => [['href' => "sendprivate.php?pid=$pid", 'title' => 'Reply']]
 ];
 
-$pmsgs['id'] = $pmsgs['num'] = 0;
-
-ob_start();
-
-RenderPageBar($pagebar);
-echo '<br>' . threadpost($pmsgs) . '<br>';
-RenderPageBar($pagebar);
-
-$content = ob_get_contents();
-ob_end_clean();
+$pmsgs['id'] = 0;
 
 $twig = _twigloader();
-echo $twig->render('_legacy.twig', [
-	'page_title' => $pmsgs['title'],
-	'content' => $content
+echo $twig->render('showprivate.twig', [
+	'pagebar' => $pagebar,
+	'pmsgs' => $pmsgs
 ]);
