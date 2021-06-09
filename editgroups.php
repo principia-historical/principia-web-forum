@@ -97,7 +97,7 @@ if ($act == 'new' || $act == 'edit') {
 
 		RenderPageBar($pagebar);
 		echo '<br><form method="post"><table class="c1">' .
-		catheader('Group Settings')
+			'<tr class="h"><td class="b h" colspan="2">Group Settings</td>'
 .	fieldrow('Name', fieldinput(50, 255, 'title', $group['title']))
 .	fieldrow('Parent group', fieldselect('inherit_group_id', $group['inherit_group_id'], $grouplist))
 .	fieldrow('Sort order', fieldinput(4, 8, 'sortorder', $group['sortorder']))

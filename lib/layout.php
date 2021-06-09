@@ -106,10 +106,6 @@ function RenderPageBar($pagebar) {
 	}
 }
 
-function catheader($title) {
-	return sprintf('<tr class="h"><td class="b h" colspan="2">%s</td>', $title);
-}
-
 function fieldrow($title, $input) {
 	return sprintf('<tr><td class="b n1 center">%s:</td><td class="b n2">%s</td>', $title, $input);
 }
@@ -120,20 +116,11 @@ function fieldinput($size, $max, $field, $value = null) {
 	return sprintf('<input type="text" name="%s" size="%s" maxlength="%s" value="%s">', $field, $size, $max, $val);
 }
 
-function fieldtext($rows, $cols, $field) {
-	global $user;
-	return sprintf('<textarea wrap="virtual" name="%s" rows=%s cols=%s>%s</textarea>', $field, $rows, $cols, esc($user[$field]));
-}
-
 function fieldoption($field, $checked, $choices) {
 	$text = '';
 	foreach ($choices as $k => $v)
 		$text .= sprintf('<label><input type="radio" name="%s" value="%s" %s>%s </label>', $field, $k, ($k == $checked ? ' checked' : ''), $v);
 	return $text;
-}
-
-function fieldcheckbox($field, $checked, $label) {
-	return sprintf('<label><input type="checkbox" name="%s" value="1" %s>%s </label>', $field, ($checked ? ' checked' : ''), $label);
 }
 
 function fieldselect($field, $checked, $choices) {
