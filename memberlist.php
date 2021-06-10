@@ -24,61 +24,11 @@ if ($num >= $ppp) {
 		$pagelist .= ($p == $page ? " $p" : ' ' . mlink($p, $sort, $p, $orderby) . "</a>");
 }
 
-ob_start();
-
-?>
-<table class="c1">
-	<tr class="h"><td class="b h" colspan="2">Memberlist</td></tr>
-	<tr>
-		<td class="b n1" width="80">Sort by:</td>
-		<td class="b n2 center">
-			<?=mlink('Posts', '', $page, $orderby) ?> |
-			<?=mlink('Username', 'name', $page, $orderby) ?> |
-			<?=mlink('Registration date', 'reg', $page, $orderby) ?> |
-			<?=mlink('[ &#x25BC; ]', $sort, $page, 'd') ?>
-			<?=mlink('[ &#x25B2; ]', $sort, $page, 'a') ?>
-		</td>
-	</tr>
-</table><br>
-<table class="c1">
-	<tr class="h">
-		<td class="b h" width="32">#</td>
-		<td class="b h" width="62">Picture</td>
-		<td class="b h">Name</td>
-		<td class="b h" width="130">Registered on</td>
-		<td class="b h" width="50">Posts</td>
-	</tr>
-<?php
-
-for ($i = 1; $user = $users->fetch(); $i++) {
-	$tr = ($i % 2 ? 1 : 2);
-	$picture = ($user['avatar'] ? '<img src="userpic/'.$user['id'].'" width="60" height="60">' : '');
-	?><tr class="n<?=$tr ?>" style="height:69px">
-		<td class="b center"><?=$user['id'] ?>.</td>
-		<td class="b center"><?=$picture ?></td>
-		<td class="b"><?=userlink($user) ?></td>
-		<td class="b center"><?=date($dateformat,$user['joined']) ?></td>
-		<td class="b center"><?=$user['posts'] ?></td>
-	</tr><?php
-}
-if_empty_query($i, "No users found.", 5);
-echo '</table>';
-
-if ($pagelist)
-	echo '<br>'.$pagelist.'<br>';
-
-function mlink($name, $sort, $page, $orderby) {
-	return '<a href="memberlist.php?'.
-		($sort ? "sort=$sort" : '').($page != 1 ? "&page=$page" : '').
-		($orderby != '' ? "&orderby=$orderby" : '').'">'
-		.$name.'</a>';
-}
-
-$content = ob_get_contents();
-ob_end_clean();
-
 $twig = _twigloader();
-echo $twig->render('_legacy.twig', [
-	'page_title' => 'Memberlist',
-	'content' => $content
+echo $twig->render('memberlist.twig', [
+	'sort' => $sort,
+	'page' => $page,
+	'orderby' => $orderby,
+	'users' => $users,
+	'pagelist' => $pagelist
 ]);
