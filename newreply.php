@@ -82,41 +82,15 @@ foreach ($userdata as $field => $val)
 	$post['u' . $field] = $val;
 $post['ulastpost'] = time();
 
-ob_start();
-
-RenderPageBar($topbot);
-
 if ($action == 'Preview') {
 	$topbot['title'] .= ' (Preview)';
 	echo '<br><table class="c1"><tr class="h"><td class="b h" colspan="2">Post preview</table>'.threadpost($post);
 }
-?><br>
-<form action="newreply.php" method="post"><table class="c1">
-	<tr class="h"><td class="b h" colspan="2">Reply</td></tr>
-	<tr>
-		<td class="b n1 center" width="120">Format:</td>
-		<td class="b n2"><?=posttoolbar() ?></td>
-	</tr><tr>
-		<td class="b n1 center" width="120">Post:</td>
-		<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"><?=esc($post['text']) ?></textarea></td>
-	</tr><tr>
-		<td class="b n1"></td>
-		<td class="b n1">
-			<input type="hidden" name="tid" value="<?=$tid ?>">
-			<input type="submit" name="action" value="Submit">
-			<input type="submit" name="action" value="Preview">
-		</td>
-	</tr>
-</table></form><?php
-
-echo '<br>';
-RenderPageBar($topbot);
-
-$content = ob_get_contents();
-ob_end_clean();
 
 $twig = _twigloader();
-echo $twig->render('_legacy.twig', [
-	'page_title' => 'New Reply',
-	'content' => $content
+echo $twig->render('newreply.twig', [
+	'post' => $post,
+	'topbot' => $topbot,
+	'action' => $action,
+	'tid' => $tid
 ]);
