@@ -1,4 +1,4 @@
--- Adminer 4.7.8 MySQL dump
+-- Adminer 4.8.1 MySQL 5.5.5-10.5.10-MariaDB dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
@@ -13,8 +13,8 @@ CREATE TABLE `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `categories` (`id`, `title`, `ord`) VALUES
-(1,	'General',	2),
-(2,	'Staff Forums',	0);
+(1,	'General',	50),
+(2,	'Staff forums',	0);
 
 CREATE TABLE `forums` (
   `id` int(5) NOT NULL DEFAULT 0,
@@ -33,8 +33,8 @@ CREATE TABLE `forums` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `forums` (`id`, `cat`, `ord`, `title`, `descr`, `threads`, `posts`, `lastdate`, `lastuser`, `lastid`, `private`, `readonly`) VALUES
-(1,	1,	1,	'General Forum',	'General topics forum',	0,	0,	0,	0,	0,	0,	0),
-(2,	2,	1,	'General Staff Forum',	'Generic Staff Forum',	0,	0,	0,	0,	0,	1,	0);
+(1,	1,	0,	'Example forum',	'This is an example forum to get started with.',	0,	0,	0,	0,	0,	0,	0),
+(2,	2,	0,	'Example staff forum',	'This is an example staff forum to get started with.',	0,	0,	0,	0,	0,	0,	0);
 
 CREATE TABLE `forumsread` (
   `uid` mediumint(9) NOT NULL,
@@ -186,13 +186,7 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (1,	'group',	'rename-own-thread',	'',	0,	1),
 (1,	'group',	'update-own-post',	'',	0,	1),
 (1,	'group',	'update-own-profile',	'',	0,	1),
-(2,	'group',	'create-private-forum-post',	'forums',	2,	1),
-(2,	'group',	'create-private-forum-thread',	'forums',	2,	1),
 (2,	'group',	'create-public-thread',	'',	0,	0),
-(2,	'group',	'delete-forum-post',	'forums',	2,	1),
-(2,	'group',	'edit-forum-post',	'forums',	2,	1),
-(2,	'group',	'edit-forum-thread',	'forums',	2,	1),
-(2,	'group',	'view-private-forum',	'forums',	2,	1),
 (3,	'group',	'create-pms',	'',	0,	0),
 (3,	'group',	'create-public-post',	'',	0,	0),
 (3,	'group',	'create-public-thread',	'',	0,	0),
@@ -200,12 +194,6 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (3,	'group',	'rename-own-thread',	'',	0,	0),
 (3,	'group',	'update-own-post',	'',	0,	0),
 (3,	'group',	'update-own-profile',	'',	0,	0),
-(4,	'group',	'create-private-forum-post',	'forums',	2,	0),
-(4,	'group',	'create-private-forum-thread',	'forums',	2,	0),
-(4,	'group',	'delete-forum-post',	'forums',	2,	0),
-(4,	'group',	'edit-forum-post',	'forums',	2,	0),
-(4,	'group',	'edit-forum-thread',	'forums',	2,	0),
-(4,	'group',	'view-private-forum',	'forums',	2,	0),
 (5,	'group',	'ban-users',	'',	0,	0),
 (5,	'group',	'delete-post',	'',	0,	0),
 (5,	'group',	'override-closed',	'',	0,	0),
@@ -220,6 +208,24 @@ INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `
 (6,	'group',	'override-readonly-forums',	'',	0,	0),
 (6,	'group',	'update-profiles',	'',	0,	0),
 (6,	'group',	'view-all-private-forums',	'',	0,	0),
-(7,	'group',	'no-restrictions',	'',	0,	0);
+(7,	'group',	'no-restrictions',	'',	0,	0),
+(2,	'group',	'create-private-forum-post',	'forums',	1,	1),
+(2,	'group',	'create-private-forum-thread',	'forums',	1,	1),
+(2,	'group',	'delete-forum-post',	'forums',	1,	1),
+(2,	'group',	'edit-forum-post',	'forums',	1,	1),
+(2,	'group',	'edit-forum-thread',	'forums',	1,	1),
+(2,	'group',	'view-private-forum',	'forums',	1,	1),
+(2,	'group',	'create-private-forum-post',	'forums',	2,	1),
+(2,	'group',	'create-private-forum-thread',	'forums',	2,	1),
+(2,	'group',	'delete-forum-post',	'forums',	2,	1),
+(2,	'group',	'edit-forum-post',	'forums',	2,	1),
+(2,	'group',	'edit-forum-thread',	'forums',	2,	1),
+(2,	'group',	'view-private-forum',	'forums',	2,	1),
+(4,	'group',	'create-private-forum-post',	'forums',	2,	0),
+(4,	'group',	'create-private-forum-thread',	'forums',	2,	0),
+(4,	'group',	'delete-forum-post',	'forums',	2,	0),
+(4,	'group',	'edit-forum-post',	'forums',	2,	0),
+(4,	'group',	'edit-forum-thread',	'forums',	2,	0),
+(4,	'group',	'view-private-forum',	'forums',	2,	0);
 
--- 2020-12-21 17:21:49
+-- 2021-06-09 09:07:26
