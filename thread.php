@@ -135,10 +135,7 @@ if ($viewmode == "thread") {
 
 	$thread['replies'] = $sql->result("SELECT count(*) FROM posts p WHERE user = ?", [$uid]) - 1;
 } elseif ($viewmode == "time") {
-	if (is_numeric($time))
-		$mintime = time() - $time;
-	else
-		$mintime = 86400;
+	$mintime = ($time > 0 && $time <= 2592000 ? time() - $time : 86400);
 
 	$title = 'Latest posts';
 

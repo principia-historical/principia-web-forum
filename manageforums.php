@@ -150,7 +150,7 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 				<td class="b n1 center"></td>
 				<td class="b n2">
 					<input type="submit" name="saveforum" value="Save forum">
-					<?php ($fid == 'new' ? '' : '<input type="submit" name="delforum" value="Delete forum" onclick="if (!confirm("Really delete this forum?")) return false;">') ?>
+					<?=($fid == 'new' ? '' : '<input type="submit" name="delforum" value="Delete forum" onclick="if (!confirm("Really delete this forum?")) return false;">') ?>
 					<button type="button" id="back" onclick="window.location='manageforums.php'">Back</button>
 				</td>
 			</tr>

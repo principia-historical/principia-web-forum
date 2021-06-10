@@ -67,7 +67,7 @@ function RenderActions($actions, $ret = false) {
 				"javascript:if(confirm('%s')) window.location.href='%s'; else void('');",
 			$confirmmsg, $action['href']);
 		} else {
-			$href = $action['href'];
+			$href = (isset($action['href']) ? $action['href'] : '');
 		}
 		if ($i++)
 			$out .= ' | ';
@@ -85,7 +85,7 @@ function RenderActions($actions, $ret = false) {
 
 function RenderBreadcrumb($breadcrumb) {
 	foreach ($breadcrumb as $action) {
-		printf('<a href=%s>%s</a> - ', '"'.htmlentities($action['href'], ENT_QUOTES).'"', $action['title']);
+		printf('<a href=%s>%s</a> &raquo; ', '"'.htmlentities($action['href'], ENT_QUOTES).'"', $action['title']);
 	}
 }
 
@@ -198,8 +198,9 @@ function _twigloader($subfolder = '') {
 	$twig = twigloader($subfolder, function () use ($subfolder) {
 		return new \Twig\Loader\FilesystemLoader('templates/' . $subfolder);
 	}, function ($loader, $doCache) {
+
 		return new \Twig\Environment($loader, [
-			'cache' => $doCache,
+			'cache' => ($doCache ? "../".$doCache : $doCache),
 		]);
 	});
 
