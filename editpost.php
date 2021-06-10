@@ -65,10 +65,6 @@ $topbot = [
 	'title' => 'Edit post'
 ];
 
-ob_start();
-
-RenderPageBar($topbot);
-
 $euser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$post['id']]);
 $post['date'] = time();
 $post['num'] = $euser['posts']++;
@@ -79,36 +75,12 @@ $post['ulastpost'] = time();
 
 if ($action == 'Preview') {
 	$topbot['title'] .= ' (Preview)';
-	echo '<br><table class="c1"><tr class="h"><td class="b h" colspan="2">Post preview</table>'.threadpost($post);
 }
 
-?><br>
-<form action="editpost.php" method="post"><table class="c1">
-	<tr class="h"><td class="b h" colspan=2>Edit Post</td></tr>
-	<tr>
-		<td class="b n1 center" width=120>Format:</td>
-		<td class="b n2"><?=posttoolbar() ?></td>
-	</tr><tr>
-		<td class="b n1 center" width=120>Post:</td>
-		<td class="b n2"><textarea wrap="virtual" name="message" id="message" rows=20 cols=80><?=esc($post['text']) ?></textarea></td>
-	</tr><tr>
-		<td class="b n1"></td>
-		<td class="b n1">
-			<input type="hidden" name="pid" value="<?=$pid ?>">
-			<input type="submit" name="action" value="Submit">
-			<input type="submit" name="action" value="Preview">
-		</td>
-	</tr>
-</table></form><?php
-
-echo '<br>';
-RenderPageBar($topbot);
-
-$content = ob_get_contents();
-ob_end_clean();
-
 $twig = _twigloader();
-echo $twig->render('_legacy.twig', [
-	'page_title' => 'Edit post',
-	'content' => $content
+echo $twig->render('editpost.twig', [
+	'post' => $post,
+	'topbot' => $topbot,
+	'action' => $action,
+	'pid' => $pid
 ]);
