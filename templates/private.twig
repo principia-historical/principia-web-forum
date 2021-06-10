@@ -17,7 +17,7 @@
 {% for pmsg in pmsgs %}
 	<tr class="n{% if i % 2 %}1{% else %}2{% endif %} center">
 		<td class="b n2">
-			<a href="private.php?action=del&id={{ pmsg.id }}&view={{ view }}"><img src="assets/smilies/no.png" align="absmiddle"></a>
+			<a href="private.php?action=del&id={{ pmsg.id }}&view={{ view }}" class="delete">X</a>
 		</td>
 		<td class="b n1">{% if pmsg.unread %}{{ rendernewstatus("n") }}{% endif %}</td>
 		<td class="b left wbreak"><a href="showprivate.php?id={{ pmsg.id }}">{{ pmsg.title | default('(untitled)') }}</a></td>

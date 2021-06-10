@@ -94,3 +94,12 @@ textarea, input, select, button {
 .autowidth { width: auto !important; }
 .wbreak { word-break: break-word; }
 .fullwidth { width: 100% !important; }
+
+.delete {
+	font-weight:900;
+	display: inline-block;
+	margin-left: 6px;
+	margin-right: 6px;
+	font-size: 18px;
+	color: red;
+}
