@@ -186,7 +186,7 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 		$c = ($c == 1) ? 2 : 1;
 	}
 
-	?><table style="width:100%;">
+	?><table class="fullwidth">
 		<tr>
 			<td class="nb" style="width:50%; vertical-align:top;">
 				<table class="c1">

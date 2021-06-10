@@ -248,5 +248,5 @@ function PermTable($permset) {
 
 	if (!$ret) $ret = '<td>&bull; None</td>';
 
-	return '<table style="width:100%"><tr>'.$ret.'</tr></table>';
+	return '<table class="fullwidth"><tr>'.$ret.'</tr></table>';
 }

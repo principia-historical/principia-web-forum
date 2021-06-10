@@ -145,14 +145,14 @@ HTML;
 <table class="c1" id="{$post['id']}">
 	$postheaderrow
 	<tr>
-		<td class="b n1 topbar_1" style="border-bottom:0;border-right:0;min-width:180px;text-align:center" height="15">$ulink</td>
-		<td class="b n1 topbar_2" style="border-left:0;width:100%">
-			<table style="width:100%">
+		<td class="b n1 topbar_1">$ulink</td>
+		<td class="b n1 topbar_2 fullwidth">
+			<table class="fullwidth">
 				<tr><td class="nb sfont">Posted on $pdate$threadlink $revisionstr</td><td class="nb sfont right">$postlinks</td></tr>
 			</table>
 		</td>
 	</tr><tr valign="top">
-		<td class="b n1 sfont sidebar" style="border-top:0;text-align:center">
+		<td class="b n1 sfont sidebar">
 			$utitle
 			$picture
 			<br>Posts: {$post['uposts']}

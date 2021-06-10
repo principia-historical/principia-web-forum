@@ -281,7 +281,7 @@ HTML;
 RenderPageBar($topbot);
 
 if (isset($time)) {
-	?><table class="c1" style="width:auto">
+	?><table class="c1 autowidth">
 		<tr class="h"><td class="b">Latest Posts</td></tr>
 		<tr><td class="b n1 center">
 			<a href="forum.php?time=<?=$time ?>">By Threads</a> | By Posts</a><br><br>

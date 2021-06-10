@@ -65,6 +65,18 @@ textarea, input, select, button {
 	padding: 0 1px 2px;
 }
 
+.topbar_1 {
+	border-bottom: 0 !important;
+	min-width: 180px;
+	text-align: center;
+	height: 24px;
+}
+
+.sidebar {
+	border-top: 0 !important;
+	text-align: center;
+}
+
 .mainbar p {
 	margin-top: 0;
 }
@@ -78,3 +90,7 @@ textarea, input, select, button {
 .mainbar img {
 	max-width: 100%;
 }
+
+.autowidth { width: auto !important; }
+.wbreak { word-break: break-word; }
+.fullwidth { width: 100% !important; }
