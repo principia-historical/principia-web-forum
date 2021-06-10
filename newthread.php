@@ -46,10 +46,6 @@ $topbot = [
 	'title' => "New thread"
 ];
 
-ob_start();
-
-RenderPageBar($topbot);
-
 $title = '';
 $message = '';
 
@@ -62,42 +58,17 @@ if ($action == 'Preview') {
 	$post['ulastpost'] = time();
 
 	$topbot['title'] .= ' (Preview)';
-	echo '<br><table class="c1"><tr class="h"><td class="b h" colspan="2">Post preview</table>'.threadpost($post);
 
 	$title = $_POST['title'];
 	$message = $_POST['message'];
 }
 
-?><br><form action="newthread.php" method="post">
-	<table class="c1">
-		<tr class="h"><td class="b h" colspan="2">Thread</td></tr>
-		<tr>
-			<td class="b n1 center" width="120">Thread title:</td>
-			<td class="b n2"><input type="text" name="title" size="100" maxlength="100" value="<?=esc($title) ?>"></td>
-		</tr><tr>
-			<td class="b n1 center">Format:</td>
-			<td class="b n2"><?=posttoolbar() ?></td>
-		</tr><tr>
-			<td class="b n1 center">Post:</td>
-			<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"><?=esc($message) ?></textarea></td>
-		</tr><tr>
-			<td class="b n1"></td>
-			<td class="b n1">
-				<input type="hidden" name="fid" value="<?=$fid ?>">
-				<input type="submit" name="action" value="Submit">
-				<input type="submit" name="action" value="Preview">
-			</td>
-		</tr>
-	</table>
-</form><br><?php
-
-RenderPageBar($topbot);
-
-$content = ob_get_contents();
-ob_end_clean();
-
 $twig = _twigloader();
-echo $twig->render('_legacy.twig', [
-	'page_title' => 'New Thread',
-	'content' => $content
+echo $twig->render('newthread.twig', [
+	'post' => (isset($post) ? $post : null),
+	'title' => $title,
+	'message' => $message,
+	'topbot' => $topbot,
+	'action' => $action,
+	'fid' => $fid
 ]);
