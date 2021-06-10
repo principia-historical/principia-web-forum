@@ -9,13 +9,25 @@ function toolBtn(prefix,suffix) {
 	}
 }
 
+// Functions moved from thread.php
+function submitmod(act){
+	document.getElementById('action').value=act;
+	document.getElementById('mod').submit();
+}
+function submitrename(name){
+	document.mod.arg.value=name;
+	submitmod('rename')
+}
+function submitmove(fid){
+	document.mod.arg.value=fid;
+	submitmod('move')
+}
 function submit_on_return(event,act){
 	a=event.keyCode?event.keyCode:event.which?event.which:event.charCode;
 	document.mod.action.value=act;
 	document.mod.arg.value=document.mod.tmp.value;
 	if (a==13) document.mod.submit();
 }
-
 function movetid() {
 	var x = document.getElementById('forumselect').selectedIndex;
 	document.getElementById('move').innerHTML = document.getElementsByTagName('option')[x].value;
@@ -31,17 +43,4 @@ function trashConfirm(e) {
 	else {
 		e.preventDefault();
 	}
-}
-
-function submitmod(act){
-	document.getElementById('action').value=act;
-	document.getElementById('mod').submit();
-}
-function submitrename(name){
-	document.mod.arg.value=name;
-	submitmod('rename')
-}
-function submitmove(fid){
-	document.mod.arg.value=fid;
-	submitmod('move')
 }
