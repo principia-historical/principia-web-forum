@@ -48,31 +48,12 @@ $topbot = [
 
 ob_start();
 
-if (!$action) {
-	RenderPageBar($topbot);
-	?><br>
-	<form action="newthread.php" method="post"><table class="c1">
-		<tr class="h"><td class="b h" colspan="2">Thread</td></tr>
-		<tr>
-			<td class="b n1 center" width="120">Thread title:</td>
-			<td class="b n2"><input type="text" name="title" size="100" maxlength="100"></td>
-		</tr><tr>
-			<td class="b n1 center">Format:</td>
-			<td class="b n2"><?=posttoolbar() ?></td>
-		</tr><tr>
-			<td class="b n1 center">Post:</td>
-			<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"></textarea></td>
-		</tr><tr>
-			<td class="b n1"></td>
-			<td class="b n1">
-				<input type="hidden" name="fid" value="<?=$fid ?>">
-				<input type="submit" name="action" value="Submit">
-				<input type="submit" name="action" value="Preview">
-			</td>
-		</tr>
-	</table></form>
-	<?php
-} elseif ($action == 'Preview') {
+RenderPageBar($topbot);
+
+$title = '';
+$message = '';
+
+if ($action == 'Preview') {
 	$post['date'] = time();
 	$post['num'] = $userdata['posts']++;
 	$post['text'] = $_POST['message'];
@@ -81,22 +62,24 @@ if (!$action) {
 	$post['ulastpost'] = time();
 
 	$topbot['title'] .= ' (Preview)';
-	RenderPageBar($topbot);
-	?><br>
-	<table class="c1"><tr class="h"><td class="b h" colspan="2">Post preview</td></tr>
-	<?=threadpost($post) ?>
-	<br>
-	<form action="newthread.php" method="post"><table class="c1">
+	echo '<br><table class="c1"><tr class="h"><td class="b h" colspan="2">Post preview</table>'.threadpost($post);
+
+	$title = $_POST['title'];
+	$message = $_POST['message'];
+}
+
+?><br><form action="newthread.php" method="post">
+	<table class="c1">
 		<tr class="h"><td class="b h" colspan="2">Thread</td></tr>
 		<tr>
-			<td class="b n1 center">Title:</td>
-			<td class="b n2"><input type="text" name="title" size="100" maxlength="100" value="<?=esc($_POST['title']) ?>"></td>
+			<td class="b n1 center" width="120">Thread title:</td>
+			<td class="b n2"><input type="text" name="title" size="100" maxlength="100" value="<?=esc($title) ?>"></td>
 		</tr><tr>
-			<td class="b n1 center" width="120">Format:</td>
+			<td class="b n1 center">Format:</td>
 			<td class="b n2"><?=posttoolbar() ?></td>
 		</tr><tr>
-			<td class="b n1 center" width="120">Post:</td>
-			<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"><?=esc($_POST['message']) ?></textarea></td>
+			<td class="b n1 center">Post:</td>
+			<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"><?=esc($message) ?></textarea></td>
 		</tr><tr>
 			<td class="b n1"></td>
 			<td class="b n1">
@@ -105,10 +88,9 @@ if (!$action) {
 				<input type="submit" name="action" value="Preview">
 			</td>
 		</tr>
-	</table></form><?php
-}
+	</table>
+</form><br><?php
 
-echo '<br>';
 RenderPageBar($topbot);
 
 $content = ob_get_contents();

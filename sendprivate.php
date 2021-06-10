@@ -17,7 +17,7 @@ if ($action == 'Submit') {
 	$userto = $sql->result("SELECT id FROM principia.users WHERE name LIKE ?", [$_POST['userto']]);
 
 	if ($userto && $_POST['message']) {
-		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP()-30) AND userfrom = ?", [$userdata['id']]);
+		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 30) AND userfrom = ?", [$userdata['id']]);
 		$secafterpm = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 2) AND userfrom = ?", [$userdata['id']]);
 		if ($recentpms && (!has_perm('consecutive-posts'))) {
 			$msg = "You can't send more than one PM within 30 seconds!";
@@ -40,6 +40,8 @@ if ($action == 'Submit') {
 
 ob_start();
 
+RenderPageBar($topbot);
+
 // Default
 if (!$action) {
 	$userto = '';
@@ -59,34 +61,6 @@ if (!$action) {
 	} elseif (!isset($userto)) {
 		$userto = $_POST['userto'];
 	}
-
-	RenderPageBar($topbot);
-	?><br>
-	<form action="sendprivate.php" method="post">
-		<table class="c1">
-			<tr class="h"><td class="b h" colspan="2">Send message</td></tr>
-			<tr>
-				<td class="b n1 center" width="120">Send to:</td>
-				<td class="b n2"><input type="text" name="userto" size="25" maxlength=25 value="<?=esc($userto) ?>"></td>
-			</tr><tr>
-				<td class="b n1 center">Title:</td>
-				<td class="b n2"><input type="text" name="title" size="80" maxlength="255" value="<?=esc((isset($title) ? $title : '')) ?>"></td>
-			</tr><tr>
-				<td class="b n1 center" width="120">Format:</td>
-				<td class="b n2"><?=posttoolbar() ?></td>
-			</tr><tr>
-				<td class="b n1 center"></td>
-				<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"><?=esc((isset($quotetext) ? $quotetext : '')) ?></textarea></td>
-			</tr><tr>
-				<td class="b n1"></td>
-				<td class="b n1">
-					<input type="submit" name="action" value="Submit">
-					<input type="submit" name="action" value="Preview">
-				</td>
-			</tr>
-		</table>
-	</form>
-	<?php
 } else if ($action == 'Preview') { // Previewing PM
 	$post['date'] = time();
 	$post['num'] = 0;
@@ -95,40 +69,38 @@ if (!$action) {
 		$post['u' . $field] = $val;
 	$post['ulastpost'] = time();
 
+	$userto = $_POST['userto'];
+	$title = $_POST['title'];
+	$quotetext = $_POST['message'];
 	$topbot['title'] .= ' (Preview)';
-	RenderPageBar($topbot);
-	?><br>
-	<table class="c1"><tr class="h"><td class="b h" colspan="2">Message preview</td></tr></table>
-	<?=threadpost($post) ?>
-	<br>
-	<form action="sendprivate.php" method="post">
-		<table class="c1">
-			<tr class="h"><td class="b h" colspan="2">Send message</td></tr>
-			<tr>
-				<td class="b n1 center" width="120">Send to:</td>
-				<td class="b n2"><input type="text" name="userto" size=25 maxlength=25 value="<?=esc((isset($_POST['userto']) ? $_POST['userto'] : '')) ?>"></td>
-			</tr><tr>
-				<td class="b n1 center">Title:</td>
-				<td class="b n2"><input type="text" name="title" size="80" maxlength="255" value="<?=esc($_POST['title']) ?>"></td>
-			</tr><tr>
-				<td class="b n1 center" width="120">Format:</td>
-				<td class="b n2"><?=posttoolbar() ?></td>
-			</tr><tr>
-				<td class="b n1 center">Post:</td>
-				<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"><?=esc($_POST['message']) ?></textarea></td>
-			</tr><tr>
-				<td class="b n1"></td>
-				<td class="b n1">
-					<input type="submit" name="action" value="Submit">
-					<input type="submit" name="action" value="Preview">
-				</td>
-			</tr>
-		</table>
-	</form>
-	<?php
+	echo '<br><table class="c1"><tr class="h"><td class="b h" colspan="2">Message preview</table>'.threadpost($post);
 }
 
-echo '<br>';
+?><br><form action="sendprivate.php" method="post">
+	<table class="c1">
+		<tr class="h"><td class="b h" colspan="2">Send message</td></tr>
+		<tr>
+			<td class="b n1 center" width="120">Send to:</td>
+			<td class="b n2"><input type="text" name="userto" size="25" maxlength=25 value="<?=esc($userto) ?>"></td>
+		</tr><tr>
+			<td class="b n1 center">Title:</td>
+			<td class="b n2"><input type="text" name="title" size="80" maxlength="255" value="<?=esc((isset($title) ? $title : '')) ?>"></td>
+		</tr><tr>
+			<td class="b n1 center" width="120">Format:</td>
+			<td class="b n2"><?=posttoolbar() ?></td>
+		</tr><tr>
+			<td class="b n1 center"></td>
+			<td class="b n2"><textarea name="message" id="message" rows="20" cols="80"><?=esc((isset($quotetext) ? $quotetext : '')) ?></textarea></td>
+		</tr><tr>
+			<td class="b n1"></td>
+			<td class="b n1">
+				<input type="submit" name="action" value="Submit">
+				<input type="submit" name="action" value="Preview">
+			</td>
+		</tr>
+	</table>
+</form><br><?php
+
 RenderPageBar($topbot);
 
 $content = ob_get_contents();
