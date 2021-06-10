@@ -13,6 +13,9 @@ class PrincipiaForumExtension extends \Twig\Extension\AbstractExtension {
 			new \Twig\TwigFunction('render_page_bar', 'RenderPageBar', ['is_safe' => ['html']]),
 			new \Twig\TwigFunction('if_empty_query2', 'if_empty_query2', ['is_safe' => ['html']]),
 
+			// misc.php
+			new \Twig\TwigFunction('mlink', 'mlink', ['is_safe' => ['html']]),
+
 			// perm.php
 			new \Twig\TwigFunction('load_user_permset', 'load_user_permset'),
 			new \Twig\TwigFunction('permset_for_user', 'permset_for_user'),
