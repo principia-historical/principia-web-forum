@@ -1,6 +1,6 @@
 {% extends "_layout.twig" %}
 
-{% block title %}{{ pmsgs.title }}{% endblock %}
+{% block title %}{{ pmsgs.title | default('(untitled)') }}{% endblock %}
 
 	{% block content %}
 {{ render_page_bar(pagebar) }}
