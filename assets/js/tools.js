@@ -44,3 +44,9 @@ function trashConfirm(e) {
 		e.preventDefault();
 	}
 }
+
+// Functions moved from manageforums.php
+function toggleAll(cls, enable) {
+	var elems = document.getElementsByClassName(cls);
+	for (var i = 0; i < elems.length; i++) elems[i].disabled = !enable;
+}

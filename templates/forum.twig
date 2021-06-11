@@ -80,7 +80,7 @@
 		</tr>
 	{% endfor %}
 </table>
-{{ fpagelist }}
+{{ fpagelist | raw }}
 {% if not time %}<br>{% endif %}
 {{ render_page_bar(topbot) }}
 	{% endblock %}

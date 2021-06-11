@@ -105,7 +105,7 @@ if ($forum['threads'] <= $userdata['tpp']) {
 		$furl = "forum.php?user=$uid";
 	elseif ($time)
 		$furl = "forum.php?time=$time";
-	$fpagelist = '<br>'.pagelist($forum['threads'], $userdata['tpp'], $furl, $page);
+	$fpagelist = '<br>'.pagelist($forum['threads'], $userdata['tpp'], $furl, $page, true);
 }
 
 $twig = _twigloader();

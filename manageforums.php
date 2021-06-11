@@ -72,13 +72,7 @@ if ($error) error("Error", $error);
 
 ob_start();
 
-?>
-<script>function toggleAll(cls, enable) {
-	var elems = document.getElementsByClassName(cls);
-	for (var i = 0; i < elems.length; i++) elems[i].disabled = !enable;
-}</script>
-<style type="text/css">label { white-space: nowrap; } input:disabled { opacity: 0.5; }</style>
-<?php
+echo '<style type="text/css">label { white-space: nowrap; } input:disabled { opacity: 0.5; }</style>';
 
 if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 	// category editor

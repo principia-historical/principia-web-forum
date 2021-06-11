@@ -16,8 +16,8 @@ if ($log && $action == 'markread') {
 		$sql->query("REPLACE INTO forumsread VALUES (?,?,?)", [$userdata['id'], $fid, time()]);
 	} else {
 		//mark all read
-		$sql->query("DELETE FROM threadsread WHERE uid=" . $userdata['id']);
-		$sql->query("REPLACE INTO forumsread (uid,fid,time) SELECT " . $userdata['id'] . ",f.id," . time() . " FROM forums f");
+		$sql->query("DELETE FROM threadsread WHERE uid = ?", [$userdata['id']]);
+		$sql->query("REPLACE INTO forumsread (uid,fid,time) SELECT ?, f.id, ? FROM forums f", [$userdata['id'], time()]);
 	}
 	redirect('index.php');
 }

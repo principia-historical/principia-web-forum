@@ -131,23 +131,6 @@ function fieldselect($field, $checked, $choices) {
 	return $text;
 }
 
-function bantimeselect($name) {
-	$selector = [
-		"0"			=> "Never",
-		"3600"		=> "1 hour",
-		"10800"		=> "3 hours",
-		"86400"		=> "1 day",
-		"172800"	=> "2 days",
-		"259200"	=> "3 days",
-		"604800"	=> "1 week",
-		"1209600"	=> "2 weeks",
-		"2419200"	=> "1 month",
-		"4838400"	=> "2 months",
-		"14515200"	=> "6 months",
-	];
-	return fieldselect($name, 0, $selector);
-}
-
 function pagelist($total, $limit, $url, $sel = 0, $showall = false, $tree = false) {
 	$pagelist = '';
 	$pages = ceil($total / $limit);

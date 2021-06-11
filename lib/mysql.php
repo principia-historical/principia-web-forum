@@ -13,7 +13,7 @@ class mysql {
 			PDO::ATTR_EMULATE_PREPARES		=> false,
 		];
 
-		$this->db = new PDO("mysql:host=$host;dbname=$db;charset=latin1", $user, $pass, $options);
+		$this->db = new PDO("mysql:host=$host;dbname=$db", $user, $pass, $options);
 
 		return $this->db;
 	}
