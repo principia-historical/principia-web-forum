@@ -210,27 +210,9 @@ if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($userdata['id']
 
 		$edit = '| <a href="javascript:showrbox()">Rename</a> | <a href="javascript:showmove()">Move</a>';
 
-		$r = $sql->query("SELECT c.title ctitle,f.id,f.title,f.cat,f.private FROM forums f LEFT JOIN categories c ON c.id=f.cat ORDER BY c.ord,c.id,f.ord,f.id");
-		$fmovelinks = '<select id="forumselect">';
-		$c = -1;
-		while ($d = $r->fetch()) {
-			if (!can_view_forum($d))
-				continue;
-
-			if ($d['cat'] != $c) {
-				if ($c != -1)
-					$fmovelinks .= '</optgroup>';
-				$c = $d['cat'];
-				$fmovelinks .= '<optgroup label="' . $d['ctitle'] . '">';
-			}
-			$fmovelinks .= sprintf(
-				'<option value="%s"%s>%s</option>',
-			$d['id'], ($d['id'] == $thread['forum'] ? ' selected="selected"' : ''), $d['title']);
-		}
-		$fmovelinks.="</optgroup></select>";
-		$fmovelinks = addslashes($fmovelinks);
-		$fmovelinks.='<input type="submit" id="move" value="Submit" name="movethread" onclick="submitmove(movetid())">';
-		$fmovelinks.='<input type="button" value="Cancel" onclick="hidethreadedit(); return false;">';
+		$fmovelinks = addslashes(forumlist($thread['forum']))
+		.	'<input type="submit" id="move" value="Submit" name="movethread" onclick="submitmove(movetid())">'
+		.	'<input type="button" value="Cancel" onclick="hidethreadedit(); return false;">';
 	} else {
 		$fmovelinks = $close = $stick = $trash = '';
 		$edit = '<a href=javascript:showrbox()>Rename</a>';
