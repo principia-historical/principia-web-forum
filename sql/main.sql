@@ -8,7 +8,7 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 CREATE TABLE `categories` (
   `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
-  `ord` tinyint(4) NOT NULL,
+  `ord` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -17,18 +17,18 @@ INSERT INTO `categories` (`id`, `title`, `ord`) VALUES
 (2,	'Staff forums',	0);
 
 CREATE TABLE `forums` (
-  `id` int(5) NOT NULL DEFAULT 0,
+  `id` int(5) unsigned NOT NULL DEFAULT 0,
   `cat` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `ord` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
   `descr` varchar(255) NOT NULL,
-  `threads` mediumint(8) NOT NULL DEFAULT 0,
-  `posts` mediumint(8) NOT NULL DEFAULT 0,
-  `lastdate` int(11) NOT NULL DEFAULT 0,
-  `lastuser` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `lastid` int(11) NOT NULL DEFAULT 0,
-  `private` int(1) NOT NULL,
-  `readonly` int(1) NOT NULL DEFAULT 0,
+  `threads` int(10) unsigned NOT NULL DEFAULT 0,
+  `posts` int(10) unsigned NOT NULL DEFAULT 0,
+  `lastdate` int(10) unsigned NOT NULL DEFAULT 0,
+  `lastuser` int(10) unsigned NOT NULL DEFAULT 0,
+  `lastid` int(10) unsigned NOT NULL DEFAULT 0,
+  `private` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `readonly` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -37,20 +37,20 @@ INSERT INTO `forums` (`id`, `cat`, `ord`, `title`, `descr`, `threads`, `posts`, 
 (2,	2,	0,	'Example staff forum',	'This is an example staff forum to get started with.',	0,	0,	0,	0,	0,	0,	0);
 
 CREATE TABLE `forumsread` (
-  `uid` mediumint(9) NOT NULL,
-  `fid` int(5) NOT NULL,
-  `time` int(11) NOT NULL,
+  `uid` int(10) unsigned NOT NULL,
+  `fid` int(5) unsigned NOT NULL,
+  `time` int(11) unsigned NOT NULL,
   UNIQUE KEY `uid` (`uid`,`fid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(127) NOT NULL,
   `nc` varchar(6) NOT NULL,
-  `inherit_group_id` int(11) NOT NULL,
-  `sortorder` int(11) NOT NULL DEFAULT 0,
-  `visible` int(1) NOT NULL DEFAULT 0,
+  `inherit_group_id` tinyint(3) unsigned NOT NULL,
+  `sortorder` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `visible` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -112,23 +112,22 @@ CREATE TABLE `pmsgs` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `text` text NOT NULL,
-  `date` int(11) NOT NULL DEFAULT 0,
-  `userto` mediumint(9) unsigned NOT NULL,
-  `userfrom` mediumint(9) unsigned NOT NULL,
-  `unread` tinyint(4) NOT NULL DEFAULT 1,
-  `del_from` tinyint(1) NOT NULL DEFAULT 0,
-  `del_to` tinyint(1) NOT NULL DEFAULT 0,
+  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `userto` int(10) unsigned NOT NULL,
+  `userfrom` int(10) unsigned NOT NULL,
+  `unread` tinyint(1) unsigned NOT NULL DEFAULT 1,
+  `del_from` tinyint(1) DEFAULT NULL,
+  `del_to` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `posts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `user` mediumint(9) unsigned NOT NULL DEFAULT 0,
-  `thread` mediumint(9) unsigned NOT NULL DEFAULT 0,
-  `date` int(11) NOT NULL DEFAULT 0,
-  `num` mediumint(9) NOT NULL DEFAULT 0,
-  `deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `user` int(10) unsigned NOT NULL DEFAULT 0,
+  `thread` int(10) unsigned NOT NULL DEFAULT 0,
+  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `deleted` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `threadid` (`thread`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -137,45 +136,45 @@ CREATE TABLE `posts` (
 CREATE TABLE `poststext` (
   `id` int(11) unsigned NOT NULL DEFAULT 0,
   `text` text NOT NULL,
-  `revision` int(5) NOT NULL DEFAULT 1,
-  `date` int(11) NOT NULL DEFAULT 0,
-  `user` mediumint(9) NOT NULL DEFAULT 0,
+  `revision` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `user` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`revision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `threads` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
-  `replies` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `views` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `closed` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `sticky` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `forum` int(5) NOT NULL DEFAULT 0,
-  `user` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `lastdate` int(11) NOT NULL DEFAULT 0,
-  `lastuser` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `lastid` int(11) NOT NULL DEFAULT 0,
+  `replies` int(10) unsigned NOT NULL DEFAULT 0,
+  `views` int(10) unsigned NOT NULL DEFAULT 0,
+  `forum` int(10) unsigned NOT NULL DEFAULT 0,
+  `user` int(10) unsigned NOT NULL DEFAULT 0,
+  `lastdate` int(10) unsigned NOT NULL DEFAULT 0,
+  `lastuser` int(10) unsigned NOT NULL DEFAULT 0,
+  `lastid` int(10) unsigned NOT NULL DEFAULT 0,
+  `sticky` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `closed` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `threadsread` (
-  `uid` mediumint(9) NOT NULL,
-  `tid` mediumint(9) NOT NULL,
-  `time` int(11) NOT NULL,
+  `uid` int(10) unsigned NOT NULL,
+  `tid` int(10) unsigned NOT NULL,
+  `time` int(10) unsigned NOT NULL,
   UNIQUE KEY `uid` (`uid`,`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `x_perm` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `x_id` int(11) NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `x_id` int(11) unsigned NOT NULL,
   `x_type` varchar(64) NOT NULL,
   `perm_id` varchar(64) NOT NULL,
   `permbind_id` varchar(64) NOT NULL,
-  `bindvalue` int(11) NOT NULL,
-  `revoke` int(1) NOT NULL,
+  `bindvalue` int(11) unsigned NOT NULL,
+  `revoke` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

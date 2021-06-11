@@ -62,7 +62,6 @@ if (!$action) {
 	}
 } else if ($action == 'Preview') { // Previewing PM
 	$post['date'] = time();
-	$post['num'] = 0;
 	$post['text'] = $_POST['message'];
 	foreach ($userdata as $field => $val)
 		$post['u' . $field] = $val;

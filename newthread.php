@@ -27,8 +27,8 @@ if ($action == 'Submit') {
 		[$_POST['title'], $fid, $userdata['id'], time(), $userdata['id']]);
 
 	$tid = $sql->insertid();
-	$sql->query("INSERT INTO posts (user, thread, date, num) VALUES (?,?,?,?)",
-		[$userdata['id'], $tid, time(), $userdata['posts']++]);
+	$sql->query("INSERT INTO posts (user, thread, date) VALUES (?,?,?)",
+		[$userdata['id'], $tid, time()]);
 
 	$pid = $sql->insertid();
 	$sql->query("INSERT INTO poststext (id, text) VALUES (?,?)",
@@ -51,7 +51,6 @@ $message = '';
 
 if ($action == 'Preview') {
 	$post['date'] = time();
-	$post['num'] = $userdata['posts']++;
 	$post['text'] = $_POST['message'];
 	foreach ($userdata as $field => $val)
 		$post['u' . $field] = $val;

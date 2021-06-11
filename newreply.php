@@ -30,8 +30,8 @@ if ($action == 'Submit') {
 		error("Error", "You must wait 2 seconds before posting on a freshly registered account.");
 
 	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
-	$sql->query("INSERT INTO posts (user,thread,date,num) VALUES (?,?,?,?)",
-		[$userdata['id'],$tid,time(),$userdata['posts']++]);
+	$sql->query("INSERT INTO posts (user,thread,date) VALUES (?,?,?)",
+		[$userdata['id'],$tid,time()]);
 	$pid = $sql->insertid();
 	$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
 		[$pid,$_POST['message']]);
@@ -76,7 +76,6 @@ if ($pid) {
 }
 
 $post['date'] = time();
-$post['num'] = $userdata['posts']++;
 $post['text'] = ($action == 'Preview' ? $_POST['message'] : $quotetext);
 foreach ($userdata as $field => $val)
 	$post['u' . $field] = $val;

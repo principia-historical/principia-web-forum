@@ -67,7 +67,6 @@ $topbot = [
 
 $euser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$post['id']]);
 $post['date'] = time();
-$post['num'] = $euser['posts']++;
 $post['text'] = ($action == 'Preview' ? $_POST['message'] : $post['text']);
 foreach ($euser as $field => $val)
 	$post['u'.$field] = $val;
