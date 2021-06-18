@@ -44,7 +44,8 @@
 			<ul class="menu right">
 				<li><a href="./?action=markread&fid=all">Mark all forums read</a></li>
 			</ul>
-		</div><br>
+		</div>
+		{% block precontent %}{% endblock %}<br>
 		<div class="home content forum">
 			{% block content %}{% endblock %}
 		</div><br>

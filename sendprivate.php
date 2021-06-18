@@ -18,11 +18,8 @@ if ($action == 'Submit') {
 
 	if ($userto && $_POST['message']) {
 		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 30) AND userfrom = ?", [$userdata['id']]);
-		$secafterpm = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 2) AND userfrom = ?", [$userdata['id']]);
-		if ($recentpms && (!has_perm('consecutive-posts'))) {
-			$msg = "You can't send more than one PM within 30 seconds!";
-		} else if ($secafterpm && (has_perm('consecutive-posts'))) {
-			$msg = "You can't send more than one PM within 2 seconds!";
+		if ($recentpms) {
+			$error = "You can't send more than one PM within 30 seconds!";
 		} else {
 			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
 				[time(),$userto,$userdata['id'],$_POST['title'],$_POST['message']]);
@@ -30,17 +27,15 @@ if ($action == 'Submit') {
 			redirect("private.php");
 		}
 	} elseif (!$userto) {
-		$msg = "That user doesn't exist!<br>Go back or <a href=sendprivate.php>try again</a>";
+		$error = "That user doesn't exist!";
 	} elseif (!$_POST['message']) {
-		$msg = "You can't send a blank message!<br>Go back or <a href=sendprivate.php>try again</a>";
+		$error = "You can't send a blank message!";
 	}
-
-	error("Error", $msg);
 }
 
-$userto = '';
-$title = '';
-$quotetext = '';
+$userto = (isset($_POST['userto']) ? $_POST['userto'] : '');
+$title = (isset($_POST['title']) ? $_POST['title'] : '');
+$quotetext = (isset($_POST['message']) ? $_POST['message'] : '');
 
 // Default
 if (!$action) {
@@ -80,5 +75,6 @@ echo $twig->render('sendprivate.twig', [
 	'title' => $title,
 	'quotetext' => $quotetext,
 	'topbot' => $topbot,
-	'action' => $action
+	'action' => $action,
+	'error' => $error
 ]);
