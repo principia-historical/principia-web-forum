@@ -28,7 +28,7 @@ if (isset($_GET['action']) && $_GET['action'] == "del") {
 	if (has_perm('delete-user-pms') || ($owner == $userdata['id'] && has_perm('delete-own-pms'))) {
 		$sql->query("UPDATE pmsgs SET del_$fieldn2 = ? WHERE id = ?", [!$showdel, $id]);
 	} else {
-		error("Error", "You are not allowed to (un)delete that message.");
+		error("403", "You are not allowed to (un)delete that message.");
 	}
 	$id = 0;
 }
@@ -36,7 +36,7 @@ if (isset($_GET['action']) && $_GET['action'] == "del") {
 $ptitle = 'Private messages' . ($sent ? ' (sent)' : '');
 if ($id && has_perm('view-user-pms')) {
 	$user = $sql->fetch("SELECT id,name,group_id FROM principia.users WHERE id = ?", [$id]);
-	if ($user == null) error("Error", "User doesn't exist.");
+	if ($user == null) error("404", "User doesn't exist.");
 	$headtitle = $user['name']."'s ".strtolower($ptitle);
 	$title = userlink($user)."'s ".strtolower($ptitle);
 } else {

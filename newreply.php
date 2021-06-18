@@ -11,23 +11,21 @@ $thread = $sql->fetch("SELECT t.*, f.title ftitle, f.private fprivate, f.readonl
 	WHERE t.id = ? AND t.forum IN " . forums_with_view_perm(), [$tid]);
 
 if (!$thread) {
-	error("Error", "Thread does not exist.");
+	error("404", "Thread does not exist.");
 } else if (!can_create_forum_post(['id' => $thread['forum'], 'private' => $thread['fprivate'], 'readonly' => $thread['freadonly']])) {
-	error("Error", "You have no permissions to create posts in this forum!");
+	error("403", "You have no permissions to create posts in this forum!");
 } elseif ($thread['closed'] && !has_perm('override-closed')) {
-	error("Error", "You can't post in closed threads!");
+	error("400", "You can't post in closed threads!");
 }
 
 if ($action == 'Submit') {
 	$lastpost = $sql->fetch("SELECT id,user,date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
 	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && !has_perm('consecutive-posts'))
-		error("Error", "You can't double post until it's been at least one day!");
+		error("403", "You can't double post until it's been at least one day!");
 	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !has_perm('consecutive-posts'))
-		error("Error", "You must wait 2 seconds before posting consecutively.");
+		error("403", "You must wait 2 seconds before posting consecutively.");
 	if (strlen(trim($_POST['message'])) == 0)
-		error("Error", "Your post is empty! Enter a message and try again.");
-	if ($userdata['joined'] > (time() - 2))
-		error("Error", "You must wait 2 seconds before posting on a freshly registered account.");
+		error("400", "Your post is empty! Enter a message and try again.");
 
 	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
 	$sql->query("INSERT INTO posts (user,thread,date) VALUES (?,?,?)",

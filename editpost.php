@@ -23,11 +23,11 @@ $thread = $sql->fetch("SELECT p.user puser, t.*, f.title ftitle, f.private fpriv
 if (!$thread) $pid = 0;
 
 if ($thread['closed'] && !can_edit_forum_posts($thread['forum'])) {
-	error("Error", "You can't edit a post in closed threads!");
+	error("403", "You can't edit a post in closed threads!");
 } else if (!can_edit_post(['user' => $thread['puser'], 'tforum' => $thread['forum']])) {
-	error("Error", "You do not have permission to edit this post.");
+	error("403", "You do not have permission to edit this post.");
 } else if ($pid == -1) {
-	error("Error", "Invalid post ID.");
+	error("404", "Invalid post ID.");
 }
 
 $post = $sql->fetch("SELECT u.id, p.user, pt.text FROM posts p LEFT JOIN poststext pt ON p.id=pt.id "
@@ -38,7 +38,7 @@ if (!isset($post)) $err = "Post doesn't exist.";
 
 if ($action == 'Submit') {
 	if ($post['text'] == $_POST['message']) {
-		error("Error", "No changes detected.");
+		error("400", "No changes detected.");
 	}
 
 	$rev = $sql->result("SELECT MAX(revision) FROM poststext WHERE id = ?", [$pid]) + 1;
@@ -49,7 +49,7 @@ if ($action == 'Submit') {
 } else if ($action == 'delete' || $action == 'undelete') {
 
 	if (!(can_delete_forum_posts($thread['forum']))) {
-		error("Error", "You do not have the permission to do this.");
+		error("403", "You do not have the permission to do this.");
 	} else {
 		$sql->query("UPDATE posts SET deleted = ? WHERE id = ?", [($action == 'delete' ? 1 : 0), $pid]);
 		redirect("thread.php?pid=$pid#edit");

@@ -1,7 +1,7 @@
 <?php
 require('lib/common.php');
 
-if (!has_perm('edit-groups')) error('Error', 'You have no permissions to do this!');
+if (!has_perm('edit-groups')) error('403', 'You have no permissions to do this!');
 
 $act = (isset($_GET['act']) ? $_GET['act'] : '');
 $errmsg = '';
@@ -85,7 +85,7 @@ if ($act == 'new' || $act == 'edit') {
 		$pagebar['title'] = 'New group';
 	} else {
 		$group = $sql->fetch("SELECT * FROM groups WHERE id = ?",[$_GET['id']]);
-		if (!$group) error("Error", "Invalid group ID.");
+		if (!$group) error("404", "Invalid group ID.");
 		$pagebar['title'] = 'Edit group';
 	}
 

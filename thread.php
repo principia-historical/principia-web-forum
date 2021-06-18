@@ -2,12 +2,11 @@
 require('lib/common.php');
 
 $page = isset($_REQUEST['page']) ? (int)$_REQUEST['page'] : 1;
-if ($page < 0) error("Error", "Invalid page number");
+if ($page < 0) error("404", "Invalid page number");
 
 $fieldlist = userfields('u', 'u') . ',' . userfields_post();
 
-$ppp = isset($_REQUEST['ppp']) ? (int)$_REQUEST['ppp'] : $userdata['ppp'];
-if ($ppp < 0) error("Error", "Invalid posts per page number");
+$ppp = $userdata['ppp'];
 
 if (isset($_REQUEST['id'])) {
 	$tid = (int)$_REQUEST['id'];
@@ -23,13 +22,13 @@ if (isset($_REQUEST['id'])) {
 elseif (isset($_GET['pid'])) {
 	$pid = (int)$_GET['pid'];
 	$numpid = $sql->fetch("SELECT t.id tid FROM posts p LEFT JOIN threads t ON p.thread = t.id WHERE p.id = ?", [$pid]);
-	if (!$numpid) error("Error", "Thread post does not exist.");
+	if (!$numpid) error("404", "Thread post does not exist.");
 
 	$tid = $sql->result("SELECT thread FROM posts WHERE id = ?", [$pid]);
 	$page = floor($sql->result("SELECT COUNT(*) FROM posts WHERE thread = ? AND id < ?", [$tid, $pid]) / $ppp) + 1;
 	$viewmode = "thread";
 } else {
-	error("Error", "Thread does not exist.");
+	error("404", "Thread does not exist.");
 }
 
 if ($viewmode == "thread")
@@ -60,7 +59,7 @@ if (isset($tid) && $log && $act && (can_edit_forum_threads(getforumbythread($tid
 	} elseif ($act == 'move') {
 		editthread($tid, '', $_POST['arg']);
 	} else {
-		error("Error", "Unknown action.");
+		error("400", "Unknown action.");
 	}
 }
 
@@ -85,7 +84,7 @@ if ($viewmode == "thread") {
 			. "WHERE t.id = ? AND t.forum IN ".forums_with_view_perm(),
 			[$tid]);
 
-	if (!isset($thread['id'])) error("Error", "Thread does not exist.");
+	if (!isset($thread['id'])) error("404", "Thread does not exist.");
 
 	//append thread's title to page title
 	$title = $thread['title'];
@@ -119,7 +118,7 @@ if ($viewmode == "thread") {
 } elseif ($viewmode == "user") {
 	$user = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$uid]);
 
-	if ($user == null) error("Error", "User doesn't exist.");
+	if ($user == null) error("404", "User doesn't exist.");
 
 	$title = "Posts by " . $user['name'];
 	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
@@ -190,7 +189,7 @@ if ($viewmode == "thread") {
 	$topbot = [];
 	$time = $_GET['time'];
 } else {
-	error("Error", "Thread does not exist.<br><a href=./>Back to main</a>");
+	error("404", "Thread does not exist.<br><a href=./>Back to main</a>");
 }
 
 ob_start();

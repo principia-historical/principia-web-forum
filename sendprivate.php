@@ -10,7 +10,7 @@ $topbot = [
 	'title' => 'Send'
 ];
 
-if (!has_perm('create-pms')) error('Error', 'You have no permissions to do this!');
+if (!has_perm('create-pms')) error('403', 'You have no permissions to do this!');
 
 // Submitting a PM
 if ($action == 'Submit') {

@@ -3,15 +3,15 @@ require('lib/common.php');
 
 $permlist = null;
 
-if (!has_perm('edit-permissions')) error('Error', 'You have no permissions to do this!');
+if (!has_perm('edit-permissions')) error('403', 'You have no permissions to do this!');
 
 if (isset($_GET['gid'])) {
 	$id = (int)$_GET['gid'];
 	if ((is_root_gid($id) || (!can_edit_group_assets() && $id!=$userdata['group_id'])) && !has_perm('no-restrictions')) {
-		error('Error', 'You have no permissions to do this!');
+		error('403', 'You have no permissions to do this!');
 	}
 	if ($userdata['group_id'] == $id && !has_perm('edit-own-permissions')) {
-		error('Error', 'You have no permissions to do this!');
+		error('403', 'You have no permissions to do this!');
 	}
 	$permowner = $sql->fetch("SELECT id,title,inherit_group_id FROM groups WHERE id=?", [$id]);
 	$type = 'group';
@@ -20,11 +20,11 @@ if (isset($_GET['gid'])) {
 
 	$tuser = $sql->result("SELECT group_id FROM principia.users WHERE id = ?",[$id]);
 	if ((is_root_gid($tuser) || (!can_edit_user_assets() && $id != $userdata['id'])) && !has_perm('no-restrictions')) {
-		error('Error', 'You have no permissions to do this!');
+		error('403', 'You have no permissions to do this!');
 	}
 
 	if ($id == $userdata['id'] && !has_perm('edit-own-permissions')) {
-		error('Error', 'You have no permissions to do this!');
+		error('403', 'You have no permissions to do this!');
 	}
 	$permowner = $sql->fetch("SELECT u.id,u.name title,u.group_id,g.title group_title FROM principia.users u LEFT JOIN groups g ON g.id=u.group_id WHERE u.id=?", [$id]);
 	$type = 'user';
@@ -38,7 +38,7 @@ if (isset($_GET['gid'])) {
 	$type = '';
 }
 
-if (!$permowner) error("Error", "Invalid {$type} ID.");
+if (!$permowner) error("404", "Invalid {$type} ID.");
 
 $errmsg = '';
 
@@ -161,6 +161,9 @@ RenderTable($data, $header);
 echo '<br>';
 $pagebar['message'] = '';
 RenderPageBar($pagebar);
+
+$content = ob_get_contents();
+ob_end_clean();
 
 $twig = _twigloader();
 echo $twig->render('_legacy.twig', [

@@ -13,7 +13,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	} else
 		$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN " . forums_with_view_perm(), [$fid]);
 
-	if (!isset($forum['id'])) error("Error", "Forum does not exist.");
+	if (!isset($forum['id'])) error("404", "Forum does not exist.");
 
 	$title = $forum['title'];
 
@@ -37,7 +37,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 } elseif (isset($_GET['user']) && $uid = $_GET['user']) {
 	$user = $sql->fetch("SELECT name FROM principia.users WHERE id = ?", [$uid]);
 
-	if (!isset($user)) error("Error", "User does not exist.");
+	if (!isset($user)) error("404", "User does not exist.");
 
 	$title = "Threads by " . $user['name'];
 
@@ -91,7 +91,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	$topbot = [];
 } else {
-	error("Error", "Forum does not exist.");
+	error("404", "Forum does not exist.");
 }
 
 $showforum = (isset($time) ? $time : $uid);
