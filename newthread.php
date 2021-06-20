@@ -13,32 +13,37 @@ if (!$forum)
 if (!can_create_forum_thread($forum))
 	error("403", "You have no permissions to create threads in this forum!");
 
+$error = '';
+
 if ($action == 'Submit') {
 	if (strlen(trim($_POST['title'])) < 4)
-		error("400", "You need to enter a longer title.");
+		$error = "You need to enter a longer title.";
 	if ($userdata['lastpost'] > time() - 30 && $action == 'Submit' && !has_perm('ignore-thread-time-limit'))
-		error("403", "Don't post threads so fast, wait a little longer.");
+		$error = "Don't post threads so fast, wait a little longer.";
 	if ($userdata['lastpost'] > time() - 2 && $action == 'Submit' && has_perm('ignore-thread-time-limit'))
-		error("403", "You must wait 2 seconds before posting a thread.");
+		$error = "You must wait 2 seconds before posting a thread.";
 
-	$sql->query("UPDATE principia.users SET posts = posts + 1, threads = threads + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
+	if (!$error) {
+		$sql->query("UPDATE principia.users SET posts = posts + 1, threads = threads + 1, lastpost = ? WHERE id = ?",
+			[time(), $userdata['id']]);
 
-	$sql->query("INSERT INTO threads (title, forum, user, lastdate, lastuser) VALUES (?,?,?,?,?)",
-		[$_POST['title'], $fid, $userdata['id'], time(), $userdata['id']]);
+		$sql->query("INSERT INTO threads (title, forum, user, lastdate, lastuser) VALUES (?,?,?,?,?)",
+			[$_POST['title'], $fid, $userdata['id'], time(), $userdata['id']]);
 
-	$tid = $sql->insertid();
-	$sql->query("INSERT INTO posts (user, thread, date) VALUES (?,?,?)",
-		[$userdata['id'], $tid, time()]);
+		$tid = $sql->insertid();
+		$sql->query("INSERT INTO posts (user, thread, date) VALUES (?,?,?)",
+			[$userdata['id'], $tid, time()]);
 
-	$pid = $sql->insertid();
-	$sql->query("INSERT INTO poststext (id, text) VALUES (?,?)",
-		[$pid, $_POST['message']]);
+		$pid = $sql->insertid();
+		$sql->query("INSERT INTO poststext (id, text) VALUES (?,?)", [$pid, $_POST['message']]);
 
-	$sql->query("UPDATE forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?", [time(), $userdata['id'], $pid, $fid]);
+		$sql->query("UPDATE forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?",
+			[time(), $userdata['id'], $pid, $fid]);
 
-	$sql->query("UPDATE threads SET lastid = ? WHERE id = ?", [$pid, $tid]);
+		$sql->query("UPDATE threads SET lastid = ? WHERE id = ?", [$pid, $tid]);
 
-	redirect("thread.php?id=$tid");
+		redirect("thread.php?id=$tid");
+	}
 }
 
 $topbot = [
@@ -46,8 +51,8 @@ $topbot = [
 	'title' => "New thread"
 ];
 
-$title = '';
-$message = '';
+$title = isset($_POST['title']) ? $_POST['title'] : '';
+$message = isset($_POST['message']) ? $_POST['message'] : '';
 
 if ($action == 'Preview') {
 	$post['date'] = time();
@@ -69,5 +74,6 @@ echo $twig->render('newthread.twig', [
 	'message' => $message,
 	'topbot' => $topbot,
 	'action' => $action,
-	'fid' => $fid
+	'fid' => $fid,
+	'error' => $error
 ]);
