@@ -23,16 +23,13 @@
 		<tr class="h"><td class="b h" colspan="2">Send message</td></tr>
 		<tr>
 			<td class="b n1 center" width="120">Send to:</td>
-			<td class="b n2"><input type="text" name="userto" size="25" maxlength=25 value="{{ userto }}"></td>
+			<td class="b n2"><input type="text" name="userto" size="30" maxlength="50" value="{{ userto }}"></td>
 		</tr><tr>
 			<td class="b n1 center">Title:</td>
-			<td class="b n2"><input type="text" name="title" size="80" maxlength="255" value="{{ title }}"></td>
-		</tr><tr>
-			<td class="b n1 center" width="120">Format:</td>
-			<td class="b n2">{{ posttoolbar() }}</td>
+			<td class="b n2"><input type="text" name="title" size="75" maxlength="255" value="{{ title }}"></td>
 		</tr><tr>
 			<td class="b n1 center">Message:</td>
-			<td class="b n2"><textarea name="message" id="message" rows="20" cols="80">{{ quotetext }}</textarea></td>
+			<td class="b n2"><textarea name="message" id="message" rows="15" cols="80">{{ quotetext }}</textarea></td>
 		</tr><tr>
 			<td class="b n1"></td>
 			<td class="b n1">
