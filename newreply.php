@@ -15,33 +15,37 @@ if (!$thread) {
 } else if (!can_create_forum_post(['id' => $thread['forum'], 'private' => $thread['fprivate'], 'readonly' => $thread['freadonly']])) {
 	error("403", "You have no permissions to create posts in this forum!");
 } elseif ($thread['closed'] && !has_perm('override-closed')) {
-	error("400", "You can't post in closed threads!");
+	error("400", "You can't post in closed threads.");
 }
+
+$error = '';
 
 if ($action == 'Submit') {
 	$lastpost = $sql->fetch("SELECT id,user,date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
 	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && !has_perm('consecutive-posts'))
-		error("403", "You can't double post until it's been at least one day!");
+		$error = "You can't double post until it's been at least one day!";
 	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !has_perm('consecutive-posts'))
-		error("403", "You must wait 2 seconds before posting consecutively.");
+		$error = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
-		error("400", "Your post is empty! Enter a message and try again.");
+		$error = "Your post is empty! Enter a message and try again.";
 
-	$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
-	$sql->query("INSERT INTO posts (user,thread,date) VALUES (?,?,?)",
-		[$userdata['id'],$tid,time()]);
-	$pid = $sql->insertid();
-	$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
-		[$pid,$_POST['message']]);
-	$sql->query("UPDATE threads SET replies = replies + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
-		[time(), $userdata['id'], $pid, $tid]);
-	$sql->query("UPDATE forums SET posts = posts + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
-		[time(), $userdata['id'], $pid, $thread['forum']]);
+	if (!$error) {
+		$sql->query("UPDATE principia.users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
+		$sql->query("INSERT INTO posts (user,thread,date) VALUES (?,?,?)",
+			[$userdata['id'],$tid,time()]);
+		$pid = $sql->insertid();
+		$sql->query("INSERT INTO poststext (id,text) VALUES (?,?)",
+			[$pid,$_POST['message']]);
+		$sql->query("UPDATE threads SET replies = replies + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
+			[time(), $userdata['id'], $pid, $tid]);
+		$sql->query("UPDATE forums SET posts = posts + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
+			[time(), $userdata['id'], $pid, $thread['forum']]);
 
-	// nuke entries of this thread in the "threadsread" table
-	$sql->query("DELETE FROM threadsread WHERE tid = ? AND NOT (uid = ?)", [$thread['id'], $userdata['id']]);
+		// nuke entries of this thread in the "threadsread" table
+		$sql->query("DELETE FROM threadsread WHERE tid = ? AND NOT (uid = ?)", [$thread['id'], $userdata['id']]);
 
-	redirect("thread.php?pid=$pid#$pid");
+		redirect("thread.php?pid=$pid#$pid");
+	}
 }
 
 $topbot = [
@@ -53,7 +57,7 @@ $topbot = [
 ];
 
 $pid = isset($_GET['pid']) ? (int)$_GET['pid'] : 0;
-$quotetext = '';
+$quotetext = isset($_POST['message']) ? $_POST['message'] : '';
 if ($pid) {
 	$post = $sql->fetch("SELECT u.name name, p.user, pt.text, f.id fid, f.private fprivate, p.thread "
 			. "FROM posts p "
@@ -89,5 +93,6 @@ echo $twig->render('newreply.twig', [
 	'post' => $post,
 	'topbot' => $topbot,
 	'action' => $action,
-	'tid' => $tid
+	'tid' => $tid,
+	'error' => $error
 ]);
