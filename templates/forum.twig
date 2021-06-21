@@ -47,12 +47,12 @@
 		<tr class="n{{ tr }} center">
 			<td class="b n1">
 				{% if log and not thread.isread %}
-					{% if thread.locked %}
+					{% if thread.closed %}
 						{{ rendernewstatus("on") }}
 					{% else %}
 						{{ rendernewstatus("n") }}
 					{% endif %}
-				{% elseif thread.locked %}
+				{% elseif thread.closed %}
 					{{ rendernewstatus("o") }}
 				{% endif %}
 			</td>
