@@ -35,7 +35,7 @@
 			{% if forum.private %}({% endif %}
 				<a href="forum.php?id={{ forum.id }}">{{ forum.title }}</a>
 			{% if forum.private %}){% endif %}
-			<br><span class="sfont">{{ forum.descr }}</span>
+			<br><span class="sfont">{{ forum.descr | raw }}</span>
 		</td>
 		<td class="b n1">{{ forum.threads }}</td>
 		<td class="b n1">{{ forum.posts }}</td>
