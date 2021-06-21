@@ -12,6 +12,8 @@ $topbot = [
 
 if (!has_perm('create-pms')) error('403', 'You have no permissions to do this!');
 
+$error = '';
+
 // Submitting a PM
 if ($action == 'Submit') {
 	$userto = $sql->result("SELECT id FROM principia.users WHERE name LIKE ?", [$_POST['userto']]);

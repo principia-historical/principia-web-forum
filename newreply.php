@@ -85,7 +85,6 @@ $post['ulastpost'] = time();
 
 if ($action == 'Preview') {
 	$topbot['title'] .= ' (Preview)';
-	echo '<br><table class="c1"><tr class="h"><td class="b h" colspan="2">Post preview</table>'.threadpost($post);
 }
 
 $twig = _twigloader();

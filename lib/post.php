@@ -74,12 +74,12 @@ function threadpost($post, $pthread = '') {
 	if (isset($post['deleted']) && $post['deleted']) {
 		$postlinks = '';
 		if (can_edit_forum_posts(getforumbythread($post['thread']))) {
-			$postlinks .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$post[revision]#$post[id]\">Peek</a> | ";
+			$postlinks .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$post[revision]#$post[id]\">Peek</a> &bull; ";
 			$postlinks .= "<a href=\"editpost.php?pid=" . $post['id'] . "&act=undelete\">Undelete</a>";
 		}
 
 		if ($post['id'])
-			$postlinks .= ($postlinks ? ' | ' : '') . "ID: $post[id]";
+			$postlinks .= ($postlinks ? ' &bull; ' : '') . "ID: $post[id]";
 
 		$ulink = userlink($post, 'u');
 		$text = <<<HTML
@@ -111,21 +111,21 @@ HTML;
 
 	// I have no way to tell if it's closed (or otherwise impostable (hah)) so I can't hide it in those circumstances...
 	if (isset($post['thread']) && $post['id'] && $userdata['id'] != 0) {
-		$postlinks .= ($postlinks ? ' | ' : '') . "<a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Reply</a>";
+		$postlinks .= ($postlinks ? ' &bull; ' : '') . "<a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Reply</a>";
 	}
 
 	// "Edit" link for admins or post owners, but not banned users
 	if (isset($post['thread']) && can_edit_post($post) && $post['id'])
-		$postlinks.=($postlinks ? ' | ' : '') . "<a href=\"editpost.php?pid=$post[id]\">Edit</a>";
+		$postlinks.=($postlinks ? ' &bull; ' : '') . "<a href=\"editpost.php?pid=$post[id]\">Edit</a>";
 
 	if (isset($post['thread']) && isset($post['id']) && can_delete_forum_posts(getforumbythread($post['thread'])))
-		$postlinks.=($postlinks ? ' | ' : '') . "<a href=\"editpost.php?pid=".$post['id']."&act=delete\">Delete</a>";
+		$postlinks.=($postlinks ? ' &bull; ' : '') . "<a href=\"editpost.php?pid=".$post['id']."&act=delete\">Delete</a>";
 
 	if (isset($post['thread']) && $post['id'])
-		$postlinks.=" | ID: $post[id]";
+		$postlinks.=" &bull; ID: $post[id]";
 
 	if (isset($post['maxrevision']) && isset($post['thread']) && has_perm('view-post-history') && $post['maxrevision'] > 1) {
-		$revisionstr.=" | Revision ";
+		$revisionstr.=" &bull; Revision ";
 		for ($i = 1; $i <= $post['maxrevision']; $i++)
 			$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";
 	}
