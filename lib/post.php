@@ -138,7 +138,7 @@ HTML;
 	if ($post['usignature']) {
 		$post['usignature'] = '<div class="siggy">' . postfilter($post['usignature']) . '</div>';
 	}
-	$utitle = esc($post['utitle']);
+	$utitle = $post['utitle'];
 	$ujoined = date('Y-m-d', $post['ujoined']);
 	$posttext = postfilter($post['text']);
 	$text = <<<HTML
