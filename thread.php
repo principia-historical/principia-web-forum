@@ -63,10 +63,13 @@ if (isset($tid) && $log && $act && (can_edit_forum_threads(getforumbythread($tid
 	}
 }
 
+$pin = (isset($_GET['pin']) && is_numeric($_GET['pin']) ? $_GET['pin'] : null);
+$rev = (isset($_GET['rev']) && is_numeric($_GET['rev']) ? $_GET['rev'] : null);
+
 //determine string for revision pinning
-if (isset($_GET['pin']) && isset($_GET['rev']) && is_numeric($_GET['pin']) && is_numeric($_GET['rev']) && has_perm('view-post-history')) {
-	$pinstr = "AND (pt2.id<>$_GET[pin] OR pt2.revision<>($_GET[rev]+1)) ";
-} else
+if ($pin && $rev && has_perm('view-post-history'))
+	$pinstr = "AND (pt2.id <> $pin OR pt2.revision <> ($rev+1)) ";
+else
 	$pinstr = '';
 
 if ($viewmode == "thread") {
@@ -192,8 +195,6 @@ if ($viewmode == "thread") {
 	error("404", "Thread does not exist.<br><a href=./>Back to main</a>");
 }
 
-ob_start();
-
 $modlinks = '';
 if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($userdata['id'] == $thread['user'] && !$thread['closed'] && has_perm('rename-own-thread')))) {
 	$link = "<a href=javascript:submitmod";
@@ -213,7 +214,7 @@ if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($userdata['id']
 		.	'<input type="submit" id="move" value="Submit" name="movethread" onclick="submitmove(movetid())">'
 		.	'<input type="button" value="Cancel" onclick="hidethreadedit(); return false;">';
 	} else {
-		$fmovelinks = $close = $stick = $trash = '';
+		$fmovelinks = $stick = $stick2 = $close = $close2 = $trash = $trash2 = '';
 		$edit = '<a href=javascript:showrbox()>Rename</a>';
 	}
 
@@ -256,74 +257,18 @@ function hidethreadedit() {
 HTML;
 }
 
-RenderPageBar($topbot);
-
-if (isset($time)) {
-	?><table class="c1 autowidth">
-		<tr class="h"><td class="b">Latest Posts</td></tr>
-		<tr><td class="b n1 center">
-			<a href="forum.php?time=<?=$time ?>">By Threads</a> | By Posts</a><br><br>
-			<?=timelink(900,'thread').' | '.timelink(3600,'thread').' | '.timelink(86400,'thread').' | '.timelink(604800,'thread') ?>
-		</td></tr>
-	</table><?php
-}
-
-echo "$modlinks $pagelist";
-
-if ($posts) echo '<br>';
-
-for ($i = 1; $post = $posts->fetch(); $i++) {
-	if (isset($post['fid'])) {
-		if (!can_view_forum(['id' => $post['fid'], 'private' => $post['fprivate']]))
-			continue;
-	}
-	if (isset($uid) || isset($time)) {
-		$pthread['id'] = $post['tid'];
-		$pthread['title'] = $post['ttitle'];
-	}
-	if (!isset($_GET['pin']) || $post['id'] != $_GET['pin']) {
-		$post['maxrevision'] = $post['revision']; // not pinned, hence the max. revision equals the revision we selected
-	} else {
-		$post['maxrevision'] = $sql->result("SELECT MAX(revision) FROM poststext WHERE id = ?", [$_GET['pin']]);
-	}
-	if (isset($thread['forum']) && can_edit_forum_posts($thread['forum']) && isset($_GET['pin']) && $post['id'] == $_GET['pin'])
-		$post['deleted'] = false;
-
-	echo "<br>".threadpost($post);
-}
-
-if_empty_query($i, "No posts were found.", 0, true);
-
-echo "$pagelist" . (!isset($time) ? '<br>' : '');
-
-if (isset($thread['id']) && can_create_forum_post($faccess) && !$thread['closed']) {
-	?><table class="c1">
-<form action="newreply.php" method="post">
-	<tr class="h"><td class="b h" colspan=2>Quick Reply</a></td>
-	<tr>
-		<td class="b n1 center" width=120>Format:</td>
-		<td class="b n2"><?=posttoolbar() ?></td>
-	</tr><tr>
-		<td class="b n1 center" width=120>Reply:</td>
-		<td class="b n2"><textarea wrap="virtual" name="message" id="message" rows=8 cols=80></textarea></td>
-	</tr><tr class="n1">
-		<td class="b"></td>
-		<td class="b">
-			<input type="hidden" name="tid" value="<?=$tid ?>">
-			<input type="submit" name="action" value="Submit">
-			<input type="submit" name="action" value="Preview">
-		</td>
-	</tr>
-</form></table><br><?php
-}
-
-RenderPageBar($topbot);
-
-$content = ob_get_contents();
-ob_end_clean();
-
 $twig = _twigloader();
-echo $twig->render('_legacy.twig', [
-	'page_title' => $title,
-	'content' => $content
+echo $twig->render('thread.twig', [
+	'thread' => $thread,
+	'posts' => $posts,
+	'topbot' => $topbot,
+	'uid' => (isset($uid) ? $uid : null),
+	'time' => (isset($time) ? $time : null),
+	'modlinks' => $modlinks,
+	'pagelist' => $pagelist,
+	'faccess' => (isset($faccess) ? $faccess : null),
+	'pin' => $pin,
+	'rev' => $rev,
+	'tid' => (isset($tid) ? $tid : null),
+	'title' => $title
 ]);
