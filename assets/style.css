@@ -81,6 +81,22 @@ textarea, input, select, button {
 	margin-top: 0;
 }
 
+.mainbar table {
+	border: #000000 1px solid;
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+.mainbar th {
+	background: #3367aa;
+	font-size: 1em;
+	color: #ffffff;
+}
+.mainbar td, th {
+	border: #000000 1px solid;
+
+	padding: 5px;
+}
+
 .siggy {
 	border-top: 1px solid black;
 	font-size: 10pt;
@@ -103,3 +119,4 @@ textarea, input, select, button {
 	font-size: 18px;
 	color: red;
 }
+
