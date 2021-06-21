@@ -40,6 +40,6 @@
 	{% endfor %}
 </table>
 {% if pagelist %}
-	<br>{{ pagelist }}<br>
+	<br>{{ pagelist | raw }}<br>
 {% endif %}
 	{% endblock %}
