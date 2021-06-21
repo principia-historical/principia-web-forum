@@ -46,7 +46,10 @@ if (!$action) {
 			."FROM pmsgs p LEFT JOIN principia.users u ON p.userfrom = u.id "
 			."WHERE p.id = ?" . (!has_perm('view-user-pms') ? " AND (p.userfrom=".$userdata['id']." OR p.userto=".$userdata['id'].")" : ''), [$pid]);
 		if ($post) {
-			$quotetext = '[reply="'.$post['name'].'" id="'.$pid.'"]'.$post['text'].'[/quote]' . PHP_EOL;
+			$quotetext = sprintf(
+				'[reply="%s" id="%s"]%s[/reply]'.PHP_EOL.PHP_EOL,
+			$post['name'], $pid, $post['text']);
+
 			$title = 'Re:' . $post['title'];
 			$userto = $post['name'];
 		}
