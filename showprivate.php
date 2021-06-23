@@ -12,8 +12,10 @@ $tologuser = ($pmsgs['userto'] == $userdata['id']);
 
 if ((!$tologuser && $pmsgs['userfrom'] != $userdata['id']) && !has_perm('view-user-pms'))
 	error("404", "Private message does not exist.");
-elseif ($tologuser && $pmsgs['unread'])
+elseif ($tologuser && $pmsgs['unread']) {
 	$sql->query("UPDATE pmsgs SET unread = 0 WHERE id = ?", [$pid]);
+	$sql->query("DELETE FROM principia.notifications WHERE type = 3 AND level = ? AND recipient = ?", [$pid, $userdata['id']]);
+}
 
 $pagebar = [
 	'breadcrumb' => [

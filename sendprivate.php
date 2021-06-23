@@ -25,6 +25,10 @@ if ($action == 'Submit') {
 		} else {
 			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
 				[time(),$userto,$userdata['id'],$_POST['title'],$_POST['message']]);
+			$nextId = $sql->insertid();
+
+			$sql->query("INSERT INTO principia.notifications (type, level, recipient, sender) VALUES (?,?,?,?)",
+				[3, $nextId, $userto, $userdata['id']]);
 
 			redirect("private.php");
 		}
