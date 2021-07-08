@@ -5,6 +5,8 @@ $page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $fid = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $uid = isset($_GET['user']) ? (int)$_GET['user'] : 0;
 
+$fieldlist = userfields('u1', 'u1').",".userfields('u2', 'u2');
+
 if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if ($log) {
 		$forum = $sql->fetch("SELECT f.*, r.time rtime FROM forums f LEFT JOIN forumsread r ON (r.fid = f.id AND r.uid = ?) "
@@ -17,7 +19,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	$title = $forum['title'];
 
-	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*"
+	$threads = $sql->query("SELECT $fieldlist, t.*"
 		. ($log ? ", (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<'$forum[rtime]') isread" : '') . ' '
 		. "FROM threads t "
 		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
@@ -41,7 +43,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	$title = "Threads by " . $user['name'];
 
-	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*, f.id fid, "
+	$threads = $sql->query("SELECT $fieldlist, t.*, f.id fid, "
 		. ($log ? " (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread, " : ' ')
 		. "f.title ftitle FROM threads t "
 		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
@@ -68,7 +70,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	$title = 'Latest threats';
 
-	$threads = $sql->query("SELECT " . userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ", t.*, f.id fid,
+	$threads = $sql->query("SELECT $fieldlist, t.*, f.id fid,
 		f.title ftitle" . ($log ? ', (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread ' : ' ')
 		. "FROM threads t "
 		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
