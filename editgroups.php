@@ -1,11 +1,11 @@
 <?php
 require('lib/common.php');
 
-if (!has_perm('edit-groups')) error('403', 'You have no permissions to do this!');
+if (!hasPerm('edit-groups')) error('403', 'You have no permissions to do this!');
 
 $act = (isset($_GET['act']) ? $_GET['act'] : '');
 $errmsg = '';
-$caneditperms = has_perm('edit-permissions');
+$caneditperms = hasPerm('edit-permissions');
 
 if ($act == 'delete') {
 	$id = $_GET['id'];
@@ -95,7 +95,7 @@ if ($act == 'new' || $act == 'edit') {
 		while ($g = $allgroups->fetch())
 			$grouplist[$g['id']] = $g['title'];
 
-		RenderPageBar($pagebar);
+		renderPageBar($pagebar);
 		echo '<br><form method="post"><table class="c1">' .
 			'<tr class="h"><td class="b h" colspan="2">Group Settings</td>'
 .	fieldrow('Name', fieldinput(50, 255, 'title', $group['title']))
@@ -105,7 +105,7 @@ if ($act == 'new' || $act == 'edit') {
 .	fieldrow('Color', fieldinput(6,6,'nc',$group['nc']))
 .	'<tr class="n1"><td class="b"></td><td class="b"><input type="submit" name="submit" value="Apply changes"></td></table></form><br>';
 		$pagebar['message'] = '';
-		RenderPageBar($pagebar);
+		renderPageBar($pagebar);
 	}
 } else {
 	$pagebar = [
@@ -115,7 +115,7 @@ if ($act == 'new' || $act == 'edit') {
 		'message' => $errmsg
 	];
 
-	RenderPageBar($pagebar);
+	renderPageBar($pagebar);
 	echo '<br>';
 
 	$header = [
@@ -146,14 +146,14 @@ if ($act == 'new' || $act == 'edit') {
 			'id' => $group['id'],
 			'name' => $name,
 			'parent' => $group['parenttitle'] ? esc($group['parenttitle']) : '<small>(none)</small>',
-			'actions' => RenderActions($actions,true),
+			'actions' => renderActions($actions,true),
 		];
 	}
 
-	RenderTable($data, $header);
+	renderTable($data, $header);
 	echo '<br>';
 	$pagebar['message'] = '';
-	RenderPageBar($pagebar);
+	renderPageBar($pagebar);
 }
 
 $content = ob_get_contents();

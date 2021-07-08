@@ -1,7 +1,7 @@
 <?php
 require('lib/common.php');
 
-if (!has_perm('edit-forums')) error('403', 'You have no permissions to do this!');
+if (!hasPerm('edit-forums')) error('403', 'You have no permissions to do this!');
 
 $error = '';
 
@@ -320,7 +320,7 @@ function saveperms($bind, $id) {
 
 	// apply the new perms
 	foreach ($usergroups as $gid => $group) {
-		if (is_root_gid($gid)) continue;
+		if (isRootGid($gid)) continue;
 
 		if ($_POST['inherit'][$gid])
 			continue;

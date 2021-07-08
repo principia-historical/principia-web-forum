@@ -20,9 +20,9 @@ foreach (glob("lib/*.php") as $filename)
 $logpermset = [];
 
 if ($log) {
-	load_user_permset();
+	loadUserPermset();
 } else {
-	load_guest_permset();
+	loadGuestPermset();
 
 	$userdata['id'] = 0;
 }

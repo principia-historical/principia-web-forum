@@ -1,6 +1,6 @@
 <?php
 
-function editthread($id, $title = '', $forum = 0, $closed= -1, $sticky= -1, $delete = -1) {
+function editThread($id, $title = '', $forum = 0, $closed= -1, $sticky= -1, $delete = -1) {
 	global $sql;
 	if ($delete < 1) {
 		$set = '';
@@ -11,11 +11,11 @@ function editthread($id, $title = '', $forum = 0, $closed= -1, $sticky= -1, $del
 		if (strlen(trim($set))>0&&!is_array($set)) $sql->query("UPDATE threads SET $set WHERE id = ?", [$id]);
 
 		if ($forum)
-			movethread($id,$forum);
+			moveThread($id,$forum);
 	}
 }
 
-function movethread($id, $forum) {
+function moveThread($id, $forum) {
 	global $sql;
 
 	if (!$sql->result("SELECT COUNT(*) FROM forums WHERE id = ?", [$forum])) return;
@@ -34,7 +34,7 @@ function movethread($id, $forum) {
 		[$thread['replies'], $last2['lastdate'], $last2['lastuser'], $last2['lastid'], $forum]);
 }
 
-function getforumbythread($tid) {
+function getForumByThread($tid) {
 	global $sql;
 	static $cache;
 	return isset($cache[$tid]) ? $cache[$tid] : $cache[$tid] = $sql->result("SELECT forum FROM threads WHERE id = ?", [$tid]);

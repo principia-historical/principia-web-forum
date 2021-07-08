@@ -38,7 +38,7 @@
 		<br>{{ threadpost(post, pthread) }}
 	{% endif %}
 {% else %}
-	{{ if_empty_query2("No posts were found.", 0, true) }}
+	{{ if_empty_query("No posts were found.", 0, true) }}
 {% endfor %}
 
 {{ pagelist | raw }}

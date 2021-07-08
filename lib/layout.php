@@ -13,7 +13,7 @@
  *	key				column key (must match the header column key)
  *	value			cell value
  */
-function RenderTable($data, $headers) {
+function renderTable($data, $headers) {
 	$zebra = 1;
 
 	echo '<table class="c1"><tr class="h">';
@@ -34,7 +34,7 @@ function RenderTable($data, $headers) {
 	echo "</table>";
 }
 
-function rendernewstatus($type) {
+function newStatus($type) {
 	switch ($type) {
 		case "n":
 			$text = "NEW";
@@ -53,7 +53,7 @@ function rendernewstatus($type) {
 	return "<img src=\"assets/status/$statusimg\" alt=\"$text\">";
 }
 
-function RenderActions($actions, $ret = false) {
+function renderActions($actions, $ret = false) {
 	$out = '';
 	$i = 0;
 	foreach ($actions as $action) {
@@ -83,21 +83,17 @@ function RenderActions($actions, $ret = false) {
 		echo $out;
 }
 
-function RenderBreadcrumb($breadcrumb) {
-	foreach ($breadcrumb as $action) {
-		printf('<a href=%s>%s</a> &raquo; ', '"'.htmlentities($action['href'], ENT_QUOTES).'"', $action['title']);
-	}
-}
-
-function RenderPageBar($pagebar) {
+function renderPageBar($pagebar) {
 	if (empty($pagebar)) return;
 
 	echo "<table width=100%><td class=nb>";
-	if (!empty($pagebar['breadcrumb']))
-		RenderBreadcrumb($pagebar['breadcrumb']);
+	if (!empty($pagebar['breadcrumb'])) {
+		foreach ($pagebar['breadcrumb'] as $action)
+			printf('<a href=%s>%s</a> &raquo; ', '"'.htmlentities($action['href'], ENT_QUOTES).'"', $action['title']);
+	}
 	echo $pagebar['title'].'</td><td class="nb right">';
 	if (!empty($pagebar['actions']))
-		RenderActions($pagebar['actions']);
+		renderActions($pagebar['actions']);
 	else
 		echo "&nbsp;";
 	echo "</td></table>";
@@ -131,7 +127,7 @@ function fieldselect($field, $checked, $choices) {
 	return $text;
 }
 
-function pagelist($total, $limit, $url, $sel = 0, $showall = false, $tree = false) {
+function pagelist($total, $limit, $url, $sel = 0, $showall = false) {
 	$pagelist = '';
 	$pages = ceil($total / $limit);
 	if ($pages < 2) return '';
@@ -150,10 +146,7 @@ function pagelist($total, $limit, $url, $sel = 0, $showall = false, $tree = fals
 		}
 	}
 
-	if ($tree)
-		$listhtml = '<span class="sfont">(pages: %s)</span>';
-	else
-		$listhtml = '<div class="pagelist">Pages: %s</div>';
+	$listhtml = '<div class="pagelist">Pages: %s</div>';
 
 	return sprintf($listhtml, $pagelist);
 }
@@ -165,7 +158,7 @@ function forumlist($currentforum = -1) {
 	$out = '<select id="forumselect">';
 	$c = -1;
 	while ($d = $r->fetch()) {
-		if (!can_view_forum($d))
+		if (!canViewForum($d))
 			continue;
 
 		if ($d['cat'] != $c) {
@@ -183,18 +176,7 @@ function forumlist($currentforum = -1) {
 	return $out;
 }
 
-/**
- * Display $message if $result (the result of a SQL query) is empty (has no lines).
- */
-function if_empty_query($result, $message, $colspan = 0, $table = false) {
-	if ($result == 1) {
-		if ($table) echo '<table class="c1">';
-		echo '<tr><td class="b n1 center" '.($colspan != 0 ? "colspan=$colspan" : '')."><p>$message</p></td></tr>";
-		if ($table) echo '</table>';
-	}
-}
-
-function if_empty_query2($message, $colspan = 0, $table = false) {
+function ifEmptyQuery($message, $colspan = 0, $table = false) {
 	if ($table) echo '<table class="c1">';
 	echo '<tr><td class="b n1 center" '.($colspan != 0 ? "colspan=$colspan" : '')."><p>$message</p></td></tr>";
 	if ($table) echo '</table>';

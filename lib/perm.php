@@ -15,26 +15,26 @@ while ($g = $r->fetch())
 //-user permissions
 //-user's primary group permissions, then the parent group's permissions, recursively until it reaches the top
 //first encountered occurence of a permission has precendence (+/-)
-function load_user_permset() {
+function loadUserPermset() {
 	global $logpermset, $userdata;
 
 	//load user specific permissions
-	$logpermset = perms_for_x('user',$userdata['id']);
-	$logpermset = apply_group_permissions($logpermset,$userdata['group_id']);
+	$logpermset = permsForX('user',$userdata['id']);
+	$logpermset = applyGroupPermissions($logpermset,$userdata['group_id']);
 }
 
 //Badge permset
 
-function permset_for_user($userid) {
+function permsetForUser($userid) {
 	$permset = [];
 	//load user specific permissions
-	$permset = perms_for_x('user',$userid);
+	$permset = permsForX('user',$userid);
 
-	$permset = apply_group_permissions($permset,gid_for_user($userid));
+	$permset = applyGroupPermissions($permset,gidForUser($userid));
 	return $permset;
 }
 
-function is_root_gid($gid) {
+function isRootGid($gid) {
 	global $rootgroup;
 	if ($gid == $rootgroup)
 		return true;
@@ -42,52 +42,52 @@ function is_root_gid($gid) {
 		return false;
 }
 
-function gid_for_user($userid) {
+function gidForUser($userid) {
 	global $sql;
 	$row = $sql->fetch("SELECT group_id FROM principia.users WHERE id=?",[$userid]);
 	return $row['group_id'];
 }
 
-function load_guest_permset() {
+function loadGuestPermset() {
 	global $logpermset;
 	$logpermset = [];
 	$loggroups = [1];
 	foreach ($loggroups as $gid) {
-		$logpermset = apply_group_permissions($logpermset,$gid);
+		$logpermset = applyGroupPermissions($logpermset,$gid);
 	}
 }
 
-function load_bot_permset() {
+function loadBotPermset() {
 	global $logpermset;
 	$logpermset = [];
 	$loggroups = [];
 	foreach ($loggroups as $gid) {
-		$logpermset = apply_group_permissions($logpermset,$gid);
+		$logpermset = applyGroupPermissions($logpermset,$gid);
 	}
 }
 
-function title_for_perm($permid) {
+function titleForPerm($permid) {
 	global $sql;
 	$row = $sql->fetch("SELECT title FROM perm WHERE id=?",[$permid]);
 	return $row['title'];
 }
 
-function apply_group_permissions($permset,$gid) {
+function applyGroupPermissions($permset,$gid) {
 	//apply group permissions from lowest node upwards
 	while ($gid > 0) {
-		$gpermset = perms_for_x('group',$gid);
+		$gpermset = permsForX('group',$gid);
 		foreach ($gpermset as $k => $v) {
 			//remove already added permissions
-			if (in_permset($permset,$v)) unset($gpermset[$k]);
+			if (inPermset($permset,$v)) unset($gpermset[$k]);
 		}
 		//merge permissions
 		$permset = array_merge($permset,$gpermset);
-		$gid = parent_group_for_group($gid);
+		$gid = parentGroupForGroup($gid);
 	}
 	return $permset;
 }
 
-function in_permset($permset,$perm) {
+function inPermset($permset,$perm) {
 	foreach ($permset as $v) {
 		if (($v['id'] == $perm['id']) && ($v['bindvalue'] == $perm['bindvalue']))
 			return true;
@@ -95,119 +95,119 @@ function in_permset($permset,$perm) {
 	return false;
 }
 
-function can_edit_post($post) {
+function canEditPost($post) {
 	global $userdata;
-	if (isset($post['user']) && $post['user'] == $userdata['id'] && has_perm('update-own-post')) return true;
-	else if (has_perm('update-post')) return true;
-	else if (isset($post['tforum']) && can_edit_forum_posts($post['tforum'])) return true;
+	if (isset($post['user']) && $post['user'] == $userdata['id'] && hasPerm('update-own-post')) return true;
+	else if (hasPerm('update-post')) return true;
+	else if (isset($post['tforum']) && canCreateForumPosts($post['tforum'])) return true;
 	return false;
 }
 
-function can_edit_group_assets() {
-	if (has_perm('edit-all-group')) return true;
+function canEditGroupAssets() {
+	if (hasPerm('edit-all-group')) return true;
 	return false;
 }
 
-function can_edit_user_assets() {
-	if (has_perm('edit-all-group-member')) return true;
+function canEditUserAssets() {
+	if (hasPerm('edit-all-group-member')) return true;
 	return false;
 }
 
-function can_edit_user($uid) {
+function canEditUser($uid) {
 	global $userdata;
 
-	$gid = gid_for_user($uid);
-	if (is_root_gid($gid) && !has_perm('no-restrictions')) return false;
-	if ((!can_edit_user_assets() && $uid!=$userdata['id']) && !has_perm('no-restrictions')) return false;
+	$gid = gidForUser($uid);
+	if (isRootGid($gid) && !hasPerm('no-restrictions')) return false;
+	if ((!canEditUserAssets() && $uid!=$userdata['id']) && !hasPerm('no-restrictions')) return false;
 
-	if ($uid == $userdata['id'] && has_perm('update-own-profile')) return true;
-	else if (has_perm('update-profiles')) return true;
+	if ($uid == $userdata['id'] && hasPerm('update-own-profile')) return true;
+	else if (hasPerm('update-profiles')) return true;
 	return false;
 }
 
-function forums_with_view_perm() {
+function forumsWithViewPerm() {
 	global $sql;
 	static $cache = '';
 	if ($cache != '') return $cache;
 	$cache = "(";
 	$r = $sql->query("SELECT f.id, f.private, f.cat FROM forums f");
 	while ($d = $r->fetch()) {
-		if (can_view_forum($d)) $cache .= $d['id'].',';
+		if (canViewForum($d)) $cache .= $d['id'].',';
 	}
 	$cache .= "NULL)";
 	return $cache;
 }
 
-function can_view_forum($forum) {
+function canViewForum($forum) {
 	//must fulfill the following criteria
 
 	//if the forum is private
 	if ($forum['private']) {
 		//and can view the forum
-		if (!has_perm('view-all-private-forums') && !has_perm_with_bindvalue('view-private-forum',$forum['id'])) return false;
+		if (!hasPerm('view-all-private-forums') && !hasPermWithBindvalue('view-private-forum',$forum['id'])) return false;
 	}
 	return true;
 }
 
-function needs_login() {
+function needsLogin() {
 	global $log;
 	if (!$log) {
 		error('403', "This page requires login.");
 	}
 }
 
-function can_create_forum_thread($forum) {
+function canCreateForumThread($forum) {
 	global $log;
-	if ($forum['readonly'] && !has_perm('override-readonly-forums')) return false;
+	if ($forum['readonly'] && !hasPerm('override-readonly-forums')) return false;
 
 	//must fulfill the following criteria
 
 	//can create public threads
-	if (!has_perm('create-public-thread')) return false;
+	if (!hasPerm('create-public-thread')) return false;
 	if (!$log) return false;
 
 	//and if the forum is private
 	if (isset($forum['private']) && $forum['private']) {
 		//can view the forum
-		if (!has_perm('create-all-private-forum-threads') && !has_perm_with_bindvalue('create-private-forum-thread',$forum['id'])) return false;
+		if (!hasPerm('create-all-private-forum-threads') && !hasPermWithBindvalue('create-private-forum-thread',$forum['id'])) return false;
 	}
 	return true;
 }
 
-function can_create_forum_post($forum) {
+function canCreateForumPost($forum) {
 	global $log;
-	if ($forum['readonly'] && !has_perm('override-readonly-forums')) return false;
+	if ($forum['readonly'] && !hasPerm('override-readonly-forums')) return false;
 
 	//must fulfill the following criteria
 
 	//can create public threads
-	if (!has_perm('create-public-post')) return false;
+	if (!hasPerm('create-public-post')) return false;
 	if (!$log) return false;
 
 	//and if the forum is private
 	if ($forum['private']) {
 		//can view the forum
-		if (!has_perm('create-all-private-forum-posts') && !has_perm_with_bindvalue('create-private-forum-post',$forum['id'])) return false;
+		if (!hasPerm('create-all-private-forum-posts') && !hasPermWithBindvalue('create-private-forum-post',$forum['id'])) return false;
 	}
 	return true;
 }
 
-function can_edit_forum_posts($forumid) {
-	if (!has_perm('update-post') && !has_perm_with_bindvalue('edit-forum-post',$forumid)) return false;
+function canCreateForumPosts($forumid) {
+	if (!hasPerm('update-post') && !hasPermWithBindvalue('edit-forum-post',$forumid)) return false;
 	return true;
 }
 
-function can_delete_forum_posts($forumid) {
-	if (!has_perm('delete-post') && !has_perm_with_bindvalue('delete-forum-post',$forumid)) return false;
+function canDeleteForumPosts($forumid) {
+	if (!hasPerm('delete-post') && !hasPermWithBindvalue('delete-forum-post',$forumid)) return false;
 	return true;
 }
 
-function can_edit_forum_threads($forumid) {
-	if (!has_perm('update-thread') && !has_perm_with_bindvalue('edit-forum-thread',$forumid)) return false;
+function canEditForumThreads($forumid) {
+	if (!hasPerm('update-thread') && !hasPermWithBindvalue('edit-forum-thread',$forumid)) return false;
 	return true;
 }
 
-function has_perm($permid) {
+function hasPerm($permid) {
 	global $logpermset;
 	foreach ($logpermset as $k => $v) {
 		if ($v['id'] == 'no-restrictions') return true;
@@ -216,7 +216,7 @@ function has_perm($permid) {
 	return false;
 }
 
-function has_perm_with_bindvalue($permid,$bindvalue) {
+function hasPermWithBindvalue($permid,$bindvalue) {
 	global $logpermset;
 	foreach ($logpermset as $k => $v) {
 		if ($v['id'] == 'no-restrictions') return true;
@@ -226,7 +226,7 @@ function has_perm_with_bindvalue($permid,$bindvalue) {
 	return false;
 }
 
-function parent_group_for_group($groupid) {
+function parentGroupForGroup($groupid) {
 	global $usergroups;
 
 	$gid = $usergroups[$groupid]['inherit_group_id'];
@@ -237,7 +237,7 @@ function parent_group_for_group($groupid) {
 	}
 }
 
-function perms_for_x($xtype,$xid) {
+function permsForX($xtype,$xid) {
 	global $sql;
 	$res = $sql->query("SELECT * FROM x_perm WHERE x_type=? AND x_id=?", [$xtype,$xid]);
 

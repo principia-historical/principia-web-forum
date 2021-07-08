@@ -48,12 +48,12 @@
 			<td class="b n1">
 				{% if log and not thread.isread %}
 					{% if thread.closed %}
-						{{ rendernewstatus("on") }}
+						{{ new_status("on") }}
 					{% else %}
-						{{ rendernewstatus("n") }}
+						{{ new_status("n") }}
 					{% endif %}
 				{% elseif thread.closed %}
-					{{ rendernewstatus("o") }}
+					{{ new_status("o") }}
 				{% endif %}
 			</td>
 			{% if showforum %}

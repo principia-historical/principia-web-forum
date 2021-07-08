@@ -3,14 +3,14 @@ require('lib/common.php');
 
 $permlist = null;
 
-if (!has_perm('edit-permissions')) error('403', 'You have no permissions to do this!');
+if (!hasPerm('edit-permissions')) error('403', 'You have no permissions to do this!');
 
 if (isset($_GET['gid'])) {
 	$id = (int)$_GET['gid'];
-	if ((is_root_gid($id) || (!can_edit_group_assets() && $id!=$userdata['group_id'])) && !has_perm('no-restrictions')) {
+	if ((isRootGid($id) || (!canEditGroupAssets() && $id!=$userdata['group_id'])) && !hasPerm('no-restrictions')) {
 		error('403', 'You have no permissions to do this!');
 	}
-	if ($userdata['group_id'] == $id && !has_perm('edit-own-permissions')) {
+	if ($userdata['group_id'] == $id && !hasPerm('edit-own-permissions')) {
 		error('403', 'You have no permissions to do this!');
 	}
 	$permowner = $sql->fetch("SELECT id,title,inherit_group_id FROM groups WHERE id=?", [$id]);
@@ -19,11 +19,11 @@ if (isset($_GET['gid'])) {
 	$id = (int)$_GET['uid'];
 
 	$tuser = $sql->result("SELECT group_id FROM principia.users WHERE id = ?",[$id]);
-	if ((is_root_gid($tuser) || (!can_edit_user_assets() && $id != $userdata['id'])) && !has_perm('no-restrictions')) {
+	if ((isRootGid($tuser) || (!canEditUserAssets() && $id != $userdata['id'])) && !hasPerm('no-restrictions')) {
 		error('403', 'You have no permissions to do this!');
 	}
 
-	if ($id == $userdata['id'] && !has_perm('edit-own-permissions')) {
+	if ($id == $userdata['id'] && !hasPerm('edit-own-permissions')) {
 		error('403', 'You have no permissions to do this!');
 	}
 	$permowner = $sql->fetch("SELECT u.id,u.name title,u.group_id,g.title group_title FROM principia.users u LEFT JOIN groups g ON g.id=u.group_id WHERE u.id=?", [$id]);
@@ -47,7 +47,7 @@ if (isset($_POST['addnew'])) {
 	$permid = $_POST['permid_new'];
 	$bindval = (int)$_POST['bindval_new'];
 
-	if (has_perm('no-restrictions') || $permid != 'no-restrictions') {
+	if (hasPerm('no-restrictions') || $permid != 'no-restrictions') {
 		$sql->query("INSERT INTO x_perm (x_id,x_type,perm_id,permbind_id,bindvalue,`revoke`) VALUES (?,?,?,'',?,?)",
 			[$id, $type, $permid, $bindval, $revoke]);
 		$msg = "The %s permission has been successfully assigned!";
@@ -62,7 +62,7 @@ if (isset($_POST['addnew'])) {
 	$permid = $_POST['permid'][$pid];
 	$bindval = (int)$_POST['bindval'][$pid];
 
-	if (has_perm('no-restrictions') || $permid != 'no-restrictions') {
+	if (hasPerm('no-restrictions') || $permid != 'no-restrictions') {
 		$sql->query("UPDATE x_perm SET perm_id = ?, bindvalue = ?, `revoke` = ? WHERE id = ?",
 			[$permid, $bindval, $revoke, $pid]);
 		$msg = "The %s permission has been successfully edited!";
@@ -73,7 +73,7 @@ if (isset($_POST['addnew'])) {
 	$keys = array_keys($_POST['del']);
 	$pid = $keys[0];
 	$permid = $_POST['permid'][$pid];
-	if (has_perm('no-restrictions') || $permid != 'no-restrictions') {
+	if (hasPerm('no-restrictions') || $permid != 'no-restrictions') {
 		$sql->query("DELETE FROM x_perm WHERE id = ?", [$pid]);
 		$msg = "The %s permission has been successfully deleted!";
 	} else {
@@ -87,10 +87,10 @@ $pagebar = [
 	'breadcrumb' => [['href'=>'./', 'title'=>'Main']],
 	'title' => 'Edit permissions',
 	'actions' => [],
-	'message' => (isset($msg) ? sprintf($msg, title_for_perm($permid)) : '')
+	'message' => (isset($msg) ? sprintf($msg, titleForPerm($permid)) : '')
 ];
 
-RenderPageBar($pagebar);
+renderPageBar($pagebar);
 
 echo '<br><form action="" method="POST">';
 
@@ -123,7 +123,7 @@ if (($i % 2) != 0) {
 	$data[] = $row;
 }
 
-RenderTable($data, $header);
+renderTable($data, $header);
 
 $header = ['c0' => ['name' => 'Add permission']];
 
@@ -131,7 +131,7 @@ $field = RevokeSelect("revoke_new", 0)
 		.PermSelect("permid_new", null)
 		.'for ID <input type="text" name="bindval_new" value="" size=3 maxlength=8> <input type="submit" name="addnew" value="Add">';
 $data = [['c0' => $field]];
-RenderTable($data, $header);
+renderTable($data, $header);
 
 echo "</form><br>";
 
@@ -156,11 +156,11 @@ while (isset($parentid) && $parentid > 0) {
 
 $header = ['cell' => ['name'=>"Permissions overview for {$type} '".esc($permowner['title'])."'"]];
 $data = [['cell' => $permoverview]];
-RenderTable($data, $header);
+renderTable($data, $header);
 
 echo '<br>';
 $pagebar['message'] = '';
-RenderPageBar($pagebar);
+renderPageBar($pagebar);
 
 $content = ob_get_contents();
 ob_end_clean();

@@ -51,3 +51,21 @@ function userlink_by_id($uid) {
 	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE id=?", [$uid]);
 	return userlink($u);
 }
+
+function userlinkByName($name) {
+	global $sql;
+	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE UPPER(name)=UPPER(?)", [$name]);
+	if ($u)
+		return userlink($u, null);
+	else
+		return 0;
+}
+
+function getUsernameLink($matches) {
+	$x = str_replace('"', '', $matches[1]);
+	$nl = userlinkByName($x);
+	if ($nl)
+		return $nl;
+	else
+		return $matches[0];
+}

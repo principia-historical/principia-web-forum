@@ -96,7 +96,7 @@ if ($where == 1) {
 		."LEFT JOIN threads t ON p.thread=t.id "
 		."LEFT JOIN forums f ON f.id=t.forum "
 		."WHERE $string AND ISNULL(pt2.id) "
-		."AND f.id IN ".forums_with_view_perm()
+		."AND f.id IN ".forumsWithViewPerm()
 		."ORDER BY p.id");
 
 	for ($i = 1; $post = $posts->fetch(); $i++) {
@@ -106,7 +106,9 @@ if ($where == 1) {
 		echo '<br>' . threadpost($post,$pthread);
 	}
 
-	if_empty_query($i, 'No posts found.', 1, true);
+	if ($i == 1) {
+		ifEmptyQuery('No posts found.', 1, true);
+	}
 } else {
 	$page = (isset($_GET['page']) ? $_GET['page'] : 1);
 	if ($page < 1) $page = 1;
@@ -114,13 +116,13 @@ if ($where == 1) {
 		."FROM threads t "
 		."LEFT JOIN principia.users u ON u.id=t.user "
 		."LEFT JOIN forums f ON f.id=t.forum "
-		."WHERE $string AND f.id IN ".forums_with_view_perm()
+		."WHERE $string AND f.id IN ".forumsWithViewPerm()
 		."ORDER BY t.lastdate DESC "
 		."LIMIT ".(($page-1)*$userdata['tpp']).",".$userdata['tpp']);
 	$threadcount = $sql->result("SELECT COUNT(*) "
 		."FROM threads t "
 		."LEFT JOIN forums f ON f.id=t.forum "
-		."WHERE $string AND f.id IN ".forums_with_view_perm());
+		."WHERE $string AND f.id IN ".forumsWithViewPerm());
 	?><table class="c1">
 		<tr class="c">
 			<td class="b h">Title</td>
@@ -141,7 +143,9 @@ if ($where == 1) {
 			<td class="b"><?=date($dateformat,$thread['lastdate']) ?></td>
 		</tr><?php
 	}
-	if_empty_query($i, "No threads found.", 6);
+	if ($i == 1) {
+		ifEmptyQuery("No threads found.", 6);
+	}
 
 	$query = urlencode($query);
 	$fpagelist = pagelist($threadcount, $userdata['tpp'], "search.php?q=$query&action=Search&w=0&f=$forum", $page);

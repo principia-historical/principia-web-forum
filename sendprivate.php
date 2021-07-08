@@ -3,14 +3,14 @@ require('lib/common.php');
 
 $action = (isset($_POST['action']) ? $_POST['action'] : null);
 
-needs_login();
+needsLogin();
 
 $topbot = [
 	'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "private.php", 'title' => 'Private messages']],
 	'title' => 'Send'
 ];
 
-if (!has_perm('create-pms')) error('403', 'You have no permissions to do this!');
+if (!hasPerm('create-pms')) error('403', 'You have no permissions to do this!');
 
 $error = '';
 
@@ -48,7 +48,7 @@ if (!$action) {
 	if (isset($_GET['pid']) && $pid = $_GET['pid']) {
 		$post = $sql->fetch("SELECT u.name name, p.title, p.text "
 			."FROM pmsgs p LEFT JOIN principia.users u ON p.userfrom = u.id "
-			."WHERE p.id = ?" . (!has_perm('view-user-pms') ? " AND (p.userfrom=".$userdata['id']." OR p.userto=".$userdata['id'].")" : ''), [$pid]);
+			."WHERE p.id = ?" . (!hasPerm('view-user-pms') ? " AND (p.userfrom=".$userdata['id']." OR p.userto=".$userdata['id'].")" : ''), [$pid]);
 		if ($post) {
 			$quotetext = sprintf(
 				'[reply="%s" id="%s"]%s[/reply]'.PHP_EOL.PHP_EOL,

@@ -15,16 +15,16 @@ if ($_GET['act'] == 'delete' || $_GET['act'] == 'undelete') {
 	$pid = $pid;
 }
 
-needs_login();
+needsLogin();
 
 $thread = $sql->fetch("SELECT p.user puser, t.*, f.title ftitle, f.private fprivate, f.readonly freadonly FROM posts p LEFT JOIN threads t ON t.id = p.thread "
-	."LEFT JOIN forums f ON f.id=t.forum WHERE p.id = ? AND (t.forum IN ".forums_with_view_perm().")", [$pid]);
+	."LEFT JOIN forums f ON f.id=t.forum WHERE p.id = ? AND (t.forum IN ".forumsWithViewPerm().")", [$pid]);
 
 if (!$thread) $pid = 0;
 
-if ($thread['closed'] && !can_edit_forum_posts($thread['forum'])) {
+if ($thread['closed'] && !canCreateForumPosts($thread['forum'])) {
 	error("403", "You can't edit a post in closed threads!");
-} else if (!can_edit_post(['user' => $thread['puser'], 'tforum' => $thread['forum']])) {
+} else if (!canEditPost(['user' => $thread['puser'], 'tforum' => $thread['forum']])) {
 	error("403", "You do not have permission to edit this post.");
 } else if ($pid == -1) {
 	error("404", "Invalid post ID.");
@@ -48,7 +48,7 @@ if ($action == 'Submit') {
 	redirect("thread.php?pid=$pid#edit");
 } else if ($action == 'delete' || $action == 'undelete') {
 
-	if (!(can_delete_forum_posts($thread['forum']))) {
+	if (!(canDeleteForumPosts($thread['forum']))) {
 		error("403", "You do not have the permission to do this.");
 	} else {
 		$sql->query("UPDATE posts SET deleted = ? WHERE id = ?", [($action == 'delete' ? 1 : 0), $pid]);

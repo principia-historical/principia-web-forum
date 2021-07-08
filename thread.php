@@ -67,7 +67,7 @@ $pin = (isset($_GET['pin']) && is_numeric($_GET['pin']) ? $_GET['pin'] : null);
 $rev = (isset($_GET['rev']) && is_numeric($_GET['rev']) ? $_GET['rev'] : null);
 
 //determine string for revision pinning
-if ($pin && $rev && has_perm('view-post-history'))
+if ($pin && $rev && hasPerm('view-post-history'))
 	$pinstr = "AND (pt2.id <> $pin OR pt2.revision <> ($rev+1)) ";
 else
 	$pinstr = '';
@@ -84,7 +84,7 @@ if ($viewmode == "thread") {
 	$thread = $sql->fetch("SELECT t.*, f.title ftitle, t.forum fid".($log ? ', r.time frtime' : '').' '
 			. "FROM threads t LEFT JOIN forums f ON f.id=t.forum "
 			. ($log ? "LEFT JOIN forumsread r ON (r.fid=f.id AND r.uid=$userdata[id]) " : '')
-			. "WHERE t.id = ? AND t.forum IN ".forums_with_view_perm(),
+			. "WHERE t.id = ? AND t.forum IN ".forumsWithViewPerm(),
 			[$tid]);
 
 	if (!isset($thread['id'])) error("404", "Thread does not exist.");
@@ -175,8 +175,8 @@ if ($viewmode == "thread") {
 	];
 
 	$faccess = $sql->fetch("SELECT id,private,readonly FROM forums WHERE id = ?",[$thread['forum']]);
-	if (can_create_forum_post($faccess)) {
-		if (has_perm('override-closed') && $thread['closed'])
+	if (canCreateForumPost($faccess)) {
+		if (hasPerm('override-closed') && $thread['closed'])
 			$topbot['actions'] = [['title' => 'Thread closed'],['href' => "newreply.php?id=$tid", 'title' => 'New reply']];
 		else if ($thread['closed'])
 			$topbot['actions'] = [['title' => 'Thread closed']];
@@ -196,9 +196,9 @@ if ($viewmode == "thread") {
 }
 
 $modlinks = '';
-if (isset($tid) && (can_edit_forum_threads($thread['forum']) || ($userdata['id'] == $thread['user'] && !$thread['closed'] && has_perm('rename-own-thread')))) {
+if (isset($tid) && (canEditForumThreads($thread['forum']) || ($userdata['id'] == $thread['user'] && !$thread['closed'] && hasPerm('rename-own-thread')))) {
 	$link = "<a href=javascript:submitmod";
-	if (can_edit_forum_threads($thread['forum'])) {
+	if (canEditForumThreads($thread['forum'])) {
 		$stick = ($thread['sticky'] ? "$link('unstick')>Unstick</a>" : "$link('stick')>Stick</a>");
 		$stick2 = addcslashes($stick, "'");
 

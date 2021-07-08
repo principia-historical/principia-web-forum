@@ -1,16 +1,16 @@
 <?php
 require('lib/common.php');
 
-needs_login();
+needsLogin();
 
 $action = (isset($_POST['action']) ? $_POST['action'] : null);
 $fid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['fid']) ? $_POST['fid'] : null));
 
-$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN ".forums_with_view_perm(), [$fid]);
+$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN ".forumsWithViewPerm(), [$fid]);
 
 if (!$forum)
 	error("404", "Forum does not exist.");
-if (!can_create_forum_thread($forum))
+if (!canCreateForumThread($forum))
 	error("403", "You have no permissions to create threads in this forum!");
 
 $error = '';
@@ -23,9 +23,9 @@ if ($action == 'Submit') {
 		$error = "You need to enter a longer title.";
 	if (strlen(trim($message)) == 0)
 		$error = "You need to enter a message to your thread.";
-	if ($userdata['lastpost'] > time() - 30 && $action == 'Submit' && !has_perm('ignore-thread-time-limit'))
+	if ($userdata['lastpost'] > time() - 30 && $action == 'Submit' && !hasPerm('ignore-thread-time-limit'))
 		$error = "Don't post threads so fast, wait a little longer.";
-	if ($userdata['lastpost'] > time() - 2 && $action == 'Submit' && has_perm('ignore-thread-time-limit'))
+	if ($userdata['lastpost'] > time() - 2 && $action == 'Submit' && hasPerm('ignore-thread-time-limit'))
 		$error = "You must wait 2 seconds before posting a thread.";
 
 	if (!$error) {

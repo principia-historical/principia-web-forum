@@ -1,20 +1,20 @@
 <?php
 require('lib/common.php');
 
-needs_login();
+needsLogin();
 
 $action = (isset($_POST['action']) ? $_POST['action'] : null);
 $tid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['tid']) ? $_POST['tid'] : null));
 
 $thread = $sql->fetch("SELECT t.*, f.title ftitle, f.private fprivate, f.readonly freadonly
 	FROM threads t LEFT JOIN forums f ON f.id=t.forum
-	WHERE t.id = ? AND t.forum IN " . forums_with_view_perm(), [$tid]);
+	WHERE t.id = ? AND t.forum IN " . forumsWithViewPerm(), [$tid]);
 
 if (!$thread) {
 	error("404", "Thread does not exist.");
-} else if (!can_create_forum_post(['id' => $thread['forum'], 'private' => $thread['fprivate'], 'readonly' => $thread['freadonly']])) {
+} else if (!canCreateForumPost(['id' => $thread['forum'], 'private' => $thread['fprivate'], 'readonly' => $thread['freadonly']])) {
 	error("403", "You have no permissions to create posts in this forum!");
-} elseif ($thread['closed'] && !has_perm('override-closed')) {
+} elseif ($thread['closed'] && !hasPerm('override-closed')) {
 	error("400", "You can't post in closed threads.");
 }
 
@@ -22,9 +22,9 @@ $error = '';
 
 if ($action == 'Submit') {
 	$lastpost = $sql->fetch("SELECT id,user,date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
-	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && !has_perm('consecutive-posts'))
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && !hasPerm('consecutive-posts'))
 		$error = "You can't double post until it's been at least one day!";
-	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !has_perm('consecutive-posts'))
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !hasPerm('consecutive-posts'))
 		$error = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
 		$error = "Your post is empty! Enter a message and try again.";
@@ -69,7 +69,7 @@ if ($pid) {
 			. "WHERE p.id = ? AND ISNULL(pt2.id)", [$pid]);
 
 	//does the user have reading access to the quoted post?
-	if (!can_view_forum(['id' => $post['fid'], 'private' => $post['fprivate']])) {
+	if (!canViewForum(['id' => $post['fid'], 'private' => $post['fprivate']])) {
 		$post['name'] = 'ROllerozxa';
 		$post['text'] = 'uwu';
 	}

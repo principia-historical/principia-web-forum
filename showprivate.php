@@ -1,6 +1,6 @@
 <?php
 require('lib/common.php');
-needs_login();
+needsLogin();
 
 $fieldlist = userfields('u', 'u').','.userfields_post();
 
@@ -10,7 +10,7 @@ $pmsgs = $sql->fetch("SELECT $fieldlist p.* FROM pmsgs p LEFT JOIN principia.use
 if ($pmsgs == null) error("404", "Private message does not exist.");
 $tologuser = ($pmsgs['userto'] == $userdata['id']);
 
-if ((!$tologuser && $pmsgs['userfrom'] != $userdata['id']) && !has_perm('view-user-pms'))
+if ((!$tologuser && $pmsgs['userfrom'] != $userdata['id']) && !hasPerm('view-user-pms'))
 	error("404", "Private message does not exist.");
 elseif ($tologuser && $pmsgs['unread']) {
 	$sql->query("UPDATE pmsgs SET unread = 0 WHERE id = ?", [$pid]);

@@ -1,23 +1,5 @@
 <?php
 
-function userlink_by_name($name) {
-	global $sql;
-	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE UPPER(name)=UPPER(?)", [$name]);
-	if ($u)
-		return userlink($u, null);
-	else
-		return 0;
-}
-
-function get_username_link($matches) {
-	$x = str_replace('"', '', $matches[1]);
-	$nl = userlink_by_name($x);
-	if ($nl)
-		return $nl;
-	else
-		return $matches[0];
-}
-
 function postfilter($msg) {
 	$markdown = new Parsedown();
 	$markdown->setSafeMode(true);
@@ -39,29 +21,6 @@ function esc($text) {
 	return $text;
 }
 
-function posttoolbutton($name, $title, $leadin, $leadout) {
-	return sprintf(
-		'<button onclick="javascript:toolBtn(\'%s\',\'%s\')" title="%s"><i class="fas %s"></i></button>',
-	$leadin, $leadout, $title, $name);
-}
-
-function posttoolbar() {
-	/*return '<div class="posttoolbar">'
-		. posttoolbutton('fa-bold', "Bold", "[b]", "[/b]")
-		. posttoolbutton("fa-italic", "Italic", "[i]", "[/i]")
-		. posttoolbutton("fa-underline", "Underline", "[u]", "[/u]")
-		. posttoolbutton("fa-strikethrough", "Strikethrough", "[s]", "[/s]")
-		. "&nbsp;&nbsp;"
-		. posttoolbutton("fa-link", "URL", "[url]", "[/url]")
-		. posttoolbutton("fa-quote-left", "Quote", "[quote]", "[/quote]")
-		. posttoolbutton("fa-code", "Code", "[code]", "[/code]")
-		. "&nbsp;&nbsp;"
-		. posttoolbutton("fa-image", "IMG", "[img]", "[/img]")
-		. posttoolbutton("fa-video", "YouTube", "[youtube]", "[/youtube]")
-		. '</div>';*/
-	return 'todo';
-}
-
 function threadpost($post, $pthread = '') {
 	global $dateformat, $userdata;
 
@@ -73,7 +32,7 @@ function threadpost($post, $pthread = '') {
 
 	if (isset($post['deleted']) && $post['deleted']) {
 		$postlinks = '';
-		if (can_edit_forum_posts(getforumbythread($post['thread']))) {
+		if (canCreateForumPosts(getForumByThread($post['thread']))) {
 			$postlinks .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$post[revision]#$post[id]\">Peek</a> &bull; ";
 			$postlinks .= "<a href=\"editpost.php?pid=" . $post['id'] . "&act=undelete\">Undelete</a>";
 		}
@@ -115,16 +74,16 @@ HTML;
 	}
 
 	// "Edit" link for admins or post owners, but not banned users
-	if (isset($post['thread']) && can_edit_post($post) && $post['id'])
+	if (isset($post['thread']) && canEditPost($post) && $post['id'])
 		$postlinks.=($postlinks ? ' &bull; ' : '') . "<a href=\"editpost.php?pid=$post[id]\">Edit</a>";
 
-	if (isset($post['thread']) && isset($post['id']) && can_delete_forum_posts(getforumbythread($post['thread'])))
+	if (isset($post['thread']) && isset($post['id']) && canDeleteForumPosts(getForumByThread($post['thread'])))
 		$postlinks.=($postlinks ? ' &bull; ' : '') . "<a href=\"editpost.php?pid=".$post['id']."&act=delete\">Delete</a>";
 
 	if (isset($post['thread']) && $post['id'])
 		$postlinks.=" &bull; ID: $post[id]";
 
-	if (isset($post['maxrevision']) && isset($post['thread']) && has_perm('view-post-history') && $post['maxrevision'] > 1) {
+	if (isset($post['maxrevision']) && isset($post['thread']) && hasPerm('view-post-history') && $post['maxrevision'] > 1) {
 		$revisionstr.=" &bull; Revision ";
 		for ($i = 1; $i <= $post['maxrevision']; $i++)
 			$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";

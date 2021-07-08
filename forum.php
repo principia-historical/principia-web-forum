@@ -8,10 +8,10 @@ $uid = isset($_GET['user']) ? (int)$_GET['user'] : 0;
 if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if ($log) {
 		$forum = $sql->fetch("SELECT f.*, r.time rtime FROM forums f LEFT JOIN forumsread r ON (r.fid = f.id AND r.uid = ?) "
-			. "WHERE f.id = ? AND f.id IN " . forums_with_view_perm(), [$userdata['id'], $fid]);
+			. "WHERE f.id = ? AND f.id IN " . forumsWithViewPerm(), [$userdata['id'], $fid]);
 		if (!$forum['rtime']) $forum['rtime'] = 0;
 	} else
-		$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN " . forums_with_view_perm(), [$fid]);
+		$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN " . forumsWithViewPerm(), [$fid]);
 
 	if (!isset($forum['id'])) error("404", "Forum does not exist.");
 
@@ -32,7 +32,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		'breadcrumb' => [['href' => './', 'title' => 'Main']],
 		'title' => $forum['title']
 	];
-	if (can_create_forum_thread($forum))
+	if (canCreateForumThread($forum))
 		$topbot['actions'] = [['href' => "newthread.php?id=$fid", 'title' => 'New thread']];
 } elseif (isset($_GET['user']) && $uid = $_GET['user']) {
 	$user = $sql->fetch("SELECT name FROM principia.users WHERE id = ?", [$uid]);
@@ -50,14 +50,14 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
 			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.user = ? "
-		. "AND f.id IN " . forums_with_view_perm() . " "
+		. "AND f.id IN " . forumsWithViewPerm() . " "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 		[$uid]);
 
 	$forum['threads'] = $sql->result("SELECT count(*) FROM threads t "
 		. "LEFT JOIN forums f ON f.id = t.forum "
-		. "WHERE t.user = ? AND f.id IN " . forums_with_view_perm(), [$uid]);
+		. "WHERE t.user = ? AND f.id IN " . forumsWithViewPerm(), [$uid]);
 
 	$topbot = [
 		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "../user.php?id=$uid", 'title' => $user['name']]],
@@ -77,7 +77,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
 			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.lastdate > ? "
-		. " AND f.id IN " . forums_with_view_perm()
+		. " AND f.id IN " . forumsWithViewPerm()
 		. "ORDER BY t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 	[$mintime]);
@@ -86,7 +86,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "FROM threads t "
 		. "LEFT JOIN forums f ON f.id=t.forum "
 		. "WHERE t.lastdate > ? "
-		. "AND f.id IN " . forums_with_view_perm(),
+		. "AND f.id IN " . forumsWithViewPerm(),
 	[$mintime]);
 
 	$topbot = [];

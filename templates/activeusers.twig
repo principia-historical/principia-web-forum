@@ -28,7 +28,7 @@
 		</tr>
 		{% set i = i + 1 %}
 	{% else %}
-		{{ if_empty_query2("There are no active users in the given timespan.", 5) }}
+		{{ if_empty_query("There are no active users in the given timespan.", 5) }}
 	{% endfor %}
 </table>
 	{% endblock %}
