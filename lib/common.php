@@ -17,6 +17,8 @@ chdir('forum/');
 foreach (glob("lib/*.php") as $filename)
 	require_once($filename);
 
+preloadGroupData();
+
 $logpermset = [];
 
 if ($log) {

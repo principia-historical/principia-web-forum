@@ -7,9 +7,13 @@ $rootgroup = 7;
 
 // preload group data, makes things a lot easier afterwards
 $usergroups = [];
-$r = query("SELECT * FROM z_groups");
-while ($g = $r->fetch())
-	$usergroups[$g['id']] = $g;
+function preloadGroupData() {
+	global $usergroups;
+
+	$r = query("SELECT * FROM z_groups");
+	while ($g = $r->fetch())
+		$usergroups[$g['id']] = $g;
+}
 
 //this processes the permission stack, in this order:
 //-user permissions
