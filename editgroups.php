@@ -9,23 +9,23 @@ $caneditperms = hasPerm('edit-permissions');
 
 if ($act == 'delete') {
 	$id = $_GET['id'];
-	$group = $sql->fetch("SELECT * FROM groups WHERE id = ?", [$id]);
+	$group = fetch("SELECT * FROM z_groups WHERE id = ?", [$id]);
 
 	if (!$group)
 		$errmsg = 'Cannot delete group: invalid group ID';
 	else {
-		$usercount = $sql->result("SELECT COUNT(*) FROM principia.users WHERE group_id = ?", [$group['id']]);
+		$usercount = result("SELECT COUNT(*) FROM users WHERE group_id = ?", [$group['id']]);
 		if ($usercount > 0) $errmsg = 'This group cannot be deleted because it contains users';
 
 		if (!$errmsg && !$caneditperms) {
-			$permcount = $sql->result("SELECT COUNT(*) FROM x_perm WHERE x_type = 'group' AND x_id = ?", [$group['id']]);
+			$permcount = result("SELECT COUNT(*) FROM z_permx WHERE x_type = 'group' AND x_id = ?", [$group['id']]);
 			if ($permcount > 0) $errmsg = 'This group cannot be deleted because it has permissions attached and you may not edit permissions.';
 		}
 
 		if (!$errmsg) {
-			$sql->query("DELETE FROM groups WHERE id = ?", [$group['id']]);
-			$sql->query("DELETE FROM x_perm WHERE x_type = 'group' AND x_id = ?", [$group['id']]);
-			$sql->query("UPDATE groups SET inherit_group_id = 0 WHERE inherit_group_id = ?", [$group['id']]);
+			query("DELETE FROM z_groups WHERE id = ?", [$group['id']]);
+			query("DELETE FROM z_permx WHERE x_type = 'group' AND x_id = ?", [$group['id']]);
+			query("UPDATE z_groups SET inherit_group_id = 0 WHERE inherit_group_id = ?", [$group['id']]);
 			redirect('editgroups.php');
 		}
 	}
@@ -33,7 +33,7 @@ if ($act == 'delete') {
 	$title = trim($_POST['title']);
 
 	$parentid = $_POST['inherit_group_id'];
-	if ($parentid < 0 || $parentid > $sql->result("SELECT MAX(id) FROM groups")) $parentid = 0;
+	if ($parentid < 0 || $parentid > result("SELECT MAX(id) FROM z_groups")) $parentid = 0;
 
 	if ($act == 'edit') {
 		$recurcheck = [$_GET['id']];
@@ -45,7 +45,7 @@ if ($act == 'delete') {
 			}
 
 			$recurcheck[] = $pid;
-			$pid = $sql->result("SELECT inherit_group_id FROM groups WHERE id = ?",[$pid]);
+			$pid = result("SELECT inherit_group_id FROM z_groups WHERE id = ?",[$pid]);
 		}
 	}
 
@@ -60,10 +60,10 @@ if ($act == 'delete') {
 			$values = [$title, $_POST['nc'], $parentid, $sortorder, $visible];
 
 			if ($act == 'new')
-				$sql->query("INSERT INTO groups VALUES (0,?,?,?,?,?)", $values);
+				query("INSERT INTO z_groups VALUES (0,?,?,?,?,?)", $values);
 			else {
 				$values[] = $_GET['id'];
-				$sql->query("UPDATE groups SET title = ?,nc = ?,inherit_group_id = ?,sortorder = ?,visible = ? WHERE id = ?", $values);
+				query("UPDATE z_groups SET title = ?,nc = ?,inherit_group_id = ?,sortorder = ?,visible = ? WHERE id = ?", $values);
 			}
 			redirect('editgroups.php');
 		}
@@ -84,14 +84,14 @@ if ($act == 'new' || $act == 'edit') {
 		$group = ['id'=>0, 'title'=>'', 'nc'=>'', 'inherit_group_id'=>0, 'sortorder'=>0, 'visible'=>0];
 		$pagebar['title'] = 'New group';
 	} else {
-		$group = $sql->fetch("SELECT * FROM groups WHERE id = ?",[$_GET['id']]);
+		$group = fetch("SELECT * FROM z_groups WHERE id = ?",[$_GET['id']]);
 		if (!$group) error("404", "Invalid group ID.");
 		$pagebar['title'] = 'Edit group';
 	}
 
 	if ($group) {
 		$grouplist = [0 => '(none)'];
-		$allgroups = $sql->query("SELECT id,title FROM groups WHERE id != ? ORDER BY sortorder",[$group['id']]);
+		$allgroups = query("SELECT id,title FROM z_groups WHERE id != ? ORDER BY sortorder",[$group['id']]);
 		while ($g = $allgroups->fetch())
 			$grouplist[$g['id']] = $g['title'];
 
@@ -126,7 +126,7 @@ if ($act == 'new' || $act == 'edit') {
 		'actions' => ['name'=>'', 'width'=>'240px', 'align'=>'right'],
 	];
 
-	$groups = $sql->query("SELECT g.*, pg.title parenttitle FROM groups g LEFT JOIN groups pg ON pg.id=g.inherit_group_id ORDER BY sortorder");
+	$groups = query("SELECT g.*, pg.title parenttitle FROM z_groups g LEFT JOIN z_groups pg ON pg.id=g.inherit_group_id ORDER BY sortorder");
 	$data = [];
 
 	while ($group = $groups->fetch()) {

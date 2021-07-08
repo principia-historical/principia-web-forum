@@ -21,18 +21,18 @@ if (isset($_REQUEST['id'])) {
 // "link" support (i.e., thread.php?pid=999whatever)
 elseif (isset($_GET['pid'])) {
 	$pid = (int)$_GET['pid'];
-	$numpid = $sql->fetch("SELECT t.id tid FROM posts p LEFT JOIN threads t ON p.thread = t.id WHERE p.id = ?", [$pid]);
+	$numpid = fetch("SELECT t.id tid FROM z_posts p LEFT JOIN z_threads t ON p.thread = t.id WHERE p.id = ?", [$pid]);
 	if (!$numpid) error("404", "Thread post does not exist.");
 
-	$tid = $sql->result("SELECT thread FROM posts WHERE id = ?", [$pid]);
-	$page = floor($sql->result("SELECT COUNT(*) FROM posts WHERE thread = ? AND id < ?", [$tid, $pid]) / $ppp) + 1;
+	$tid = result("SELECT thread FROM z_posts WHERE id = ?", [$pid]);
+	$page = floor(result("SELECT COUNT(*) FROM z_posts WHERE thread = ? AND id < ?", [$tid, $pid]) / $ppp) + 1;
 	$viewmode = "thread";
 } else {
 	error("404", "Thread does not exist.");
 }
 
 if ($viewmode == "thread")
-	$threadcreator = $sql->result("SELECT user FROM threads WHERE id = ?", [$tid]);
+	$threadcreator = result("SELECT user FROM z_threads WHERE id = ?", [$tid]);
 else
 	$threadcreator = 0;
 
@@ -70,11 +70,11 @@ if ($viewmode == "thread") {
 		$params = [$_POST['title'], $tid];
 	else
 		$params = [$tid];
-	$sql->query("UPDATE threads SET views = views + 1 $action WHERE id = ?", $params);
+	query("UPDATE z_threads SET views = views + 1 $action WHERE id = ?", $params);
 
-	$thread = $sql->fetch("SELECT t.*, f.title ftitle, t.forum fid".($log ? ', r.time frtime' : '').' '
-			. "FROM threads t LEFT JOIN forums f ON f.id=t.forum "
-			. ($log ? "LEFT JOIN forumsread r ON (r.fid=f.id AND r.uid=$userdata[id]) " : '')
+	$thread = fetch("SELECT t.*, f.title ftitle, t.forum fid".($log ? ', r.time frtime' : '').' '
+			. "FROM z_threads t LEFT JOIN z_forums f ON f.id=t.forum "
+			. ($log ? "LEFT JOIN z_forumsread r ON (r.fid=f.id AND r.uid=$userdata[id]) " : '')
 			. "WHERE t.id = ? AND t.forum IN ".forumsWithViewPerm(),
 			[$tid]);
 
@@ -85,65 +85,65 @@ if ($viewmode == "thread") {
 
 	//mark thread as read
 	if ($log && $thread['lastdate'] > $thread['frtime'])
-		$sql->query("REPLACE INTO threadsread VALUES (?,?,?)", [$userdata['id'], $thread['id'], time()]);
+		query("REPLACE INTO z_threadsread VALUES (?,?,?)", [$userdata['id'], $thread['id'], time()]);
 
 	//check for having to mark the forum as read too
 	if ($log) {
-		$readstate = $sql->fetch("SELECT ((NOT ISNULL(r.time)) OR t.lastdate < ?) n FROM threads t LEFT JOIN threadsread r ON (r.tid = t.id AND r.uid = ?) "
+		$readstate = fetch("SELECT ((NOT ISNULL(r.time)) OR t.lastdate < ?) n FROM z_threads t LEFT JOIN z_threadsread r ON (r.tid = t.id AND r.uid = ?) "
 			. "WHERE t.forum = ? GROUP BY ((NOT ISNULL(r.time)) OR t.lastdate < ?) ORDER BY n ASC",
 			[$thread['frtime'], $userdata['id'], $thread['fid'], $thread['frtime']]);
 		//if $readstate[n] is 1, MySQL did not create a group for threads where ((NOT ISNULL(r.time)) OR t.lastdate<'$thread[frtime]') is 0;
 		//thus, all threads in the forum are read. Mark it as such.
 		if ($readstate['n'] == 1)
-			$sql->query("REPLACE INTO forumsread VALUES (?,?,?)", [$userdata['id'], $thread['fid'], time()]);
+			query("REPLACE INTO z_forumsread VALUES (?,?,?)", [$userdata['id'], $thread['fid'], time()]);
 	}
 
 	//select top revision
-	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.forum tforum "
-		. "FROM posts p "
-		. "LEFT JOIN threads t ON t.id = p.thread "
-		. "LEFT JOIN poststext pt ON p.id = pt.id "
-		. "LEFT JOIN poststext pt2 ON pt2.id = pt.id AND pt2.revision = (pt.revision + 1) $pinstr " //SQL barrel roll
-		. "LEFT JOIN principia.users u ON p.user = u.id "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.forum tforum "
+		. "FROM z_posts p "
+		. "LEFT JOIN z_threads t ON t.id = p.thread "
+		. "LEFT JOIN z_poststext pt ON p.id = pt.id "
+		. "LEFT JOIN z_poststext pt2 ON pt2.id = pt.id AND pt2.revision = (pt.revision + 1) $pinstr " //SQL barrel roll
+		. "LEFT JOIN users u ON p.user = u.id "
 		. "WHERE p.thread = ? AND ISNULL(pt2.id) "
 		. "GROUP BY p.id ORDER BY p.id "
 		. "LIMIT ".(($page - 1) * $ppp).",$ppp",
 		[$tid]);
 } elseif ($viewmode == "user") {
-	$user = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$uid]);
+	$user = fetch("SELECT * FROM users WHERE id = ?", [$uid]);
 
 	if ($user == null) error("404", "User doesn't exist.");
 
 	$title = "Posts by " . $user['name'];
-	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
-		. "FROM posts p "
-		. "LEFT JOIN poststext pt ON p.id=pt.id "
-		. "LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
-		. "LEFT JOIN principia.users u ON p.user=u.id "
-		. "LEFT JOIN threads t ON p.thread=t.id "
-		. "LEFT JOIN forums f ON f.id=t.forum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
+		. "FROM z_posts p "
+		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
+		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
+		. "LEFT JOIN users u ON p.user=u.id "
+		. "LEFT JOIN z_threads t ON p.thread=t.id "
+		. "LEFT JOIN z_forums f ON f.id=t.forum "
 		. "WHERE p.user=$uid AND ISNULL(pt2.id) "
 		. "ORDER BY p.id "
 		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp);
 
-	$thread['replies'] = $sql->result("SELECT count(*) FROM posts p WHERE user = ?", [$uid]) - 1;
+	$thread['replies'] = result("SELECT count(*) FROM z_posts p WHERE user = ?", [$uid]) - 1;
 } elseif ($viewmode == "time") {
 	$mintime = ($time > 0 && $time <= 2592000 ? time() - $time : 86400);
 
 	$title = 'Latest posts';
 
-	$posts = $sql->query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
-		. "FROM posts p "
-		. "LEFT JOIN poststext pt ON p.id=pt.id "
-		. "LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
-		. "LEFT JOIN principia.users u ON p.user=u.id "
-		. "LEFT JOIN threads t ON p.thread=t.id "
-		. "LEFT JOIN forums f ON f.id=t.forum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
+		. "FROM z_posts p "
+		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
+		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
+		. "LEFT JOIN users u ON p.user=u.id "
+		. "LEFT JOIN z_threads t ON p.thread=t.id "
+		. "LEFT JOIN z_forums f ON f.id=t.forum "
 		. "WHERE p.date > ? AND ISNULL(pt2.id) "
 		. "ORDER BY p.date DESC "
 		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$mintime]);
 
-	$thread['replies'] = $sql->result("SELECT count(*) FROM posts WHERE date > ?", [$mintime]) - 1;
+	$thread['replies'] = result("SELECT count(*) FROM z_posts WHERE date > ?", [$mintime]) - 1;
 } else
 	$title = '';
 
@@ -163,7 +163,7 @@ if ($viewmode == "thread") {
 		'title' => esc($thread['title'])
 	];
 
-	$faccess = $sql->fetch("SELECT id,private,readonly FROM forums WHERE id = ?",[$thread['forum']]);
+	$faccess = fetch("SELECT id,private,readonly FROM z_forums WHERE id = ?",[$thread['forum']]);
 	if (canCreateForumPost($faccess)) {
 		if (hasPerm('override-closed') && $thread['closed'])
 			$topbot['actions'] = [['title' => 'Thread closed'],['href' => "newreply.php?id=$tid", 'title' => 'New reply']];

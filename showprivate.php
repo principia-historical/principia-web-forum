@@ -6,15 +6,15 @@ $fieldlist = userfields('u', 'u').','.userfields_post();
 
 $pid = (isset($_GET['id']) ? $_GET['id'] : null);
 
-$pmsgs = $sql->fetch("SELECT $fieldlist p.* FROM pmsgs p LEFT JOIN principia.users u ON u.id = p.userfrom WHERE p.id = ?", [$pid]);
+$pmsgs = fetch("SELECT $fieldlist p.* FROM z_pmsgs p LEFT JOIN users u ON u.id = p.userfrom WHERE p.id = ?", [$pid]);
 if ($pmsgs == null) error("404", "Private message does not exist.");
 $tologuser = ($pmsgs['userto'] == $userdata['id']);
 
 if ((!$tologuser && $pmsgs['userfrom'] != $userdata['id']) && !hasPerm('view-user-pms'))
 	error("404", "Private message does not exist.");
 elseif ($tologuser && $pmsgs['unread']) {
-	$sql->query("UPDATE pmsgs SET unread = 0 WHERE id = ?", [$pid]);
-	$sql->query("DELETE FROM principia.notifications WHERE type = 3 AND level = ? AND recipient = ?", [$pid, $userdata['id']]);
+	query("UPDATE z_pmsgs SET unread = 0 WHERE id = ?", [$pid]);
+	query("DELETE FROM notifications WHERE type = 3 AND level = ? AND recipient = ?", [$pid, $userdata['id']]);
 }
 
 $pagebar = [

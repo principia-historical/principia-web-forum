@@ -14,8 +14,8 @@ $order = 'posts' . $sortby;
 if ($sort == 'name') $order = 'name' . $sortby;
 if ($sort == 'reg') $order = 'joined' . $sortby;
 
-$users = $sql->query("SELECT * FROM principia.users ORDER BY $order LIMIT " . ($page - 1) * $ppp . ",$ppp");
-$num = $sql->result("SELECT COUNT(*) FROM principia.users");
+$users = query("SELECT * FROM users ORDER BY $order LIMIT " . ($page - 1) * $ppp . ",$ppp");
+$num = result("SELECT COUNT(*) FROM users");
 
 $pagelist = '';
 if ($num >= $ppp) {

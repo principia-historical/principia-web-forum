@@ -27,7 +27,7 @@
 		if (!$pin || $post['id'] != $pin) {
 			$post['maxrevision'] = $post['revision']; // not pinned, hence the max. revision equals the revision we selected
 		} else {
-			$post['maxrevision'] = $sql->result("SELECT MAX(revision) FROM poststext WHERE id = ?", [$pin]);
+			$post['maxrevision'] = result("SELECT MAX(revision) FROM z_poststext WHERE id = ?", [$pin]);
 		}
 		#}
 

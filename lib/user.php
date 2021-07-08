@@ -47,14 +47,12 @@ function userfields_post() {
 }
 
 function userlink_by_id($uid) {
-	global $sql;
-	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE id=?", [$uid]);
+	$u = fetch("SELECT ".userfields()." FROM users WHERE id=?", [$uid]);
 	return userlink($u);
 }
 
 function userlinkByName($name) {
-	global $sql;
-	$u = $sql->fetch("SELECT ".userfields()." FROM principia.users WHERE UPPER(name)=UPPER(?)", [$name]);
+	$u = fetch("SELECT ".userfields()." FROM users WHERE UPPER(name)=UPPER(?)", [$name]);
 	if ($u)
 		return userlink($u, null);
 	else

@@ -14,21 +14,21 @@ if (isset($_POST['savecat'])) {
 		$error = 'Please enter a title for the category.';
 	else {
 		if ($cid == 'new') {
-			$cid = $sql->result("SELECT MAX(id) FROM categories");
+			$cid = result("SELECT MAX(id) FROM z_categories");
 			if (!$cid) $cid = 0;
 			$cid++;
-			$sql->query("INSERT INTO categories (id,title,ord) VALUES (?,?,?)", [$cid, $title, $ord]);
+			query("INSERT INTO z_categories (id,title,ord) VALUES (?,?,?)", [$cid, $title, $ord]);
 		} else {
 			$cid = (int)$cid;
-			if (!$sql->result("SELECT COUNT(*) FROM categories WHERE id=?",[$cid])) redirect('manageforums.php');
-			$sql->query("UPDATE categories SET title = ?, ord = ? WHERE id = ?", [$title, $ord, $cid]);
+			if (!result("SELECT COUNT(*) FROM z_categories WHERE id=?",[$cid])) redirect('manageforums.php');
+			query("UPDATE z_categories SET title = ?, ord = ? WHERE id = ?", [$title, $ord, $cid]);
 		}
 		redirect('manageforums.php?cid='.$cid);
 	}
 } else if (isset($_POST['delcat'])) {
 	// delete category
 	$cid = (int)$_GET['cid'];
-	$sql->query("DELETE FROM categories WHERE id = ?",[$cid]);
+	query("DELETE FROM z_categories WHERE id = ?",[$cid]);
 
 	redirect('manageforums.php');
 } else if (isset($_POST['saveforum'])) {
@@ -45,16 +45,16 @@ if (isset($_POST['savecat'])) {
 		$error = 'Please enter a title for the forum.';
 	else {
 		if ($fid == 'new') {
-			$fid = $sql->result("SELECT MAX(id) FROM forums");
+			$fid = result("SELECT MAX(id) FROM z_forums");
 			if (!$fid) $fid = 0;
 			$fid++;
-			$sql->query("INSERT INTO forums (id,cat,title,descr,ord,private,readonly) VALUES (?,?,?,?,?,?,?)",
+			query("INSERT INTO z_forums (id,cat,title,descr,ord,private,readonly) VALUES (?,?,?,?,?,?,?)",
 				[$fid, $cat, $title, $descr, $ord, $private, $readonly]);
 		} else {
 			$fid = (int)$fid;
-			if (!$sql->result("SELECT COUNT(*) FROM forums WHERE id=?",[$fid]))
+			if (!result("SELECT COUNT(*) FROM z_forums WHERE id=?",[$fid]))
 				redirect('manageforums.php');
-			$sql->query("UPDATE forums SET cat=?, title=?, descr=?, ord=?, private=?, readonly=? WHERE id=?",
+			query("UPDATE z_forums SET cat=?, title=?, descr=?, ord=?, private=?, readonly=? WHERE id=?",
 				[$cat, $title, $descr, $ord, $private, $readonly, $fid]);
 		}
 		saveperms('forums', $fid);
@@ -63,7 +63,7 @@ if (isset($_POST['savecat'])) {
 } else if (isset($_POST['delforum'])) {
 	// delete forum
 	$fid = (int)$_GET['fid'];
-	$sql->query("DELETE FROM forums WHERE id=?",[$fid]);
+	query("DELETE FROM z_forums WHERE id=?",[$fid]);
 	deleteperms('forums', $fid);
 	redirect('manageforums.php');
 }
@@ -80,7 +80,7 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 		$cat = ['id' => 0, 'title' => '', 'ord' => 0];
 	} else {
 		$cid = (int)$cid;
-		$cat = $sql->fetch("SELECT * FROM categories WHERE id=?",[$cid]);
+		$cat = fetch("SELECT * FROM z_categories WHERE id=?",[$cid]);
 	}
 	?><form action="" method="POST">
 		<table class="c1">
@@ -109,9 +109,9 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 		$forum = ['id' => 0, 'cat' => 1, 'title' => '', 'descr' => '', 'ord' => 0, 'private' => 0, 'readonly' => 0];
 	} else {
 		$fid = (int)$fid;
-		$forum = $sql->fetch("SELECT * FROM forums WHERE id=?",[$fid]);
+		$forum = fetch("SELECT * FROM z_forums WHERE id=?",[$fid]);
 	}
-	$qcats = $sql->query("SELECT id,title FROM categories ORDER BY ord, id");
+	$qcats = query("SELECT id,title FROM z_categories ORDER BY ord, id");
 	$cats = [];
 	while ($cat = $qcats->fetch())
 		$cats[$cat['id']] = $cat['title'];
@@ -154,12 +154,12 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 } else {
 	// main page -- category/forum listing
 
-	$qcats = $sql->query("SELECT id,title FROM categories ORDER BY ord, id");
+	$qcats = query("SELECT id,title FROM z_categories ORDER BY ord, id");
 	$cats = [];
 	while ($cat = $qcats->fetch())
 		$cats[$cat['id']] = $cat;
 
-	$qforums = $sql->query("SELECT f.id,f.title,f.cat FROM forums f LEFT JOIN categories c ON c.id=f.cat ORDER BY c.ord, c.id, f.ord, f.id");
+	$qforums = query("SELECT f.id,f.title,f.cat FROM z_forums f LEFT JOIN z_categories c ON c.id=f.cat ORDER BY c.ord, c.id, f.ord, f.id");
 	$forums = [];
 	while ($forum = $qforums->fetch())
 		$forums[$forum['id']] = $forum;
@@ -233,16 +233,16 @@ function grouplist() {
 	return $groups;
 }
 function permtable($bind, $id) {
-	global $sql, $rootgroup;
+	global $rootgroup;
 
-	$qperms = $sql->query("SELECT id,title FROM perm WHERE permbind_id=?",[$bind]);
+	$qperms = query("SELECT id,title FROM z_perm WHERE permbind_id=?",[$bind]);
 	$perms = [];
 	while ($perm = $qperms->fetch())
 		$perms[$perm['id']] = $perm['title'];
 
 	$groups = grouplist();
 
-	$qpermdata = $sql->query("SELECT x.x_id,x.perm_id,x.revoke FROM x_perm x LEFT JOIN perm p ON p.id=x.perm_id WHERE x.x_type=? AND p.permbind_id=? AND x.bindvalue=?",
+	$qpermdata = query("SELECT x.x_id,x.perm_id,x.revoke FROM z_permx x LEFT JOIN z_perm p ON p.id=x.perm_id WHERE x.x_type=? AND p.permbind_id=? AND x.bindvalue=?",
 		['group',$bind,$id]);
 	$permdata = [];
 	while ($perm = $qpermdata->fetch())
@@ -301,16 +301,14 @@ function permtable($bind, $id) {
 }
 
 function deleteperms($bind, $id) {
-	global $sql;
-
-	$sql->query("DELETE x FROM x_perm x LEFT JOIN perm p ON p.id=x.perm_id WHERE x.x_type=? AND p.permbind_id=? AND x.bindvalue=?",
+	query("DELETE x FROM z_permx x LEFT JOIN z_perm p ON p.id=x.perm_id WHERE x.x_type=? AND p.permbind_id=? AND x.bindvalue=?",
 		['group', $bind, $id]);
 }
 
 function saveperms($bind, $id) {
-	global $sql, $usergroups;
+	global $usergroups;
 
-	$qperms = $sql->query("SELECT id FROM perm WHERE permbind_id=?",[$bind]);
+	$qperms = query("SELECT id FROM z_perm WHERE permbind_id=?",[$bind]);
 	$perms = [];
 	while ($perm = $qperms->fetch())
 		$perms[] = $perm['id'];
@@ -327,7 +325,7 @@ function saveperms($bind, $id) {
 
 		$myperms = $_POST['perm'][$gid];
 		foreach ($perms as $perm)
-			$sql->query("INSERT INTO `x_perm` (`x_id`,`x_type`,`perm_id`,`permbind_id`,`bindvalue`,`revoke`)
+			query("INSERT INTO `z_permx` (`x_id`,`x_type`,`perm_id`,`permbind_id`,`bindvalue`,`revoke`)
 				VALUES (?,?,?,?,?,?)", [$gid, 'group', $perm, $bind, $id, $myperms[$perm]?0:1]);
 	}
 }

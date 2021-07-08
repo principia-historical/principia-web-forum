@@ -13,12 +13,12 @@ if (isset($_GET['gid'])) {
 	if ($userdata['group_id'] == $id && !hasPerm('edit-own-permissions')) {
 		error('403', 'You have no permissions to do this!');
 	}
-	$permowner = $sql->fetch("SELECT id,title,inherit_group_id FROM groups WHERE id=?", [$id]);
+	$permowner = fetch("SELECT id,title,inherit_group_id FROM z_groups WHERE id=?", [$id]);
 	$type = 'group';
 } else if (isset($_GET['uid'])) {
 	$id = (int)$_GET['uid'];
 
-	$tuser = $sql->result("SELECT group_id FROM principia.users WHERE id = ?",[$id]);
+	$tuser = result("SELECT group_id FROM users WHERE id = ?",[$id]);
 	if ((isRootGid($tuser) || (!canEditUserAssets() && $id != $userdata['id'])) && !hasPerm('no-restrictions')) {
 		error('403', 'You have no permissions to do this!');
 	}
@@ -26,11 +26,11 @@ if (isset($_GET['gid'])) {
 	if ($id == $userdata['id'] && !hasPerm('edit-own-permissions')) {
 		error('403', 'You have no permissions to do this!');
 	}
-	$permowner = $sql->fetch("SELECT u.id,u.name title,u.group_id,g.title group_title FROM principia.users u LEFT JOIN groups g ON g.id=u.group_id WHERE u.id=?", [$id]);
+	$permowner = fetch("SELECT u.id,u.name title,u.group_id,g.title group_title FROM users u LEFT JOIN z_groups g ON g.id=u.group_id WHERE u.id=?", [$id]);
 	$type = 'user';
 } else if (isset($_GET['fid'])) {
 	$id = (int)$_GET['fid'];
-	$permowner = $sql->fetch("SELECT id,title FROM forums WHERE id=?", [$id]);
+	$permowner = fetch("SELECT id,title FROM z_forums WHERE id=?", [$id]);
 	$type = 'forum';
 } else {
 	$id = 0;
@@ -48,7 +48,7 @@ if (isset($_POST['addnew'])) {
 	$bindval = (int)$_POST['bindval_new'];
 
 	if (hasPerm('no-restrictions') || $permid != 'no-restrictions') {
-		$sql->query("INSERT INTO x_perm (x_id,x_type,perm_id,permbind_id,bindvalue,`revoke`) VALUES (?,?,?,'',?,?)",
+		query("INSERT INTO z_permx (x_id,x_type,perm_id,permbind_id,bindvalue,`revoke`) VALUES (?,?,?,'',?,?)",
 			[$id, $type, $permid, $bindval, $revoke]);
 		$msg = "The %s permission has been successfully assigned!";
 	} else {
@@ -63,7 +63,7 @@ if (isset($_POST['addnew'])) {
 	$bindval = (int)$_POST['bindval'][$pid];
 
 	if (hasPerm('no-restrictions') || $permid != 'no-restrictions') {
-		$sql->query("UPDATE x_perm SET perm_id = ?, bindvalue = ?, `revoke` = ? WHERE id = ?",
+		query("UPDATE z_permx SET perm_id = ?, bindvalue = ?, `revoke` = ? WHERE id = ?",
 			[$permid, $bindval, $revoke, $pid]);
 		$msg = "The %s permission has been successfully edited!";
 	} else {
@@ -74,7 +74,7 @@ if (isset($_POST['addnew'])) {
 	$pid = $keys[0];
 	$permid = $_POST['permid'][$pid];
 	if (hasPerm('no-restrictions') || $permid != 'no-restrictions') {
-		$sql->query("DELETE FROM x_perm WHERE id = ?", [$pid]);
+		query("DELETE FROM z_permx WHERE id = ?", [$pid]);
 		$msg = "The %s permission has been successfully deleted!";
 	} else {
 		$msg = "You do not have the permissions to delete the %s permission!";
@@ -149,7 +149,7 @@ if ($type == 'group' && $permowner['inherit_group_id'] > 0) {
 }
 
 while (isset($parentid) && $parentid > 0) {
-	$parent = $sql->fetch("SELECT title,inherit_group_id FROM groups WHERE id=?", [$parentid]);
+	$parent = fetch("SELECT title,inherit_group_id FROM z_groups WHERE id=?", [$parentid]);
 	$permoverview .= '<br>'.esc($parent['title']).':<br>' . PermTable(PermSet('group', $parentid));
 	$parentid = $parent['inherit_group_id'];
 }
@@ -172,10 +172,10 @@ echo $twig->render('_legacy.twig', [
 ]);
 
 function PermSelect($name, $sel) {
-	global $sql, $permlist;
+	global $permlist;
 
 	if (!$permlist) {
-		$perms = $sql->query("SELECT p.id permid, p.title permtitle FROM perm p ORDER BY p.title ASC");
+		$perms = query("SELECT p.id permid, p.title permtitle FROM z_perm p ORDER BY p.title ASC");
 
 		$permlist = [];
 		while ($perm = $perms->fetch()) $permlist[] = $perm;
@@ -204,10 +204,7 @@ function RevokeSelect($name, $sel) {
 }
 
 function PermSet($type, $id) {
-	global $sql;
-	return $sql->query("SELECT x.*, p.title permtitle
-		FROM x_perm x LEFT JOIN perm p ON p.id=x.perm_id
-		WHERE x.x_type=? AND x.x_id=?", [$type,$id]);
+	return query("SELECT x.*, p.title permtitle FROM z_permx x LEFT JOIN z_perm p ON p.id=x.perm_id WHERE x.x_type=? AND x.x_id=?", [$type,$id]);
 }
 
 function PermTable($permset) {

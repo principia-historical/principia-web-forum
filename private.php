@@ -22,9 +22,9 @@ $id = (isset($_GET['id']) ? $_GET['id'] : null);
 $showdel = isset($_GET['showdel']);
 
 if (isset($_GET['action']) && $_GET['action'] == "del") {
-	$owner = $sql->result("SELECT user$fieldn2 FROM pmsgs WHERE id = ?", [$id]);
+	$owner = result("SELECT user$fieldn2 FROM z_pmsgs WHERE id = ?", [$id]);
 	if (hasPerm('delete-user-pms') || ($owner == $userdata['id'] && hasPerm('delete-own-pms'))) {
-		$sql->query("UPDATE pmsgs SET del_$fieldn2 = ? WHERE id = ?", [!$showdel, $id]);
+		query("UPDATE z_pmsgs SET del_$fieldn2 = ? WHERE id = ?", [!$showdel, $id]);
 	} else {
 		error("403", "You are not allowed to (un)delete that message.");
 	}
@@ -33,7 +33,7 @@ if (isset($_GET['action']) && $_GET['action'] == "del") {
 
 $ptitle = 'Private messages' . ($sent ? ' (sent)' : '');
 if ($id && hasPerm('view-user-pms')) {
-	$user = $sql->fetch("SELECT id,name,group_id FROM principia.users WHERE id = ?", [$id]);
+	$user = fetch("SELECT id,name,group_id FROM users WHERE id = ?", [$id]);
 	if ($user == null) error("404", "User doesn't exist.");
 	$headtitle = $user['name']."'s ".strtolower($ptitle);
 	$title = userlink($user)."'s ".strtolower($ptitle);
@@ -43,9 +43,9 @@ if ($id && hasPerm('view-user-pms')) {
 	$title = $ptitle;
 }
 
-$pmsgc = $sql->result("SELECT COUNT(*) FROM pmsgs WHERE user$fieldn2 = ? AND del_$fieldn2 = ?", [$id, $showdel]);
-$pmsgs = $sql->query("SELECT ".userfields('u', 'u').", p.* FROM pmsgs p "
-					."LEFT JOIN principia.users u ON u.id = p.user$fieldn "
+$pmsgc = result("SELECT COUNT(*) FROM z_pmsgs WHERE user$fieldn2 = ? AND del_$fieldn2 = ?", [$id, $showdel]);
+$pmsgs = query("SELECT ".userfields('u', 'u').", p.* FROM z_pmsgs p "
+					."LEFT JOIN users u ON u.id = p.user$fieldn "
 					."WHERE p.user$fieldn2 = ? "
 				."AND del_$fieldn2 = ? "
 					."ORDER BY p.unread DESC, p.date DESC "

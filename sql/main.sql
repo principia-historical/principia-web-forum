@@ -5,18 +5,18 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-CREATE TABLE `categories` (
+CREATE TABLE `z_categories` (
   `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
   `ord` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `categories` (`id`, `title`, `ord`) VALUES
+INSERT INTO `z_categories` (`id`, `title`, `ord`) VALUES
 (1,	'General',	50),
 (2,	'Staff forums',	0);
 
-CREATE TABLE `forums` (
+CREATE TABLE `z_forums` (
   `id` int(5) unsigned NOT NULL DEFAULT 0,
   `cat` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `ord` tinyint(3) unsigned NOT NULL DEFAULT 0,
@@ -32,11 +32,11 @@ CREATE TABLE `forums` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `forums` (`id`, `cat`, `ord`, `title`, `descr`, `threads`, `posts`, `lastdate`, `lastuser`, `lastid`, `private`, `readonly`) VALUES
+INSERT INTO `z_forums` (`id`, `cat`, `ord`, `title`, `descr`, `threads`, `posts`, `lastdate`, `lastuser`, `lastid`, `private`, `readonly`) VALUES
 (1,	1,	0,	'Example forum',	'This is an example forum to get started with.',	0,	0,	0,	0,	0,	0,	0),
 (2,	2,	0,	'Example staff forum',	'This is an example staff forum to get started with.',	0,	0,	0,	0,	0,	0,	0);
 
-CREATE TABLE `forumsread` (
+CREATE TABLE `z_forumsread` (
   `uid` int(10) unsigned NOT NULL,
   `fid` int(5) unsigned NOT NULL,
   `time` int(11) unsigned NOT NULL,
@@ -44,9 +44,9 @@ CREATE TABLE `forumsread` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `groups` (
+CREATE TABLE `z_groups` (
   `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(127) NOT NULL,
+  `title` varchar(32) NOT NULL,
   `nc` varchar(6) NOT NULL,
   `inherit_group_id` tinyint(3) unsigned NOT NULL,
   `sortorder` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -54,7 +54,7 @@ CREATE TABLE `groups` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `groups` (`id`, `title`, `nc`, `inherit_group_id`, `sortorder`, `visible`) VALUES
+INSERT INTO `z_groups` (`id`, `title`, `nc`, `inherit_group_id`, `sortorder`, `visible`) VALUES
 (1,	'Banned',	'888888',	3,	0,	1),
 (2,	'Base User',	'',	0,	100,	0),
 (3,	'Normal User',	'4f77ff',	2,	200,	1),
@@ -63,14 +63,14 @@ INSERT INTO `groups` (`id`, `title`, `nc`, `inherit_group_id`, `sortorder`, `vis
 (6,	'Administrator',	'd8b00d',	5,	700,	1),
 (7,	'Root Administrator',	'AA3C3C',	0,	800,	1);
 
-CREATE TABLE `perm` (
+CREATE TABLE `z_perm` (
   `id` varchar(64) NOT NULL,
   `title` varchar(255) NOT NULL,
   `permbind_id` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
+INSERT INTO `z_perm` (`id`, `title`, `permbind_id`) VALUES
 ('ban-users',	'Ban Users',	''),
 ('consecutive-posts',	'Consecutive Posts',	''),
 ('create-all-private-forum-posts',	'Create All Private Forum Posts',	''),
@@ -108,7 +108,7 @@ INSERT INTO `perm` (`id`, `title`, `permbind_id`) VALUES
 ('view-private-forum',	'View Private Forum',	'forums'),
 ('view-user-pms',	'View User PMs',	'');
 
-CREATE TABLE `pmsgs` (
+CREATE TABLE `z_pmsgs` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `text` text NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE `pmsgs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `posts` (
+CREATE TABLE `z_posts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user` int(10) unsigned NOT NULL DEFAULT 0,
   `thread` int(10) unsigned NOT NULL DEFAULT 0,
@@ -133,7 +133,7 @@ CREATE TABLE `posts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `poststext` (
+CREATE TABLE `z_poststext` (
   `id` int(11) unsigned NOT NULL DEFAULT 0,
   `text` text NOT NULL,
   `revision` smallint(5) unsigned NOT NULL DEFAULT 1,
@@ -143,7 +143,7 @@ CREATE TABLE `poststext` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `threads` (
+CREATE TABLE `z_threads` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
   `replies` int(10) unsigned NOT NULL DEFAULT 0,
@@ -159,7 +159,7 @@ CREATE TABLE `threads` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `threadsread` (
+CREATE TABLE `z_threadsread` (
   `uid` int(10) unsigned NOT NULL,
   `tid` int(10) unsigned NOT NULL,
   `time` int(10) unsigned NOT NULL,
@@ -167,7 +167,7 @@ CREATE TABLE `threadsread` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `x_perm` (
+CREATE TABLE `z_permx` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `x_id` int(11) unsigned NOT NULL,
   `x_type` varchar(64) NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE `x_perm` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `x_perm` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `revoke`) VALUES
+INSERT INTO `z_permx` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `revoke`) VALUES
 (1,	'group',	'create-public-post',	'',	0,	1),
 (1,	'group',	'create-public-thread',	'',	0,	1),
 (1,	'group',	'edit-own-title',	'',	0,	1),

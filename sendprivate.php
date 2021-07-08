@@ -16,18 +16,18 @@ $error = '';
 
 // Submitting a PM
 if ($action == 'Submit') {
-	$userto = $sql->result("SELECT id FROM principia.users WHERE name LIKE ?", [$_POST['userto']]);
+	$userto = result("SELECT id FROM users WHERE name LIKE ?", [$_POST['userto']]);
 
 	if ($userto && $_POST['message']) {
-		$recentpms = $sql->fetch("SELECT date FROM pmsgs WHERE date >= (UNIX_TIMESTAMP() - 30) AND userfrom = ?", [$userdata['id']]);
+		$recentpms = fetch("SELECT date FROM z_pmsgs WHERE date >= (UNIX_TIMESTAMP() - 30) AND userfrom = ?", [$userdata['id']]);
 		if ($recentpms) {
 			$error = "You can't send more than one PM within 30 seconds!";
 		} else {
-			$sql->query("INSERT INTO pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
+			query("INSERT INTO z_pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
 				[time(),$userto,$userdata['id'],$_POST['title'],$_POST['message']]);
-			$nextId = $sql->insertid();
+			$nextId = insertId();
 
-			$sql->query("INSERT INTO principia.notifications (type, level, recipient, sender) VALUES (?,?,?,?)",
+			query("INSERT INTO notifications (type, level, recipient, sender) VALUES (?,?,?,?)",
 				[3, $nextId, $userto, $userdata['id']]);
 
 			redirect("private.php");
@@ -46,8 +46,8 @@ $quotetext = (isset($_POST['message']) ? $_POST['message'] : '');
 // Default
 if (!$action) {
 	if (isset($_GET['pid']) && $pid = $_GET['pid']) {
-		$post = $sql->fetch("SELECT u.name name, p.title, p.text "
-			."FROM pmsgs p LEFT JOIN principia.users u ON p.userfrom = u.id "
+		$post = fetch("SELECT u.name name, p.title, p.text "
+			."FROM z_pmsgs p LEFT JOIN users u ON p.userfrom = u.id "
 			."WHERE p.id = ?" . (!hasPerm('view-user-pms') ? " AND (p.userfrom=".$userdata['id']." OR p.userto=".$userdata['id'].")" : ''), [$pid]);
 		if ($post) {
 			$quotetext = sprintf(
@@ -60,7 +60,7 @@ if (!$action) {
 	}
 
 	if (isset($_GET['uid']) && $uid = $_GET['uid']) {
-		$userto = $sql->result("SELECT u.name name FROM principia.users WHERE id = ?", [$uid]);
+		$userto = result("SELECT u.name name FROM users WHERE id = ?", [$uid]);
 	} elseif (!isset($userto)) {
 		$userto = $_POST['userto'];
 	}

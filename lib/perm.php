@@ -7,7 +7,7 @@ $rootgroup = 7;
 
 // preload group data, makes things a lot easier afterwards
 $usergroups = [];
-$r = $sql->query("SELECT * FROM groups");
+$r = query("SELECT * FROM z_groups");
 while ($g = $r->fetch())
 	$usergroups[$g['id']] = $g;
 
@@ -43,8 +43,7 @@ function isRootGid($gid) {
 }
 
 function gidForUser($userid) {
-	global $sql;
-	$row = $sql->fetch("SELECT group_id FROM principia.users WHERE id=?",[$userid]);
+	$row = fetch("SELECT group_id FROM users WHERE id=?",[$userid]);
 	return $row['group_id'];
 }
 
@@ -67,8 +66,7 @@ function loadBotPermset() {
 }
 
 function titleForPerm($permid) {
-	global $sql;
-	$row = $sql->fetch("SELECT title FROM perm WHERE id=?",[$permid]);
+	$row = fetch("SELECT title FROM z_perm WHERE id=?",[$permid]);
 	return $row['title'];
 }
 
@@ -126,11 +124,10 @@ function canEditUser($uid) {
 }
 
 function forumsWithViewPerm() {
-	global $sql;
 	static $cache = '';
 	if ($cache != '') return $cache;
 	$cache = "(";
-	$r = $sql->query("SELECT f.id, f.private, f.cat FROM forums f");
+	$r = query("SELECT f.id, f.private, f.cat FROM z_forums f");
 	while ($d = $r->fetch()) {
 		if (canViewForum($d)) $cache .= $d['id'].',';
 	}
@@ -238,8 +235,7 @@ function parentGroupForGroup($groupid) {
 }
 
 function permsForX($xtype,$xid) {
-	global $sql;
-	$res = $sql->query("SELECT * FROM x_perm WHERE x_type=? AND x_id=?", [$xtype,$xid]);
+	$res = query("SELECT * FROM z_permx WHERE x_type=? AND x_id=?", [$xtype,$xid]);
 
 	$out = [];
 	$c = 0;

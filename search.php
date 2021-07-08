@@ -88,13 +88,13 @@ if ($forum)
 
 if ($where == 1) {
 	$fieldlist = userfields_post();
-	$posts = $sql->query("SELECT ".userfields('u','u').", $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, t.title ttitle, t.forum tforum "
-		."FROM posts p "
-		."LEFT JOIN poststext pt ON p.id=pt.id "
-		."LEFT JOIN poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) "
-		."LEFT JOIN principia.users u ON p.user=u.id "
-		."LEFT JOIN threads t ON p.thread=t.id "
-		."LEFT JOIN forums f ON f.id=t.forum "
+	$posts = query("SELECT ".userfields('u','u').", $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, t.title ttitle, t.forum tforum "
+		."FROM z_posts p "
+		."LEFT JOIN z_poststext pt ON p.id=pt.id "
+		."LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) "
+		."LEFT JOIN users u ON p.user=u.id "
+		."LEFT JOIN z_threads t ON p.thread=t.id "
+		."LEFT JOIN z_forums f ON f.id=t.forum "
 		."WHERE $string AND ISNULL(pt2.id) "
 		."AND f.id IN ".forumsWithViewPerm()
 		."ORDER BY p.id");
@@ -112,16 +112,16 @@ if ($where == 1) {
 } else {
 	$page = (isset($_GET['page']) ? $_GET['page'] : 1);
 	if ($page < 1) $page = 1;
-	$threads = $sql->query("SELECT ".userfields('u', 'u').", t.* "
-		."FROM threads t "
-		."LEFT JOIN principia.users u ON u.id=t.user "
-		."LEFT JOIN forums f ON f.id=t.forum "
+	$threads = query("SELECT ".userfields('u', 'u').", t.* "
+		."FROM z_threads t "
+		."LEFT JOIN users u ON u.id=t.user "
+		."LEFT JOIN z_forums f ON f.id=t.forum "
 		."WHERE $string AND f.id IN ".forumsWithViewPerm()
 		."ORDER BY t.lastdate DESC "
 		."LIMIT ".(($page-1)*$userdata['tpp']).",".$userdata['tpp']);
-	$threadcount = $sql->result("SELECT COUNT(*) "
-		."FROM threads t "
-		."LEFT JOIN forums f ON f.id=t.forum "
+	$threadcount = result("SELECT COUNT(*) "
+		."FROM z_threads t "
+		."LEFT JOIN z_forums f ON f.id=t.forum "
 		."WHERE $string AND f.id IN ".forumsWithViewPerm());
 	?><table class="c1">
 		<tr class="c">

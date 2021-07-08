@@ -17,8 +17,8 @@ if ($_GET['act'] == 'delete' || $_GET['act'] == 'undelete') {
 
 needsLogin();
 
-$thread = $sql->fetch("SELECT p.user puser, t.*, f.title ftitle, f.private fprivate, f.readonly freadonly FROM posts p LEFT JOIN threads t ON t.id = p.thread "
-	."LEFT JOIN forums f ON f.id=t.forum WHERE p.id = ? AND (t.forum IN ".forumsWithViewPerm().")", [$pid]);
+$thread = fetch("SELECT p.user puser, t.*, f.title ftitle, f.private fprivate, f.readonly freadonly FROM z_posts p LEFT JOIN z_threads t ON t.id = p.thread "
+	."LEFT JOIN z_forums f ON f.id=t.forum WHERE p.id = ? AND (t.forum IN ".forumsWithViewPerm().")", [$pid]);
 
 if (!$thread) $pid = 0;
 
@@ -30,9 +30,9 @@ if ($thread['closed'] && !canCreateForumPosts($thread['forum'])) {
 	error("404", "Invalid post ID.");
 }
 
-$post = $sql->fetch("SELECT u.id, p.user, pt.text FROM posts p LEFT JOIN poststext pt ON p.id=pt.id "
-		."JOIN (SELECT id,MAX(revision) toprev FROM poststext GROUP BY id) as pt2 ON pt2.id = pt.id AND pt2.toprev = pt.revision "
-		."LEFT JOIN principia.users u ON p.user = u.id WHERE p.id = ?", [$pid]);
+$post = fetch("SELECT u.id, p.user, pt.text FROM z_posts p LEFT JOIN z_poststext pt ON p.id=pt.id "
+		."JOIN (SELECT id,MAX(revision) toprev FROM z_poststext GROUP BY id) as pt2 ON pt2.id = pt.id AND pt2.toprev = pt.revision "
+		."LEFT JOIN users u ON p.user = u.id WHERE p.id = ?", [$pid]);
 
 if (!isset($post)) $err = "Post doesn't exist.";
 
@@ -41,9 +41,9 @@ if ($action == 'Submit') {
 		error("400", "No changes detected.");
 	}
 
-	$rev = $sql->result("SELECT MAX(revision) FROM poststext WHERE id = ?", [$pid]) + 1;
+	$rev = result("SELECT MAX(revision) FROM z_poststext WHERE id = ?", [$pid]) + 1;
 
-	$sql->query("INSERT INTO poststext (id,text,revision,user,date) VALUES (?,?,?,?,?)", [$pid,$_POST['message'],$rev,$userdata['id'],time()]);
+	query("INSERT INTO z_poststext (id,text,revision,user,date) VALUES (?,?,?,?,?)", [$pid,$_POST['message'],$rev,$userdata['id'],time()]);
 
 	redirect("thread.php?pid=$pid#edit");
 } else if ($action == 'delete' || $action == 'undelete') {
@@ -51,7 +51,7 @@ if ($action == 'Submit') {
 	if (!(canDeleteForumPosts($thread['forum']))) {
 		error("403", "You do not have the permission to do this.");
 	} else {
-		$sql->query("UPDATE posts SET deleted = ? WHERE id = ?", [($action == 'delete' ? 1 : 0), $pid]);
+		query("UPDATE z_posts SET deleted = ? WHERE id = ?", [($action == 'delete' ? 1 : 0), $pid]);
 		redirect("thread.php?pid=$pid#edit");
 	}
 }
@@ -65,7 +65,7 @@ $topbot = [
 	'title' => 'Edit post'
 ];
 
-$euser = $sql->fetch("SELECT * FROM principia.users WHERE id = ?", [$post['id']]);
+$euser = fetch("SELECT * FROM users WHERE id = ?", [$post['id']]);
 $post['date'] = time();
 $post['text'] = ($action == 'Preview' ? $_POST['message'] : $post['text']);
 foreach ($euser as $field => $val)

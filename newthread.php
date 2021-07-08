@@ -6,7 +6,7 @@ needsLogin();
 $action = (isset($_POST['action']) ? $_POST['action'] : null);
 $fid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['fid']) ? $_POST['fid'] : null));
 
-$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN ".forumsWithViewPerm(), [$fid]);
+$forum = fetch("SELECT * FROM z_forums WHERE id = ? AND id IN ".forumsWithViewPerm(), [$fid]);
 
 if (!$forum)
 	error("404", "Forum does not exist.");
@@ -29,23 +29,23 @@ if ($action == 'Submit') {
 		$error = "You must wait 2 seconds before posting a thread.";
 
 	if (!$error) {
-		$sql->query("UPDATE principia.users SET posts = posts + 1, threads = threads + 1, lastpost = ? WHERE id = ?",
+		query("UPDATE users SET posts = posts + 1, threads = threads + 1, lastpost = ? WHERE id = ?",
 			[time(), $userdata['id']]);
 
-		$sql->query("INSERT INTO threads (title, forum, user, lastdate, lastuser) VALUES (?,?,?,?,?)",
+		query("INSERT INTO z_threads (title, forum, user, lastdate, lastuser) VALUES (?,?,?,?,?)",
 			[$title, $fid, $userdata['id'], time(), $userdata['id']]);
 
-		$tid = $sql->insertid();
-		$sql->query("INSERT INTO posts (user, thread, date) VALUES (?,?,?)",
+		$tid = insertId();
+		query("INSERT INTO z_posts (user, thread, date) VALUES (?,?,?)",
 			[$userdata['id'], $tid, time()]);
 
-		$pid = $sql->insertid();
-		$sql->query("INSERT INTO poststext (id, text) VALUES (?,?)", [$pid, $message]);
+		$pid = insertId();
+		query("INSERT INTO z_poststext (id, text) VALUES (?,?)", [$pid, $message]);
 
-		$sql->query("UPDATE forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?",
+		query("UPDATE z_forums SET threads = threads + 1, posts = posts + 1, lastdate = ?,lastuser = ?,lastid = ? WHERE id = ?",
 			[time(), $userdata['id'], $pid, $fid]);
 
-		$sql->query("UPDATE threads SET lastid = ? WHERE id = ?", [$pid, $tid]);
+		query("UPDATE z_threads SET lastid = ? WHERE id = ?", [$pid, $tid]);
 
 		redirect("thread.php?id=$tid");
 	}

@@ -152,9 +152,7 @@ function pagelist($total, $limit, $url, $sel = 0, $showall = false) {
 }
 
 function forumlist($currentforum = -1) {
-	global $sql;
-
-	$r = $sql->query("SELECT c.title ctitle,f.id,f.title,f.cat,f.private FROM forums f LEFT JOIN categories c ON c.id=f.cat ORDER BY c.ord,c.id,f.ord,f.id");
+	$r = query("SELECT c.title ctitle,f.id,f.title,f.cat,f.private FROM z_forums f LEFT JOIN z_categories c ON c.id=f.cat ORDER BY c.ord,c.id,f.ord,f.id");
 	$out = '<select id="forumselect">';
 	$c = -1;
 	while ($d = $r->fetch()) {

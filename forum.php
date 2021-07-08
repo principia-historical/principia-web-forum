@@ -9,22 +9,22 @@ $fieldlist = userfields('u1', 'u1').",".userfields('u2', 'u2');
 
 if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if ($log) {
-		$forum = $sql->fetch("SELECT f.*, r.time rtime FROM forums f LEFT JOIN forumsread r ON (r.fid = f.id AND r.uid = ?) "
+		$forum = fetch("SELECT f.*, r.time rtime FROM z_forums f LEFT JOIN z_forumsread r ON (r.fid = f.id AND r.uid = ?) "
 			. "WHERE f.id = ? AND f.id IN " . forumsWithViewPerm(), [$userdata['id'], $fid]);
 		if (!$forum['rtime']) $forum['rtime'] = 0;
 	} else
-		$forum = $sql->fetch("SELECT * FROM forums WHERE id = ? AND id IN " . forumsWithViewPerm(), [$fid]);
+		$forum = fetch("SELECT * FROM z_forums WHERE id = ? AND id IN " . forumsWithViewPerm(), [$fid]);
 
 	if (!isset($forum['id'])) error("404", "Forum does not exist.");
 
 	$title = $forum['title'];
 
-	$threads = $sql->query("SELECT $fieldlist, t.*"
+	$threads = query("SELECT $fieldlist, t.*"
 		. ($log ? ", (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<'$forum[rtime]') isread" : '') . ' '
-		. "FROM threads t "
-		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
-		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
-		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id])" : '')
+		. "FROM z_threads t "
+		. "LEFT JOIN users u1 ON u1.id=t.user "
+		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
+		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id])" : '')
 		. "WHERE t.forum = ? "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
@@ -37,28 +37,28 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if (canCreateForumThread($forum))
 		$topbot['actions'] = [['href' => "newthread.php?id=$fid", 'title' => 'New thread']];
 } elseif (isset($_GET['user']) && $uid = $_GET['user']) {
-	$user = $sql->fetch("SELECT name FROM principia.users WHERE id = ?", [$uid]);
+	$user = fetch("SELECT name FROM users WHERE id = ?", [$uid]);
 
 	if (!isset($user)) error("404", "User does not exist.");
 
 	$title = "Threads by " . $user['name'];
 
-	$threads = $sql->query("SELECT $fieldlist, t.*, f.id fid, "
+	$threads = query("SELECT $fieldlist, t.*, f.id fid, "
 		. ($log ? " (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread, " : ' ')
-		. "f.title ftitle FROM threads t "
-		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
-		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
-		. "LEFT JOIN forums f ON f.id=t.forum "
-		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
-			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
+		. "f.title ftitle FROM z_threads t "
+		. "LEFT JOIN users u1 ON u1.id=t.user "
+		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
+		. "LEFT JOIN z_forums f ON f.id=t.forum "
+		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
+			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.user = ? "
 		. "AND f.id IN " . forumsWithViewPerm() . " "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 		[$uid]);
 
-	$forum['threads'] = $sql->result("SELECT count(*) FROM threads t "
-		. "LEFT JOIN forums f ON f.id = t.forum "
+	$forum['threads'] = result("SELECT count(*) FROM z_threads t "
+		. "LEFT JOIN z_forums f ON f.id = t.forum "
 		. "WHERE t.user = ? AND f.id IN " . forumsWithViewPerm(), [$uid]);
 
 	$topbot = [
@@ -70,23 +70,23 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	$title = 'Latest threats';
 
-	$threads = $sql->query("SELECT $fieldlist, t.*, f.id fid,
+	$threads = query("SELECT $fieldlist, t.*, f.id fid,
 		f.title ftitle" . ($log ? ', (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread ' : ' ')
-		. "FROM threads t "
-		. "LEFT JOIN principia.users u1 ON u1.id=t.user "
-		. "LEFT JOIN principia.users u2 ON u2.id=t.lastuser "
-		. "LEFT JOIN forums f ON f.id=t.forum "
-		. ($log ? "LEFT JOIN threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
-			. "LEFT JOIN forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
+		. "FROM z_threads t "
+		. "LEFT JOIN users u1 ON u1.id=t.user "
+		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
+		. "LEFT JOIN z_forums f ON f.id=t.forum "
+		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
+			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.lastdate > ? "
 		. " AND f.id IN " . forumsWithViewPerm()
 		. "ORDER BY t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 	[$mintime]);
 
-	$forum['threads'] = $sql->result("SELECT count(*) "
-		. "FROM threads t "
-		. "LEFT JOIN forums f ON f.id=t.forum "
+	$forum['threads'] = result("SELECT count(*) "
+		. "FROM z_threads t "
+		. "LEFT JOIN z_forums f ON f.id=t.forum "
 		. "WHERE t.lastdate > ? "
 		. "AND f.id IN " . forumsWithViewPerm(),
 	[$mintime]);
