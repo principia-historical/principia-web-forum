@@ -67,10 +67,7 @@
 			<td class="b">{{ thread.views }}</td>
 			<td class="b">
 				<nobr>{{ thread.lastdate | date(forum_dateformat) }}</nobr><br>
-				<span class="sfont">
-					by {{ userlink(thread, 'u2') }}
-					<a href="thread.php?pid={{ thread.lastid }}#{{ thread.lastid }}">&raquo;</a>
-				</span>
+				<span>by {{ userlink(thread, 'u2') }} <a href="thread.php?pid={{ thread.lastid }}#{{ thread.lastid }}">&raquo;</a></span>
 			</td>
 		</tr>
 		{% set i = i + 1 %}

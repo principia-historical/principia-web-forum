@@ -46,8 +46,8 @@ function threadpost($post, $pthread = '') {
 	<td class="b n1" style="border-right:0;width:180px">$ulink</td>
 	<td class="b n1" style="border-left:0">
 		<table width="100%">
-			<td class="nb sfont">(post deleted)</td>
-			<td class="nb sfont right">$postlinks</td>
+			<td class="nb">(post deleted)</td>
+			<td class="nb right">$postlinks</td>
 		</table>
 	</td>
 </tr></table>
@@ -101,17 +101,17 @@ HTML;
 	$ujoined = date('Y-m-d', $post['ujoined']);
 	$posttext = postfilter($post['text']);
 	$text = <<<HTML
-<table class="c1" id="{$post['id']}">
+<table class="c1 threadpost" id="{$post['id']}">
 	$postheaderrow
 	<tr>
 		<td class="b n1 topbar_1">$ulink</td>
 		<td class="b n1 topbar_2 fullwidth">
 			<table class="fullwidth">
-				<tr><td class="nb sfont">Posted on $pdate$threadlink $revisionstr</td><td class="nb sfont right">$postlinks</td></tr>
+				<tr><td class="nb">Posted on $pdate$threadlink $revisionstr</td><td class="nb right">$postlinks</td></tr>
 			</table>
 		</td>
 	</tr><tr valign="top">
-		<td class="b n1 sfont sidebar">
+		<td class="b n1 sidebar">
 			$utitle
 			$picture
 			<br>Posts: {$post['uposts']}
