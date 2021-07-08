@@ -99,12 +99,10 @@ $showforum = (isset($time) ? $time : $uid);
 if ($forum['threads'] <= $userdata['tpp']) {
 	$fpagelist = '';
 } else {
-	if ($fid)
-		$furl = "forum.php?id=$fid";
-	elseif ($uid)
-		$furl = "forum.php?user=$uid";
-	elseif ($time)
-		$furl = "forum.php?time=$time";
+	$furl = "forum.php?";
+	if ($fid)	$furl .= "id=$fid";
+	if ($uid)	$furl .= "user=$uid";
+	if ($time)	$furl .= "time=$time";
 	$fpagelist = '<br>'.pagelist($forum['threads'], $userdata['tpp'], $furl, $page, true);
 }
 

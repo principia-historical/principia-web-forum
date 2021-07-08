@@ -41,26 +41,17 @@ $action = '';
 $post_c = isset($_POST['c']) ? $_POST['c'] : '';
 $act = isset($_POST['action']) ? $_POST['action'] : '';
 
-if (isset($tid) && $log && $act && (can_edit_forum_threads(getforumbythread($tid)) ||
-		($userdata['id'] == $threadcreator && $act == "rename" && has_perm('rename-own-thread')))) {
+if (isset($tid) && $log && $act && (canEditForumThreads(getForumByThread($tid)) ||
+		($userdata['id'] == $threadcreator && $act == "rename" && hasPerm('rename-own-thread') && isset($_POST['title'])))) {
 
-	if ($act == 'stick') {
-		$action = ',sticky=1';
-	} elseif ($act == 'unstick') {
-		$action = ',sticky=0';
-	} elseif ($act == 'close') {
-		$action = ',closed=1';
-	} elseif ($act == 'open') {
-		$action = ',closed=0';
-	} elseif ($act == 'trash') {
-		editthread($tid, '', $trashid, 1);
-	} elseif ($act == 'rename' && $_POST['title']) {
-		$action = ",title=?";
-	} elseif ($act == 'move') {
-		editthread($tid, '', $_POST['arg']);
-	} else {
-		error("400", "Unknown action.");
-	}
+	if ($act == 'stick')		$action = ',sticky=1';
+	elseif ($act == 'unstick')	$action = ',sticky=0';
+	elseif ($act == 'close')	$action = ',closed=1';
+	elseif ($act == 'open')		$action = ',closed=0';
+	elseif ($act == 'trash')	editThread($tid, '', $trashid, 1);
+	elseif ($act == 'rename')	$action = ",title=?";
+	elseif ($act == 'move')		editThread($tid, '', $_POST['arg']);
+	else						error("400", "Unknown action.");
 }
 
 $pin = (isset($_GET['pin']) && is_numeric($_GET['pin']) ? $_GET['pin'] : null);
@@ -159,12 +150,10 @@ if ($viewmode == "thread") {
 if ($thread['replies'] <= $ppp) {
 	$pagelist = '';
 } else {
-	if ($viewmode == "thread")
-		$furl = "thread.php?id=$tid";
-	elseif ($viewmode == "user")
-		$furl = "thread.php?user=$uid";
-	elseif ($viewmode == "time")
-		$furl = "thread.php?time=$time";
+	$thread = "thread.php?";
+	if ($viewmode == "thread")	$furl .= "id=$tid";
+	if ($viewmode == "user")	$furl .= "user=$uid";
+	if ($viewmode == "time")	$furl .= "time=$time";
 	$pagelist = '<br>'.pagelist($thread['replies'], $ppp, $furl, $page, true);
 }
 
