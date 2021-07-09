@@ -150,7 +150,7 @@ if ($viewmode == "thread") {
 if ($thread['replies'] <= $ppp) {
 	$pagelist = '';
 } else {
-	$thread = "thread.php?";
+	$furl = "thread.php?";
 	if ($viewmode == "thread")	$furl .= "id=$tid";
 	if ($viewmode == "user")	$furl .= "user=$uid";
 	if ($viewmode == "time")	$furl .= "time=$time";

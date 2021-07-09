@@ -54,7 +54,7 @@ function gidForUser($userid) {
 function loadGuestPermset() {
 	global $logpermset;
 	$logpermset = [];
-	$loggroups = [1];
+	$loggroups = [];
 	foreach ($loggroups as $gid) {
 		$logpermset = applyGroupPermissions($logpermset,$gid);
 	}

@@ -3,14 +3,6 @@
 {% block title %}Forum{% endblock %}
 
 	{% block content %}
-<table class="c1">
-	<tr class="h"><td class="b h">Welcome to the principia-web test forums!</td></tr>
-	<td class="b h">
-		<p>Welcome to the principia-web test forums!</p>
-
-		<p>This place is intended to be used for testing the upcoming principia-web forums to see that everything is working like it should.</p>
-	</td>
-</table><br>
 {% set category = -1 %}
 
 {% for forum in forums %}
@@ -40,9 +32,7 @@
 			{% endif %}
 		</td>
 		<td class="b n2 left">
-			{% if forum.private %}({% endif %}
-				<a href="forum.php?id={{ forum.id }}">{{ forum.title }}</a>
-			{% if forum.private %}){% endif %}
+			{% if forum.private %}({% endif %}<a href="forum.php?id={{ forum.id }}">{{ forum.title }}</a>{% if forum.private %}){% endif %}
 			<br><span>{{ forum.descr | raw }}</span>
 		</td>
 		<td class="b n1">{{ forum.threads }}</td>
