@@ -1,16 +1,18 @@
--- Adminer 4.8.1 MySQL 5.5.5-10.5.10-MariaDB dump
+-- Adminer 4.8.1 MySQL 5.5.5-10.5.11-MariaDB dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
+SET NAMES utf8mb4;
+
 CREATE TABLE `z_categories` (
   `id` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL,
   `ord` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `z_categories` (`id`, `title`, `ord`) VALUES
 (1,	'General',	50),
@@ -30,7 +32,7 @@ CREATE TABLE `z_forums` (
   `private` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `readonly` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `z_forums` (`id`, `cat`, `ord`, `title`, `descr`, `threads`, `posts`, `lastdate`, `lastuser`, `lastid`, `private`, `readonly`) VALUES
 (1,	1,	0,	'Example forum',	'This is an example forum to get started with.',	0,	0,	0,	0,	0,	0,	0),
@@ -41,7 +43,7 @@ CREATE TABLE `z_forumsread` (
   `fid` int(5) unsigned NOT NULL,
   `time` int(11) unsigned NOT NULL,
   UNIQUE KEY `uid` (`uid`,`fid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `z_groups` (
@@ -52,7 +54,7 @@ CREATE TABLE `z_groups` (
   `sortorder` smallint(5) unsigned NOT NULL DEFAULT 0,
   `visible` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `z_groups` (`id`, `title`, `nc`, `inherit_group_id`, `sortorder`, `visible`) VALUES
 (1,	'Banned',	'888888',	3,	0,	1),
@@ -68,7 +70,7 @@ CREATE TABLE `z_perm` (
   `title` varchar(255) NOT NULL,
   `permbind_id` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `z_perm` (`id`, `title`, `permbind_id`) VALUES
 ('ban-users',	'Ban Users',	''),
@@ -119,7 +121,7 @@ CREATE TABLE `z_pmsgs` (
   `del_from` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `del_to` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `z_posts` (
@@ -130,7 +132,7 @@ CREATE TABLE `z_posts` (
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `threadid` (`thread`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `z_poststext` (
@@ -140,7 +142,7 @@ CREATE TABLE `z_poststext` (
   `date` int(11) unsigned NOT NULL DEFAULT 0,
   `user` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`revision`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `z_threads` (
@@ -156,7 +158,7 @@ CREATE TABLE `z_threads` (
   `sticky` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `closed` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `z_threadsread` (
@@ -164,7 +166,7 @@ CREATE TABLE `z_threadsread` (
   `tid` int(10) unsigned NOT NULL,
   `time` int(10) unsigned NOT NULL,
   UNIQUE KEY `uid` (`uid`,`tid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `z_permx` (
@@ -176,7 +178,7 @@ CREATE TABLE `z_permx` (
   `bindvalue` int(11) unsigned NOT NULL,
   `revoke` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `z_permx` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, `revoke`) VALUES
 (1,	'group',	'create-public-post',	'',	0,	1),
@@ -227,4 +229,4 @@ INSERT INTO `z_permx` (`x_id`, `x_type`, `perm_id`, `permbind_id`, `bindvalue`, 
 (4,	'group',	'edit-forum-thread',	'forums',	2,	0),
 (4,	'group',	'view-private-forum',	'forums',	2,	0);
 
--- 2021-06-09 09:07:26
+-- 2021-07-09 20:19:37
