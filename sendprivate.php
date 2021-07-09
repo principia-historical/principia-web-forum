@@ -60,7 +60,7 @@ if (!$action) {
 	}
 
 	if (isset($_GET['uid']) && $uid = $_GET['uid']) {
-		$userto = result("SELECT u.name name FROM users WHERE id = ?", [$uid]);
+		$userto = result("SELECT name FROM users WHERE id = ?", [$uid]);
 	} elseif (!isset($userto)) {
 		$userto = $_POST['userto'];
 	}

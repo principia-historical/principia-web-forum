@@ -116,8 +116,8 @@ CREATE TABLE `z_pmsgs` (
   `userto` int(10) unsigned NOT NULL,
   `userfrom` int(10) unsigned NOT NULL,
   `unread` tinyint(1) unsigned NOT NULL DEFAULT 1,
-  `del_from` tinyint(1) DEFAULT NULL,
-  `del_to` tinyint(1) DEFAULT NULL,
+  `del_from` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `del_to` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
