@@ -5,6 +5,7 @@
 		<title>{% block title %}Forum{% endblock %} - principia-web</title>
 		<base href="{{ basepath }}forum/">
 		<link rel="stylesheet" href="../assets/css/style.css" type="text/css">
+		{% if userdata.darkmode %}<link rel="stylesheet" href="../assets/css/darkmode.css" type="text/css">{% endif %}
 		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 		<script src="assets/js/tools.js"></script>
 	</head>
@@ -33,7 +34,7 @@
 				</em></li>
 			</ul>
 		</div>
-		<div class="top">
+		<div class="top top_forum">
 			<ul class="menu left">
 				<li><a href="./" class="btn">Forum</a></li>
 				<li><a href="activeusers.php" class="btn">Active users</a></li>
