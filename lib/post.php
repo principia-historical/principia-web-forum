@@ -22,19 +22,16 @@ function esc($text) {
 }
 
 function threadpost($post, $pthread = '') {
-	global $dateformat, $userdata;
-
-	$post['utitle'] = $post['utitle'] . ((strlen($post['utitle']) >= 1) ? '<br>' : '');
+	global $log, $dateformat, $userdata;
 
 	if (isset($post['deleted']) && $post['deleted']) {
-		$postlinks = '';
 		if (canCreateForumPosts(getForumByThread($post['thread']))) {
-			$postlinks .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$post[revision]#$post[id]\">Peek</a> &bull; ";
-			$postlinks .= "<a href=\"editpost.php?pid=" . $post['id'] . "&act=undelete\">Undelete</a>";
+			$postlinks = sprintf(
+				'<a href="thread.php?pid=%s&pin=%s&rev=%s#%s">Peek</a> &bull; <a href="editpost.php?pid=%s&act=undelete">Undelete</a> &bull; ID: %s',
+			$post['id'], $post['id'], $post['revision'], $post['id'], $post['id'], $post['id']);
+		} else {
+			$postlinks = 'ID: '.$post['id'];
 		}
-
-		if ($post['id'])
-			$postlinks .= ($postlinks ? ' &bull; ' : '') . "ID: $post[id]";
 
 		$ulink = userlink($post, 'u');
 		$text = <<<HTML
@@ -53,34 +50,34 @@ HTML;
 
 	$postheaderrow = $threadlink = $postlinks = $revisionstr = '';
 
+	$post['utitle'] = $post['utitle'] . ((strlen($post['utitle']) >= 1) ? '<br>' : '');
+
 	$post['id'] = (isset($post['id']) ? $post['id'] : 0);
 
 	if ($pthread)
-		$threadlink = ", in <a href=\"thread.php?id=$pthread[id]\">" . esc($pthread['title']) . "</a>";
+		$threadlink = sprintf(', in <a href="thread.php?id=%s">%s</a>', $pthread['id'], esc($pthread['title']));
 
 	if (isset($post['id']) && $post['id'])
-		$postlinks = "<a href=\"thread.php?pid=$post[id]#$post[id]\">Link</a>"; // headlinks for posts
+		$postlinks = "<a href=\"thread.php?pid=$post[id]#$post[id]\">Link</a>";
 
 	if (isset($post['revision']) && $post['revision'] >= 2)
 		$revisionstr = " (rev. {$post['revision']} of " . date($dateformat, $post['ptdate']) . " by " . userlink_by_id($post['ptuser']) . ")";
 
-	// I have no way to tell if it's closed (or otherwise impostable (hah)) so I can't hide it in those circumstances...
-	if (isset($post['thread']) && $post['id'] && $userdata['id'] != 0) {
-		$postlinks .= ($postlinks ? ' &bull; ' : '') . "<a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Reply</a>";
-	}
+	if (isset($post['thread']) && $post['id'] && $userdata['id'] != 0)
+		$postlinks .= " &bull; <a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Reply</a>";
 
 	// "Edit" link for admins or post owners, but not banned users
 	if (isset($post['thread']) && canEditPost($post) && $post['id'])
-		$postlinks.=($postlinks ? ' &bull; ' : '') . "<a href=\"editpost.php?pid=$post[id]\">Edit</a>";
+		$postlinks .= " &bull; <a href=\"editpost.php?pid=$post[id]\">Edit</a>";
 
 	if (isset($post['thread']) && isset($post['id']) && canDeleteForumPosts(getForumByThread($post['thread'])))
-		$postlinks.=($postlinks ? ' &bull; ' : '') . "<a href=\"editpost.php?pid=".$post['id']."&act=delete\">Delete</a>";
+		$postlinks .= ' &bull; <a href=\"editpost.php?pid='.$post['id'].'&act=delete\">Delete</a>';
 
 	if (isset($post['thread']) && $post['id'])
-		$postlinks.=" &bull; ID: $post[id]";
+		$postlinks .= " &bull; ID: $post[id]";
 
 	if (isset($post['maxrevision']) && isset($post['thread']) && hasPerm('view-post-history') && $post['maxrevision'] > 1) {
-		$revisionstr.=" &bull; Revision ";
+		$revisionstr .= " &bull; Revision ";
 		for ($i = 1; $i <= $post['maxrevision']; $i++)
 			$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";
 	}
@@ -92,11 +89,11 @@ HTML;
 	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
 	if ($post['usignature']) {
 		$post['usignature'] = '<div class="siggy">' . postfilter($post['usignature']) . '</div>';
-	}
+	} else if (!$log) $post['usignature'] = '';
 	$utitle = $post['utitle'];
 	$ujoined = date('Y-m-d', $post['ujoined']);
 	$posttext = postfilter($post['text']);
-	$text = <<<HTML
+	return <<<HTML
 <table class="c1 threadpost" id="{$post['id']}">
 	$postheaderrow
 	<tr>
@@ -121,6 +118,4 @@ HTML;
 	</tr>
 </table>
 HTML;
-
-	return $text;
 }
