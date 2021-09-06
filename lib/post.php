@@ -87,9 +87,10 @@ HTML;
 	$lastpost = ($post['ulastpost'] ? timeunits(time() - $post['ulastpost']) : 'none');
 	$lastview = timeunits(time() - $post['ulastview']);
 	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
-	if ($post['usignature']) {
+	if (!$log) $post['usignature'] = '';
+	else if ($post['usignature']) {
 		$post['usignature'] = '<div class="siggy">' . postfilter($post['usignature']) . '</div>';
-	} else if (!$log) $post['usignature'] = '';
+	}
 	$utitle = $post['utitle'];
 	$ujoined = date('Y-m-d', $post['ujoined']);
 	$posttext = postfilter($post['text']);
