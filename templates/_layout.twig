@@ -19,7 +19,7 @@
 				<li><a href="../chat.php" class="btn">Chat</a></li>
 				<li><a href="./" class="btn">Forum</a></li>
 				<li><a href="../contests.php" class="btn">Contests</a></li>
-				<li><a href="search.php" class="btn"><img src="../assets/icons/search.svg" class="search"></a></li>
+				<li><a href="../search.php" class="btn"><img src="../assets/icons/search.svg" class="search"></a></li>
 			</ul>
 			<ul class="menu right">
 				<li><em>
@@ -39,11 +39,15 @@
 				<li><a href="./" class="btn">Forum</a></li>
 				<li><a href="activeusers.php" class="btn">Active users</a></li>
 				<li><a href="thread.php?time=86400" class="btn">Latest posts</a></li>
-				<li><a href="private.php" class="btn">Private messages</a></li>
+				{% if log %}
+					<li><a href="private.php" class="btn">Private messages</a></li>
+				{% endif %}
 			</ul>
-			<ul class="menu right">
-				<li><a href="./?action=markread&fid=all">Mark all forums read</a></li>
-			</ul>
+			{% if log %}
+				<ul class="menu right">
+					<li><a href="./?action=markread&fid=all">Mark all forums read</a></li>
+				</ul>
+			{% endif %}
 		</div>
 		{% block precontent %}{% endblock %}<br>
 		<div class="home content forum">
