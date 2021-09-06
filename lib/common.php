@@ -1,8 +1,6 @@
 <?php
 $acmlm = true;
 
-$rankset_names = ['None'];
-
 // List of smilies
 $smilies = [];
 

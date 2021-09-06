@@ -24,11 +24,7 @@ function esc($text) {
 function threadpost($post, $pthread = '') {
 	global $dateformat, $userdata;
 
-	$post['ranktext'] = getrank(0, $post['uposts']);
-	$post['utitle'] = $post['ranktext']
-			. ((strlen($post['ranktext']) >= 1) ? '<br>' : '')
-			. $post['utitle']
-			. ((strlen($post['utitle']) >= 1) ? '<br>' : '');
+	$post['utitle'] = $post['utitle'] . ((strlen($post['utitle']) >= 1) ? '<br>' : '');
 
 	if (isset($post['deleted']) && $post['deleted']) {
 		$postlinks = '';

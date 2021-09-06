@@ -1,26 +1,5 @@
 <?php
 
-function getrank($set, $posts) {
-	global $rankset_data, $rankset_names;
-
-	if ($set == 0 || $set == 1) return '';
-
-	$i = 1;
-	foreach ($rankset_data[$rankset_names[$set]] as $ranksetname => $rankset) {
-		$neededposts = $rankset['p'];
-		if (isset($rankset_data[$ranksetname][$i]['p']))
-			$nextneededposts = $rankset_data[$ranksetname][$i]['p'];
-		else
-			$nextneededposts = 2147483647;
-
-		if (($posts >= $neededposts) && ($posts < $nextneededposts)) {
-			return $rankset['str'];
-		}
-		$i++;
-	}
-	return '';
-}
-
 function userfields($tbl = '', $pf = '') {
 	$fields = ['id', 'name', 'customcolor'];
 
