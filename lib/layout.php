@@ -35,20 +35,16 @@ function renderTable($data, $headers) {
 }
 
 function newStatus($type) {
-	switch ($type) {
-		case "n":
-			$text = "NEW";
-			$statusimg = "new.png";
-		break;
-		case "o":
-			$text = "OFF";
-			$statusimg = "off.png";
-		break;
-		case "on":
-			$text = "OFF";
-			$statusimg = "offnew.png";
-		break;
-	}
+	$text = match ($type) {
+		'n'  => 'NEW',
+		'o'  => 'OFF',
+		'on' => 'OFF'
+	};
+	$statusimg = match ($type) {
+		'n'  => 'new.png',
+		'o'  => 'off.png',
+		'on' => 'offnew.png'
+	};
 
 	return "<img src=\"assets/status/$statusimg\" alt=\"$text\">";
 }
