@@ -5,7 +5,7 @@ class PrincipiaForumExtension extends \Twig\Extension\AbstractExtension {
 		return [
 			// datetime.php
 			new \Twig\TwigFunction('timeunits', 'timeunits', ['is_safe' => ['html']]),
-			new \Twig\TwigFunction('timelink', 'timelink', ['is_safe' => ['html']]),
+			new \Twig\TwigFunction('timelinks', 'timelinks', ['is_safe' => ['html']]),
 
 			// layout.php
 			new \Twig\TwigFunction('new_status', 'newStatus', ['is_safe' => ['html']]),
