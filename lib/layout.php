@@ -177,7 +177,7 @@ function ifEmptyQuery($message, $colspan = 0, $table = false) {
 }
 
 function _twigloader($subfolder = '') {
-	global $dateformat;
+	global $dateformat, $acmlm;
 
 	$twig = twigloader($subfolder, function () use ($subfolder) {
 		return new \Twig\Loader\FilesystemLoader('templates/' . $subfolder);
@@ -191,6 +191,7 @@ function _twigloader($subfolder = '') {
 	$twig->addExtension(new PrincipiaForumExtension());
 
 	$twig->addGlobal('forum_dateformat', $dateformat);
+	$twig->addGlobal('acmlm', $acmlm);
 
 	return $twig;
 }
