@@ -39,7 +39,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 } elseif (isset($_GET['user']) && $uid = $_GET['user']) {
 	$user = fetch("SELECT name FROM users WHERE id = ?", [$uid]);
 
-	if (!isset($user)) error("404", "User does not exist.");
+	if (!$user) error("404", "User does not exist.");
 
 	$title = "Threads by " . $user['name'];
 
@@ -65,7 +65,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "../user.php?id=$uid", 'title' => $user['name']]],
 		'title' => 'Threads'
 	];
-} elseif ($time = $_GET['time']) {
+} elseif (isset($_GET['time']) && $time = $_GET['time']) {
 	$mintime = ($time > 0 && $time <= 2592000 ? time() - $time : 86400);
 
 	$title = 'Latest threats';
