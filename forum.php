@@ -68,7 +68,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 } elseif (isset($_GET['time']) && $time = $_GET['time']) {
 	$mintime = ($time > 0 && $time <= 2592000 ? time() - $time : 86400);
 
-	$title = 'Latest threats';
+	$title = 'Latest threads';
 
 	$threads = query("SELECT $fieldlist, t.*, f.id fid,
 		f.title ftitle" . ($log ? ', (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread ' : ' ')
