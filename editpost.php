@@ -43,7 +43,7 @@ if ($action == 'Submit') {
 
 	$rev = result("SELECT MAX(revision) FROM z_poststext WHERE id = ?", [$pid]) + 1;
 
-	query("INSERT INTO z_poststext (id,text,revision,user,date) VALUES (?,?,?,?,?)", [$pid,$_POST['message'],$rev,$userdata['id'],time()]);
+	query("INSERT INTO z_poststext (id,text,revision,date) VALUES (?,?,?,?)", [$pid,$_POST['message'],$rev,time()]);
 
 	redirect("thread.php?pid=$pid#edit");
 } else if ($action == 'delete' || $action == 'undelete') {

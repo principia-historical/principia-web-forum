@@ -99,7 +99,7 @@ if ($viewmode == "thread") {
 	}
 
 	//select top revision
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.forum tforum "
 		. "FROM z_posts p "
 		. "LEFT JOIN z_threads t ON t.id = p.thread "
 		. "LEFT JOIN z_poststext pt ON p.id = pt.id "
@@ -115,7 +115,7 @@ if ($viewmode == "thread") {
 	if ($user == null) error("404", "User doesn't exist.");
 
 	$title = "Posts by " . $user['name'];
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
 		. "FROM z_posts p "
 		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
 		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
@@ -132,7 +132,7 @@ if ($viewmode == "thread") {
 
 	$title = 'Latest posts';
 
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.user ptuser, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
 		. "FROM z_posts p "
 		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
 		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
