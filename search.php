@@ -102,7 +102,7 @@ if ($where == 1) {
 	for ($i = 1; $post = $posts->fetch(); $i++) {
 		$pthread['id'] = $post['tid'];
 		$pthread['title'] = $post['ttitle'];
-		$post['text'] = preg_replace($boldify,"<b>\\0</b>",$post['text']);
+		$post['text'] = preg_replace($boldify,"**\\0**",$post['text']);
 		echo '<br>' . threadpost($post,$pthread);
 	}
 

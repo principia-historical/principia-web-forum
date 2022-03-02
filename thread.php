@@ -174,7 +174,7 @@ if ($viewmode == "thread") {
 	}
 } elseif ($viewmode == "user") {
 	$topbot = [
-		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "../user.php?id=$uid", 'title' => $user['name']]],
+		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "/user.php?id=$uid", 'title' => $user['name']]],
 		'title' => 'Posts'
 	];
 } elseif ($viewmode == "time") {
