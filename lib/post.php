@@ -51,31 +51,32 @@ HTML;
 	$post['id'] = (isset($post['id']) ? $post['id'] : 0);
 
 	if ($pthread)
-		$threadlink = sprintf(', in <a href="thread.php?id=%s">%s</a>', $pthread['id'], esc($pthread['title']));
+		$threadlink = sprintf(' - in <a href="thread.php?id=%s">%s</a>', $pthread['id'], esc($pthread['title']));
 
-	if (isset($post['id']) && $post['id'])
+	if ($post['id'])
 		$postlinks = "<a href=\"thread.php?pid=$post[id]#$post[id]\">Link</a>";
 
 	if (isset($post['revision']) && $post['revision'] >= 2)
-		$revisionstr = " (rev. {$post['revision']} of " . date($dateformat, $post['ptdate']) . " by " . userlink_by_id($post['ptuser']) . ")";
+		$revisionstr = " (edited ".date($dateformat, $post['ptdate']).")";
 
-	if (isset($post['thread']) && $post['id'] && $userdata['id'] != 0)
-		$postlinks .= " &bull; <a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Reply</a>";
+	if (isset($post['thread'])) {
+		if ($userdata['id'] != 0)
+			$postlinks .= " &bull; <a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Quote</a>";
 
-	// "Edit" link for admins or post owners, but not banned users
-	if (isset($post['thread']) && canEditPost($post) && $post['id'])
-		$postlinks .= " &bull; <a href=\"editpost.php?pid=$post[id]\">Edit</a>";
+		// "Edit" link for admins or post owners, but not banned users
+		if (canEditPost($post))
+			$postlinks .= " &bull; <a href=\"editpost.php?pid=$post[id]\">Edit</a>";
 
-	if (isset($post['thread']) && isset($post['id']) && canDeleteForumPosts(getForumByThread($post['thread'])))
-		$postlinks .= ' &bull; <a href=\"editpost.php?pid='.$post['id'].'&act=delete\">Delete</a>';
+		if (canDeleteForumPosts(getForumByThread($post['thread'])))
+			$postlinks .= ' &bull; <a href=\"editpost.php?pid='.$post['id'].'&act=delete\">Delete</a>';
 
-	if (isset($post['thread']) && $post['id'])
 		$postlinks .= " &bull; ID: $post[id]";
 
-	if (isset($post['maxrevision']) && isset($post['thread']) && hasPerm('view-post-history') && $post['maxrevision'] > 1) {
-		$revisionstr .= " &bull; Revision ";
-		for ($i = 1; $i <= $post['maxrevision']; $i++)
-			$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";
+		if (isset($post['maxrevision']) && hasPerm('view-post-history') && $post['maxrevision'] > 1) {
+			$revisionstr .= " &bull; Revision ";
+			for ($i = 1; $i <= $post['maxrevision']; $i++)
+				$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";
+		}
 	}
 
 	$ulink = userlink($post, 'u');
@@ -87,7 +88,6 @@ HTML;
 	else if ($post['usignature']) {
 		$post['usignature'] = '<div class="siggy">' . postfilter($post['usignature']) . '</div>';
 	}
-	$utitle = $post['utitle'];
 	$ujoined = date('Y-m-d', $post['ujoined']);
 	$posttext = postfilter($post['text']);
 	return <<<HTML
@@ -102,7 +102,7 @@ HTML;
 		</td>
 	</tr><tr valign="top">
 		<td class="b n1 sidebar">
-			$utitle
+			{$post['utitle']}
 			$picture
 			<br>Posts: {$post['uposts']}
 			<br>
