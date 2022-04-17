@@ -1,8 +1,8 @@
 <?php
 require('lib/common.php');
 
-$_GET['act'] = (isset($_GET['act']) ? $_GET['act'] : 'needle');
-$_POST['action'] = (isset($_POST['action']) ? $_POST['action'] : '');
+$_GET['act'] = $_GET['act'] ?? null;
+$_POST['action'] = $_POST['action'] ?? '';
 
 if ($action = $_POST['action']) {
 	$pid = $_POST['pid'];

@@ -3,7 +3,7 @@ require('lib/common.php');
 
 if (!hasPerm('edit-groups')) error('403', 'You have no permissions to do this!');
 
-$act = (isset($_GET['act']) ? $_GET['act'] : '');
+$act = $_GET['act'] ?? '';
 $errmsg = '';
 $caneditperms = hasPerm('edit-permissions');
 

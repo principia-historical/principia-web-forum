@@ -3,7 +3,7 @@ require('lib/common.php');
 
 needsLogin();
 
-$action = (isset($_POST['action']) ? $_POST['action'] : null);
+$action = $_POST['action'] ?? null;
 $fid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['fid']) ? $_POST['fid'] : null));
 
 $forum = fetch("SELECT * FROM z_forums WHERE id = ? AND id IN ".forumsWithViewPerm(), [$fid]);
@@ -15,8 +15,8 @@ if (!canCreateForumThread($forum))
 
 $error = '';
 
-$title = isset($_POST['title']) ? $_POST['title'] : '';
-$message = isset($_POST['message']) ? $_POST['message'] : '';
+$title = $_POST['title'] ?? '';
+$message = $_POST['message'] ?? '';
 
 if ($action == 'Submit') {
 	if (strlen(trim($title)) < 0)
@@ -71,7 +71,7 @@ if ($action == 'Preview') {
 
 $twig = _twigloader();
 echo $twig->render('newthread.twig', [
-	'post' => (isset($post) ? $post : null),
+	'post' => $post ?? null,
 	'title' => $title,
 	'message' => $message,
 	'topbot' => $topbot,

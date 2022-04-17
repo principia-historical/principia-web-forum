@@ -1,7 +1,7 @@
 <?php
 require('lib/common.php');
 
-$action = (isset($_POST['action']) ? $_POST['action'] : null);
+$action = $_POST['action'] ?? null;
 
 needsLogin();
 
@@ -39,9 +39,9 @@ if ($action == 'Submit') {
 	}
 }
 
-$userto = (isset($_POST['userto']) ? $_POST['userto'] : '');
-$title = (isset($_POST['title']) ? $_POST['title'] : '');
-$quotetext = (isset($_POST['message']) ? $_POST['message'] : '');
+$userto = $_POST['userto'] ?? '';
+$title = $_POST['title'] ?? '';
+$quotetext = $_POST['message'] ?? '';
 
 // Default
 if (!$action) {
@@ -79,7 +79,7 @@ if (!$action) {
 
 $twig = _twigloader();
 echo $twig->render('sendprivate.twig', [
-	'post' => (isset($post) ? $post : null),
+	'post' => $post ?? null,
 	'userto' => $userto,
 	'title' => $title,
 	'quotetext' => $quotetext,

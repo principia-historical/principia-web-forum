@@ -48,7 +48,7 @@ HTML;
 
 	$post['utitle'] = $post['utitle'] . ((strlen($post['utitle']) >= 1) ? '<br>' : '');
 
-	$post['id'] = (isset($post['id']) ? $post['id'] : 0);
+	$post['id'] = $post['id'] ?? 0;
 
 	if ($pthread)
 		$threadlink = sprintf(' - in <a href="thread.php?id=%s">%s</a>', $pthread['id'], esc($pthread['title']));

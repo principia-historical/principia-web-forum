@@ -4,7 +4,7 @@ if (isset($_GET['t'])) redirect("thread.php?id={$_GET['t']}");
 
 require('lib/common.php');
 
-$action = isset($_GET['action']) ? $_GET['action'] : '';
+$action = $_GET['action'] ?? '';
 
 //mark forum read
 if ($log && $action == 'markread') {

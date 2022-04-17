@@ -1,9 +1,9 @@
 <?php
 require('lib/common.php');
 
-$sort = isset($_GET['sort']) ? $_GET['sort'] : 'posts';
-$page = isset($_GET['page']) ? $_GET['page'] : '';
-$orderby = isset($_GET['orderby']) ? $_GET['orderby'] : '';
+$sort = $_GET['sort'] ?? 'posts';
+$page = $_GET['page'] ?? '';
+$orderby = $_GET['orderby'] ?? '';
 
 $ppp = 50;
 if ($page < 1) $page = 1;

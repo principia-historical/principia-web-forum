@@ -3,7 +3,7 @@ require('lib/common.php');
 
 needsLogin();
 
-$action = (isset($_POST['action']) ? $_POST['action'] : null);
+$action = $_POST['action'] ?? null;
 $tid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['tid']) ? $_POST['tid'] : null));
 
 $thread = fetch("SELECT t.*, f.title ftitle, f.private fprivate, f.readonly freadonly
@@ -56,8 +56,8 @@ $topbot = [
 	'title' => "New reply"
 ];
 
-$pid = isset($_GET['pid']) ? (int)$_GET['pid'] : 0;
-$quotetext = isset($_POST['message']) ? $_POST['message'] : '';
+$pid = $_GET['pid'] ?? 0;
+$quotetext = $_POST['message'] ?? '';
 if ($pid) {
 	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, f.private fprivate, p.thread "
 			. "FROM z_posts p "

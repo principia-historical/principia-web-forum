@@ -38,8 +38,8 @@ else
 
 $action = '';
 
-$post_c = isset($_POST['c']) ? $_POST['c'] : '';
-$act = isset($_POST['action']) ? $_POST['action'] : '';
+$post_c = $_POST['c'] ?? '';
+$act = $_POST['action'] ?? '';
 
 if (isset($tid) && $log && $act && (canEditForumThreads(getForumByThread($tid)) ||
 		($userdata['id'] == $threadcreator && $act == "rename" && hasPerm('rename-own-thread') && isset($_POST['title'])))) {
@@ -251,13 +251,13 @@ echo $twig->render('thread.twig', [
 	'thread' => $thread,
 	'posts' => $posts,
 	'topbot' => $topbot,
-	'uid' => (isset($uid) ? $uid : null),
-	'time' => (isset($time) ? $time : null),
+	'uid' => $uid ?? null,
+	'time' => $time ?? null,
 	'modlinks' => $modlinks,
 	'pagelist' => $pagelist,
-	'faccess' => (isset($faccess) ? $faccess : null),
+	'faccess' => $faccess ?? null,
 	'pin' => $pin,
 	'rev' => $rev,
-	'tid' => (isset($tid) ? $tid : null),
+	'tid' => $tid ?? null,
 	'title' => $title
 ]);

@@ -1,9 +1,9 @@
 <?php
 require("lib/common.php");
 
-$query = (isset($_GET['q']) ? $_GET['q'] : '');
-$where = (isset($_GET['w']) ? $_GET['w'] : 0);
-$forum = (isset($_GET['f']) ? $_GET['f'] : 0);
+$query = $_GET['q'] ?? '';
+$where = $_GET['w'] ?? 0;
+$forum = $_GET['f'] ?? 0;
 
 ob_start();
 
@@ -110,7 +110,7 @@ if ($where == 1) {
 		ifEmptyQuery('No posts found.', 1, true);
 	}
 } else {
-	$page = (isset($_GET['page']) ? $_GET['page'] : 1);
+	$page = $_GET['page'] ?? 1;
 	if ($page < 1) $page = 1;
 	$threads = query("SELECT ".userfields('u', 'u').", t.* "
 		."FROM z_threads t "

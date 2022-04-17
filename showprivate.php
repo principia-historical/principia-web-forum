@@ -4,7 +4,7 @@ needsLogin();
 
 $fieldlist = userfields('u', 'u').','.userfields_post();
 
-$pid = (isset($_GET['id']) ? $_GET['id'] : null);
+$pid = $_GET['id'] ?? null;
 
 $pmsgs = fetch("SELECT $fieldlist p.* FROM z_pmsgs p LEFT JOIN users u ON u.id = p.userfrom WHERE p.id = ?", [$pid]);
 if ($pmsgs == null) error("404", "Private message does not exist.");
