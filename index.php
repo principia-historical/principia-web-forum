@@ -32,7 +32,9 @@ $forums = query("SELECT f.*, ".($log ? "r.time rtime, " : '').userfields('u', 'u
 		. "LEFT JOIN users u ON u.id=f.lastuser "
 		. "LEFT JOIN z_categories c ON c.id=f.cat "
 		. ($log ? "LEFT JOIN z_forumsread r ON r.fid = f.id AND r.uid = ".$userdata['id'] : '')
-		. " ORDER BY c.ord,c.id,f.ord,f.id", []);
+		. " WHERE ? >= f.minread "
+		. " ORDER BY c.ord,c.id,f.ord,f.id ",
+		[$userdata['powerlevel']]);
 
 $twig = _twigloader();
 echo $twig->render('index.twig', [

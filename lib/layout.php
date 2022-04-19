@@ -1,39 +1,5 @@
 <?php
 
-/**
- * Renders a table in HTML using $headers for column definition and $data to fill cells with data.
- *
- * @param array $headers An associative array of column definitions:
- *	key				column key
- *	value['name']	Display text for the column header
- *	value['width']	Specify a fixed width size (CSS width:)
- *	value['align']	Align the contents in the column
- *
- * @param array $data An associative array of cell data values:
- *	key				column key (must match the header column key)
- *	value			cell value
- */
-function renderTable($data, $headers) {
-	$zebra = 1;
-
-	echo '<table class="c1"><tr class="h">';
-	foreach ($headers as $headerID => $headerCell) {
-		$width = (isset($headerCell['width']) ? ' style="width:'.$headerCell['width'].'"' : '');
-		echo "<td class=\"b h\" $width>".$headerCell['name']."</td>";
-	}
-	echo "</tr>";
-	foreach ($data as $dataCell) {
-		echo "<tr>";
-		foreach ($dataCell as $id => $value) {
-			$align = (isset($headers[$id]['align']) ? $headers[$id]['align'] : '');
-			echo "<td class=\"b n$zebra $align\">$value</td>";
-		}
-		echo "</tr>";
-		$zebra = ($zebra == 1 ? 2 : 1);
-	}
-	echo "</table>";
-}
-
 function newStatus($type) {
 	$text = match ($type) {
 		'n'  => 'NEW',
@@ -98,23 +64,6 @@ function renderPageBar($pagebar) {
 	}
 }
 
-function fieldrow($title, $input) {
-	return sprintf('<tr><td class="b n1 center">%s:</td><td class="b n2">%s</td>', $title, $input);
-}
-
-function fieldinput($size, $max, $field, $value = null) {
-	global $user;
-	$val = str_replace('"', '&quot;', (isset($value) ? $value : $user[$field]));
-	return sprintf('<input type="text" name="%s" size="%s" maxlength="%s" value="%s">', $field, $size, $max, $val);
-}
-
-function fieldoption($field, $checked, $choices) {
-	$text = '';
-	foreach ($choices as $k => $v)
-		$text .= sprintf('<label><input type="radio" name="%s" value="%s" %s>%s </label>', $field, $k, ($k == $checked ? ' checked' : ''), $v);
-	return $text;
-}
-
 function fieldselect($field, $checked, $choices) {
 	$text = sprintf('<select name="%s">', $field);
 	foreach ($choices as $k => $v)
@@ -148,13 +97,12 @@ function pagelist($total, $limit, $url, $sel = 0, $showall = false) {
 }
 
 function forumlist($currentforum = -1) {
-	$r = query("SELECT c.title ctitle,f.id,f.title,f.cat,f.private FROM z_forums f LEFT JOIN z_categories c ON c.id=f.cat ORDER BY c.ord,c.id,f.ord,f.id");
+	global $userdata;
+	$r = query("SELECT c.title ctitle,f.id,f.title,f.cat FROM z_forums f LEFT JOIN z_categories c ON c.id=f.cat WHERE ? >= f.minread ORDER BY c.ord,c.id,f.ord,f.id",
+		[$userdata['powerlevel']]);
 	$out = '<select id="forumselect">';
 	$c = -1;
 	while ($d = $r->fetch()) {
-		if (!canViewForum($d))
-			continue;
-
 		if ($d['cat'] != $c) {
 			if ($c != -1)
 				$out .= '</optgroup>';

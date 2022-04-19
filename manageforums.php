@@ -1,7 +1,7 @@
 <?php
 require('lib/common.php');
 
-if (!hasPerm('edit-forums')) error('403', 'You have no permissions to do this!');
+if ($userdata['powerlevel'] < 3) error('403', 'You have no permissions to do this!');
 
 $error = '';
 
@@ -38,8 +38,10 @@ if (isset($_POST['savecat'])) {
 	$title = $_POST['title'];
 	$descr = $_POST['descr'];
 	$ord = (int)$_POST['ord'];
-	$private = isset($_POST['private']) ? 1 : 0;
-	$readonly = isset($_POST['readonly']) ? 1 : 0;
+
+	$minread = (int)$_POST['minread'];
+	$minthread = (int)$_POST['minthread'];
+	$minreply = (int)$_POST['minreply'];
 
 	if (!trim($title))
 		$error = 'Please enter a title for the forum.';
@@ -48,31 +50,27 @@ if (isset($_POST['savecat'])) {
 			$fid = result("SELECT MAX(id) FROM z_forums");
 			if (!$fid) $fid = 0;
 			$fid++;
-			query("INSERT INTO z_forums (id,cat,title,descr,ord,private,readonly) VALUES (?,?,?,?,?,?,?)",
-				[$fid, $cat, $title, $descr, $ord, $private, $readonly]);
+			query("INSERT INTO z_forums (id,cat,title,descr,ord) VALUES (?,?,?,?,?,?,?)",
+				[$fid, $cat, $title, $descr, $ord]);
 		} else {
 			$fid = (int)$fid;
 			if (!result("SELECT COUNT(*) FROM z_forums WHERE id=?",[$fid]))
 				redirect('manageforums.php');
-			query("UPDATE z_forums SET cat=?, title=?, descr=?, ord=?, private=?, readonly=? WHERE id=?",
-				[$cat, $title, $descr, $ord, $private, $readonly, $fid]);
+			query("UPDATE z_forums SET cat=?, title=?, descr=?, ord=?, minread=?, minthread=?, minreply=? WHERE id=?",
+				[$cat, $title, $descr, $ord, $minread, $minthread, $minreply, $fid]);
 		}
-		saveperms('forums', $fid);
 		redirect('manageforums.php?fid='.$fid);
 	}
 } else if (isset($_POST['delforum'])) {
 	// delete forum
 	$fid = (int)$_GET['fid'];
 	query("DELETE FROM z_forums WHERE id=?",[$fid]);
-	deleteperms('forums', $fid);
 	redirect('manageforums.php');
 }
 
 if ($error) error("Error", $error);
 
 ob_start();
-
-echo '<style type="text/css">label { white-space: nowrap; } input:disabled { opacity: 0.5; }</style>';
 
 if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 	// category editor
@@ -106,7 +104,10 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 } else if (isset($_GET['fid']) && $fid = $_GET['fid']) {
 	// forum editor
 	if ($fid == 'new') {
-		$forum = ['id' => 0, 'cat' => 1, 'title' => '', 'descr' => '', 'ord' => 0, 'private' => 0, 'readonly' => 0];
+		$forum = [
+			'id' => 0, 'cat' => 1, 'title' => '', 'descr' => '',
+			'ord' => 0,
+			'minread' => -1, 'minthread' => 1, 'minreply' => 1];
 	} else {
 		$fid = (int)$fid;
 		$forum = fetch("SELECT * FROM z_forums WHERE id=?",[$fid]);
@@ -132,12 +133,17 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 			</tr><tr>
 				<td class="b n1 center">Display order:</td>
 				<td class="b n2"><input type="text" name="ord" value="<?=$forum['ord'] ?>" size="4" maxlength="10"></td>
+			</tr>
+			<tr class="h"><td class="b h" colspan="2">Permissions</td></tr>
+			<tr>
+				<td class="b n1 center">Who can view:</td>
+				<td class="b n2"><?=fieldselect('minread', $forum['minread'], $powerlevels) ?></td>
 			</tr><tr>
-				<td class="b n1 center"></td>
-				<td class="b n2">
-					<label><input type="checkbox" name="private" value="1" <?=($forum['private'] ? ' checked':'') ?>> Private forum</label>
-					<label><input type="checkbox" name="readonly" value="1" <?=($forum['readonly'] ? ' checked' : '')?>> Read-only</label>
-				</td>
+				<td class="b n1 center">Who can make threads:</td>
+				<td class="b n2"><?=fieldselect('minthread', $forum['minthread'], $powerlevels) ?></td>
+			</tr><tr>
+				<td class="b n1 center">Who can reply:</td>
+				<td class="b n2"><?=fieldselect('minreply', $forum['minreply'], $powerlevels) ?></td>
 			</tr>
 			<tr class="h"><td class="b h" colspan="2">&nbsp;</td></tr>
 			<tr>
@@ -148,8 +154,7 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 					<button type="button" id="back" onclick="window.location='manageforums.php'">Back</button>
 				</td>
 			</tr>
-		</table><br>
-		<?php permtable('forums', $fid) ?>
+		</table>
 	</form><?php
 } else {
 	// main page -- category/forum listing
@@ -210,122 +215,3 @@ echo $twig->render('_legacy.twig', [
 	'page_title' => 'Forum management',
 	'content' => $content
 ]);
-
-
-function rec_grouplist($parent, $level, $tgroups, $groups) {
-	foreach ($tgroups as $g) {
-		if ($g['inherit_group_id'] != $parent)
-			continue;
-
-		$g['indent'] = $level;
-		$groups[] = $g;
-
-		$groups = rec_grouplist($g['id'], $level+1, $tgroups, $groups);
-	}
-	return $groups;
-}
-function grouplist() {
-	global $usergroups;
-
-	$groups = [];
-	$groups = rec_grouplist(0, 0, $usergroups, $groups);
-
-	return $groups;
-}
-function permtable($bind, $id) {
-	global $rootgroup;
-
-	$qperms = query("SELECT id,title FROM z_perm WHERE permbind_id=?",[$bind]);
-	$perms = [];
-	while ($perm = $qperms->fetch())
-		$perms[$perm['id']] = $perm['title'];
-
-	$groups = grouplist();
-
-	$qpermdata = query("SELECT x.x_id,x.perm_id,x.revoke FROM z_permx x LEFT JOIN z_perm p ON p.id=x.perm_id WHERE x.x_type=? AND p.permbind_id=? AND x.bindvalue=?",
-		['group',$bind,$id]);
-	$permdata = [];
-	while ($perm = $qpermdata->fetch())
-		$permdata[$perm['x_id']][$perm['perm_id']] = !$perm['revoke'];
-
-	echo '<table class="c1"><tr class="h"><td class="b">Group</td><td class="b" colspan="2">Permissions</td></tr>';
-
-	$c = 1;
-	foreach ($groups as $group) {
-		if ($group['id'] == $rootgroup) break;
-
-		$gid = $group['id'];
-		$gtitle = esc($group['title']);
-
-		$pf = $group['visible'] ? '<strong' : '<span';
-		if ($group['nc']) $pf .= ' style="color:#'.esc($group['nc']).'"';
-		$pf .= '>';
-		$sf = $group['visible'] ? '</strong>' : '</span>';
-		$gtitle = "{$pf}{$gtitle}{$sf}";
-
-		$doinherit = false;
-		$inherit = '';
-		if ($group['inherit_group_id']) {
-			$doinherit = !isset($permdata[$gid]) || empty($permdata[$gid]);
-
-			$check = $doinherit ? ' checked="checked"' : '';
-			$inherit = sprintf(
-				'<label><input type="checkbox" name="inherit[%s]" value="1" onclick="toggleAll(\'perm_%s\',!this.checked);"%s> Inherit from parent</label>&nbsp;',
-			$gid, $gid, $check);
-		}
-
-		$permlist = '';
-		foreach ($perms as $pid => $ptitle) {
-			$check = ($doinherit ? ' disabled="disabled"' : ($permdata[$gid][$pid] ? ' checked="checked"' : ''));
-
-			$permlist .= sprintf(
-				'<label><input type="checkbox" name="perm[%s][%s]" value="1" class="perm_%s"%s> %s</label> ',
-			$gid, $pid, $gid, $check, $ptitle);
-		}
-
-		?><tr class="n<?=$c ?>">
-			<td class="b" style="width:200px;"><span style="white-space:nowrap;"><?=str_repeat('&nbsp; &nbsp; ', $group['indent']) . $gtitle ?></span></td>
-			<td class="b" style="width:100px;"><?=$inherit ?></td>
-			<td class="b"><?=$permlist ?></td>
-		</tr><?php
-
-		$c = ($c == 1) ? 2 : 1;
-	}
-
-	?><tr class="n<?=$c ?>">
-		<td class="b"></td>
-		<td class="b" colspan="2">
-			<input type="submit" name="saveforum" value="Save forum">
-		</td>
-	</tr></table><?php
-}
-
-function deleteperms($bind, $id) {
-	query("DELETE x FROM z_permx x LEFT JOIN z_perm p ON p.id=x.perm_id WHERE x.x_type=? AND p.permbind_id=? AND x.bindvalue=?",
-		['group', $bind, $id]);
-}
-
-function saveperms($bind, $id) {
-	global $usergroups;
-
-	$qperms = query("SELECT id FROM z_perm WHERE permbind_id=?",[$bind]);
-	$perms = [];
-	while ($perm = $qperms->fetch())
-		$perms[] = $perm['id'];
-
-	// delete the old perms
-	deleteperms($bind, $id);
-
-	// apply the new perms
-	foreach ($usergroups as $gid => $group) {
-		if (isRootGid($gid)) continue;
-
-		if ($_POST['inherit'][$gid])
-			continue;
-
-		$myperms = $_POST['perm'][$gid];
-		foreach ($perms as $perm)
-			query("INSERT INTO `z_permx` (`x_id`,`x_type`,`perm_id`,`permbind_id`,`bindvalue`,`revoke`)
-				VALUES (?,?,?,?,?,?)", [$gid, 'group', $perm, $bind, $id, $myperms[$perm]?0:1]);
-	}
-}

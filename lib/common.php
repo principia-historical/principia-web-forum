@@ -15,18 +15,6 @@ chdir('forum/');
 foreach (glob("lib/*.php") as $filename)
 	require_once($filename);
 
-preloadGroupData();
-
-$logpermset = [];
-
-if ($log) {
-	loadUserPermset();
-} else {
-	loadGuestPermset();
-
-	$userdata['id'] = 0;
-}
-
 // todo
 $userdata['dateformat'] = "Y-m-d";
 $userdata['timeformat'] = "H:i";

@@ -6,8 +6,6 @@
 {% set category = -1 %}
 
 {% for forum in forums %}
-	{% if can_view_forum(forum) %}
-
 	{% if forum.cat != category %}
 		{% if category != -1 %}
 			</table><br>
@@ -32,7 +30,7 @@
 			{% endif %}
 		</td>
 		<td class="b n2 left">
-			{% if forum.private %}({% endif %}<a href="forum.php?id={{ forum.id }}">{{ forum.title }}</a>{% if forum.private %}){% endif %}
+			{% if forum.minread > 0 %}({% endif %}<a href="forum.php?id={{ forum.id }}">{{ forum.title }}</a>{% if forum.minread > 0 %}){% endif %}
 			<br><span>{{ forum.descr | raw }}</span>
 		</td>
 		<td class="b n1">{{ forum.threads }}</td>
@@ -47,8 +45,6 @@
 			{% endif %}
 		</td>
 	</tr>
-
-	{% endif %}
 {% endfor %}
 </table>
 	{% endblock %}

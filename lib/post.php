@@ -21,7 +21,7 @@ function threadpost($post, $pthread = '') {
 	global $log, $dateformat, $userdata;
 
 	if (isset($post['deleted']) && $post['deleted']) {
-		if (canCreateForumPosts(getForumByThread($post['thread']))) {
+		if ($userdata['powerlevel'] > 1) {
 			$postlinks = sprintf(
 				'<a href="thread.php?pid=%s&pin=%s&rev=%s#%s">Peek</a> &bull; <a href="editpost.php?pid=%s&act=undelete">Undelete</a> &bull; ID: %s',
 			$post['id'], $post['id'], $post['revision'], $post['id'], $post['id'], $post['id']);
@@ -59,25 +59,26 @@ HTML;
 	if (isset($post['revision']) && $post['revision'] >= 2)
 		$revisionstr = " (edited ".date($dateformat, $post['ptdate']).")";
 
-	if (isset($post['thread'])) {
-		if ($userdata['id'] != 0)
-			$postlinks .= " &bull; <a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Quote</a>";
+	if (isset($post['thread']) && $log) {
+		// TODO: check minreply
+		$postlinks .= " &bull; <a href=\"newreply.php?id=$post[thread]&pid=$post[id]\">Quote</a>";
 
 		// "Edit" link for admins or post owners, but not banned users
-		if (canEditPost($post))
+		if ($userdata['powerlevel'] > 2 || $userdata['id'] == $post['uid'])
 			$postlinks .= " &bull; <a href=\"editpost.php?pid=$post[id]\">Edit</a>";
 
-		if (canDeleteForumPosts(getForumByThread($post['thread'])))
-			$postlinks .= ' &bull; <a href=\"editpost.php?pid='.$post['id'].'&act=delete\">Delete</a>';
+		if ($userdata['powerlevel'] > 1)
+			$postlinks .= ' &bull; <a href="editpost.php?pid='.$post['id'].'&act=delete">Delete</a>';
 
-		$postlinks .= " &bull; ID: $post[id]";
-
-		if (isset($post['maxrevision']) && hasPerm('view-post-history') && $post['maxrevision'] > 1) {
+		if (isset($post['maxrevision']) && $userdata['powerlevel'] > 1 && $post['maxrevision'] > 1) {
 			$revisionstr .= " &bull; Revision ";
 			for ($i = 1; $i <= $post['maxrevision']; $i++)
 				$revisionstr .= "<a href=\"thread.php?pid=$post[id]&pin=$post[id]&rev=$i#$post[id]\">$i</a> ";
 		}
 	}
+
+	if (isset($post['thread']))
+		$postlinks .= " &bull; ID: $post[id]";
 
 	$ulink = userlink($post, 'u');
 	$pdate = date($dateformat, $post['date']);
