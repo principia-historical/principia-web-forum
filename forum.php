@@ -10,10 +10,10 @@ $fieldlist = userfields('u1', 'u1').",".userfields('u2', 'u2');
 if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if ($log) {
 		$forum = fetch("SELECT f.*, r.time rtime FROM z_forums f LEFT JOIN z_forumsread r ON (r.fid = f.id AND r.uid = ?) "
-			. "WHERE f.id = ? AND f.id IN " . forumsWithViewPerm(), [$userdata['id'], $fid]);
+			. "WHERE f.id = ? AND ? >= minread", [$userdata['id'], $fid, $userdata['powerlevel']]);
 		if (!$forum['rtime']) $forum['rtime'] = 0;
 	} else
-		$forum = fetch("SELECT * FROM z_forums WHERE id = ? AND id IN " . forumsWithViewPerm(), [$fid]);
+		$forum = fetch("SELECT * FROM z_forums WHERE id = ? AND ? >= minread", [$fid, $userdata['powerlevel']]);
 
 	if (!isset($forum['id'])) error("404", "Forum does not exist.");
 
@@ -34,7 +34,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		'breadcrumb' => [['href' => './', 'title' => 'Main']],
 		'title' => $forum['title']
 	];
-	if (canCreateForumThread($forum))
+	if ($userdata['powerlevel'] >= $forum['minthread'])
 		$topbot['actions'] = [['href' => "newthread.php?id=$fid", 'title' => 'New thread']];
 } elseif (isset($_GET['user']) && $uid = $_GET['user']) {
 	$user = fetch("SELECT name FROM users WHERE id = ?", [$uid]);
@@ -52,14 +52,14 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
 			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.user = ? "
-		. "AND f.id IN " . forumsWithViewPerm() . " "
+		. "AND ? >= minread"
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
-		[$uid]);
+		[$uid, $userdata['powerlevel']]);
 
 	$forum['threads'] = result("SELECT count(*) FROM z_threads t "
 		. "LEFT JOIN z_forums f ON f.id = t.forum "
-		. "WHERE t.user = ? AND f.id IN " . forumsWithViewPerm(), [$uid]);
+		. "WHERE t.user = ? AND ? >= minread", [$uid, $userdata['powerlevel']]);
 
 	$topbot = [
 		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "/user.php?id=$uid", 'title' => $user['name']]],
@@ -79,17 +79,17 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
 			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.lastdate > ? "
-		. " AND f.id IN " . forumsWithViewPerm()
+		. "AND ? >= f.minread"
 		. "ORDER BY t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
-	[$mintime]);
+	[$mintime, $userdata['powerlevel']]);
 
 	$forum['threads'] = result("SELECT count(*) "
 		. "FROM z_threads t "
 		. "LEFT JOIN z_forums f ON f.id=t.forum "
 		. "WHERE t.lastdate > ? "
-		. "AND f.id IN " . forumsWithViewPerm(),
-	[$mintime]);
+		. "AND ? >= f.minread",
+	[$mintime, $userdata['powerlevel']]);
 
 	$topbot = [];
 } else {

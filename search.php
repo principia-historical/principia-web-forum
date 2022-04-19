@@ -96,8 +96,8 @@ if ($where == 1) {
 		."LEFT JOIN z_threads t ON p.thread=t.id "
 		."LEFT JOIN z_forums f ON f.id=t.forum "
 		."WHERE $string AND ISNULL(pt2.id) "
-		."AND f.id IN ".forumsWithViewPerm()
-		."ORDER BY p.id");
+		."AND ? >= f.minread"
+		."ORDER BY p.id", [$userdata['powerlevel']]);
 
 	for ($i = 1; $post = $posts->fetch(); $i++) {
 		$pthread['id'] = $post['tid'];
@@ -116,13 +116,14 @@ if ($where == 1) {
 		."FROM z_threads t "
 		."LEFT JOIN users u ON u.id=t.user "
 		."LEFT JOIN z_forums f ON f.id=t.forum "
-		."WHERE $string AND f.id IN ".forumsWithViewPerm()
+		."WHERE $string AND ? >= f.minread"
 		."ORDER BY t.lastdate DESC "
-		."LIMIT ".(($page-1)*$userdata['tpp']).",".$userdata['tpp']);
+		."LIMIT ".(($page-1)*$userdata['tpp']).",".$userdata['tpp'],
+	[$userdata['powerlevel']]);
 	$threadcount = result("SELECT COUNT(*) "
 		."FROM z_threads t "
 		."LEFT JOIN z_forums f ON f.id=t.forum "
-		."WHERE $string AND f.id IN ".forumsWithViewPerm());
+		."WHERE $string AND ? >= f.minread", [$userdata['powerlevel']]);
 	?><table class="c1">
 		<tr class="c">
 			<td class="b h">Title</td>

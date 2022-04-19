@@ -41,8 +41,8 @@ $action = '';
 $post_c = $_POST['c'] ?? '';
 $act = $_POST['action'] ?? '';
 
-if (isset($tid) && $log && $act && (canEditForumThreads(getForumByThread($tid)) ||
-		($userdata['id'] == $threadcreator && $act == "rename" && hasPerm('rename-own-thread') && isset($_POST['title'])))) {
+if (isset($tid) && $log && $act && ($userdata['powerlevel'] > 2 ||
+		($userdata['id'] == $threadcreator && $act == "rename" && $userdata['powerlevel'] > 0 && isset($_POST['title'])))) {
 
 	if ($act == 'stick')		$action = ',sticky=1';
 	elseif ($act == 'unstick')	$action = ',sticky=0';
@@ -58,7 +58,7 @@ $pin = (isset($_GET['pin']) && is_numeric($_GET['pin']) ? $_GET['pin'] : null);
 $rev = (isset($_GET['rev']) && is_numeric($_GET['rev']) ? $_GET['rev'] : null);
 
 //determine string for revision pinning
-if ($pin && $rev && hasPerm('view-post-history'))
+if ($pin && $rev && $userdata['powerlevel'] > 1)
 	$pinstr = "AND (pt2.id <> $pin OR pt2.revision <> ($rev+1)) ";
 else
 	$pinstr = '';
@@ -75,8 +75,8 @@ if ($viewmode == "thread") {
 	$thread = fetch("SELECT t.*, f.title ftitle, t.forum fid".($log ? ', r.time frtime' : '').' '
 			. "FROM z_threads t LEFT JOIN z_forums f ON f.id=t.forum "
 			. ($log ? "LEFT JOIN z_forumsread r ON (r.fid=f.id AND r.uid=$userdata[id]) " : '')
-			. "WHERE t.id = ? AND t.forum IN ".forumsWithViewPerm(),
-			[$tid]);
+			. "WHERE t.id = ? AND ? >= f.minread",
+			[$tid, $userdata['powerlevel']]);
 
 	if (!isset($thread['id'])) error("404", "Thread does not exist.");
 
@@ -115,16 +115,17 @@ if ($viewmode == "thread") {
 	if ($user == null) error("404", "User doesn't exist.");
 
 	$title = "Posts by " . $user['name'];
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
 		. "FROM z_posts p "
 		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
 		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
 		. "LEFT JOIN users u ON p.user=u.id "
 		. "LEFT JOIN z_threads t ON p.thread=t.id "
 		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. "WHERE p.user=$uid AND ISNULL(pt2.id) "
+		. "WHERE p.user = ? AND ISNULL(pt2.id) "
+		. "AND ? >= f.minread "
 		. "ORDER BY p.id "
-		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp);
+		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$uid, $userdata['powerlevel']]);
 
 	$thread['replies'] = result("SELECT count(*) FROM z_posts p WHERE user = ?", [$uid]) - 1;
 } elseif ($viewmode == "time") {
@@ -132,7 +133,7 @@ if ($viewmode == "thread") {
 
 	$title = 'Latest posts';
 
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, f.private fprivate, t.title ttitle, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
 		. "FROM z_posts p "
 		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
 		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
@@ -140,8 +141,9 @@ if ($viewmode == "thread") {
 		. "LEFT JOIN z_threads t ON p.thread=t.id "
 		. "LEFT JOIN z_forums f ON f.id=t.forum "
 		. "WHERE p.date > ? AND ISNULL(pt2.id) "
+		. "AND ? >= f.minread "
 		. "ORDER BY p.date DESC "
-		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$mintime]);
+		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$mintime, $userdata['powerlevel']]);
 
 	$thread['replies'] = result("SELECT count(*) FROM z_posts WHERE date > ?", [$mintime]) - 1;
 } else
@@ -163,9 +165,9 @@ if ($viewmode == "thread") {
 		'title' => esc($thread['title'])
 	];
 
-	$faccess = fetch("SELECT id,private,readonly FROM z_forums WHERE id = ?",[$thread['forum']]);
-	if (canCreateForumPost($faccess)) {
-		if (hasPerm('override-closed') && $thread['closed'])
+	$faccess = fetch("SELECT id,minreply FROM z_forums WHERE id = ?",[$thread['forum']]);
+	if ($faccess['minreply'] <= $userdata['powerlevel']) {
+		if ($userdata['powerlevel'] > 1 && $thread['closed'])
 			$topbot['actions'] = [['title' => 'Thread closed'],['href' => "newreply.php?id=$tid", 'title' => 'New reply']];
 		else if ($thread['closed'])
 			$topbot['actions'] = [['title' => 'Thread closed']];
@@ -185,9 +187,9 @@ if ($viewmode == "thread") {
 }
 
 $modlinks = '';
-if (isset($tid) && (canEditForumThreads($thread['forum']) || ($userdata['id'] == $thread['user'] && !$thread['closed'] && hasPerm('rename-own-thread')))) {
+if (isset($tid) && ($userdata['powerlevel'] > 2 || ($userdata['id'] == $thread['user'] && !$thread['closed'] && $userdata['powerlevel'] > 0))) {
 	$link = "<a href=javascript:submitmod";
-	if (canEditForumThreads($thread['forum'])) {
+	if ($userdata['powerlevel'] > 2) {
 		$stick = ($thread['sticky'] ? "$link('unstick')>Unstick</a>" : "$link('stick')>Stick</a>");
 		$stick2 = addcslashes($stick, "'");
 

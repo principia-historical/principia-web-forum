@@ -23,7 +23,7 @@ $showdel = isset($_GET['showdel']);
 
 if (isset($_GET['action']) && $_GET['action'] == "del") {
 	$owner = result("SELECT user$fieldn2 FROM z_pmsgs WHERE id = ?", [$id]);
-	if (hasPerm('delete-user-pms') || ($owner == $userdata['id'] && hasPerm('delete-own-pms'))) {
+	if ($userdata['powerlevel'] > 3 || $owner == $userdata['id']) {
 		query("UPDATE z_pmsgs SET del_$fieldn2 = ? WHERE id = ?", [!$showdel, $id]);
 	} else {
 		error("403", "You are not allowed to (un)delete that message.");
@@ -32,7 +32,7 @@ if (isset($_GET['action']) && $_GET['action'] == "del") {
 }
 
 $ptitle = 'Private messages' . ($sent ? ' (sent)' : '');
-if ($id && hasPerm('view-user-pms')) {
+if ($id && $userdata['powerlevel'] > 3) {
 	$user = fetch("SELECT id,name,group_id FROM users WHERE id = ?", [$id]);
 	if ($user == null) error("404", "User doesn't exist.");
 	$headtitle = $user['name']."'s ".strtolower($ptitle);

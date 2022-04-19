@@ -10,7 +10,7 @@ $topbot = [
 	'title' => 'Send'
 ];
 
-if (!hasPerm('create-pms')) error('403', 'You have no permissions to do this!');
+if ($userdata['powerlevel'] < 1) error('403', 'You have no permissions to do this!');
 
 $error = '';
 
@@ -48,7 +48,7 @@ if (!$action) {
 	if (isset($_GET['pid']) && $pid = $_GET['pid']) {
 		$post = fetch("SELECT u.name name, p.title, p.text "
 			."FROM z_pmsgs p LEFT JOIN users u ON p.userfrom = u.id "
-			."WHERE p.id = ?" . (!hasPerm('view-user-pms') ? " AND (p.userfrom=".$userdata['id']." OR p.userto=".$userdata['id'].")" : ''), [$pid]);
+			."WHERE p.id = ?" . ($userdata['powerlevel'] < 4 ? " AND (p.userfrom=".$userdata['id']." OR p.userto=".$userdata['id'].")" : ''), [$pid]);
 		if ($post) {
 			$quotetext = sprintf(
 				'[reply="%s" id="%s"]%s[/reply]'.PHP_EOL.PHP_EOL,

@@ -6,15 +6,15 @@ needsLogin();
 $action = $_POST['action'] ?? null;
 $tid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['tid']) ? $_POST['tid'] : null));
 
-$thread = fetch("SELECT t.*, f.title ftitle, f.private fprivate, f.readonly freadonly
+$thread = fetch("SELECT t.*, f.title ftitle, f.minreply fminreply
 	FROM z_threads t LEFT JOIN z_forums f ON f.id=t.forum
-	WHERE t.id = ? AND t.forum IN " . forumsWithViewPerm(), [$tid]);
+	WHERE t.id = ? AND ? >= f.minread", [$tid, $userdata['powerlevel']]);
 
 if (!$thread) {
 	error("404", "Thread does not exist.");
-} else if (!canCreateForumPost(['id' => $thread['forum'], 'private' => $thread['fprivate'], 'readonly' => $thread['freadonly']])) {
+} else if ($thread['fminreply'] > $userdata['powerlevel']) {
 	error("403", "You have no permissions to create posts in this forum!");
-} elseif ($thread['closed'] && !hasPerm('override-closed')) {
+} elseif ($thread['closed'] && $userdata['powerlevel'] < 2) {
 	error("400", "You can't post in closed threads.");
 }
 
@@ -22,10 +22,10 @@ $error = '';
 
 if ($action == 'Submit') {
 	$lastpost = fetch("SELECT id,user,date FROM z_posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
-	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && !hasPerm('consecutive-posts'))
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400)) // && !hasPerm('consecutive-posts')
 		$error = "You can't double post until it's been at least one day!";
-	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !hasPerm('consecutive-posts'))
-		$error = "You must wait 2 seconds before posting consecutively.";
+	//if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !hasPerm('consecutive-posts'))
+	//	$error = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
 		$error = "Your post is empty! Enter a message and try again.";
 
@@ -59,7 +59,7 @@ $topbot = [
 $pid = $_GET['pid'] ?? 0;
 $quotetext = $_POST['message'] ?? '';
 if ($pid) {
-	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, f.private fprivate, p.thread "
+	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, p.thread "
 			. "FROM z_posts p "
 			. "LEFT JOIN z_poststext pt ON p.id=pt.id "
 			. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) "
@@ -69,7 +69,7 @@ if ($pid) {
 			. "WHERE p.id = ? AND ISNULL(pt2.id)", [$pid]);
 
 	//does the user have reading access to the quoted post?
-	if (!canViewForum(['id' => $post['fid'], 'private' => $post['fprivate']])) {
+	if ($userdata['powerlevel'] >= $post['minread']) {
 		$post['name'] = 'ROllerozxa';
 		$post['text'] = 'uwu';
 	}
