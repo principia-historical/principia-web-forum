@@ -64,14 +64,6 @@ function renderPageBar($pagebar) {
 	}
 }
 
-function fieldselect($field, $checked, $choices) {
-	$text = sprintf('<select name="%s">', $field);
-	foreach ($choices as $k => $v)
-		$text .= sprintf('<option value="%s"%s>%s</option>', $k, ($k == $checked ? ' selected' : ''), $v);
-	$text .= '</select>';
-	return $text;
-}
-
 function pagelist($total, $limit, $url, $sel = 0, $showall = false) {
 	$pagelist = '';
 	$pages = ceil($total / $limit);

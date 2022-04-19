@@ -70,7 +70,7 @@ if (isset($_POST['savecat'])) {
 
 if ($error) error("Error", $error);
 
-ob_start();
+$twig = _twigloader();
 
 if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 	// category editor
@@ -80,27 +80,11 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 		$cid = (int)$cid;
 		$cat = fetch("SELECT * FROM z_categories WHERE id=?",[$cid]);
 	}
-	?><form action="" method="POST">
-		<table class="c1">
-			<tr class="h"><td class="b h" colspan="2"><?=($cid == 'new' ? 'Create' : 'Edit') ?> category</td></tr>
-			<tr>
-				<td class="b n1 center">Title:</td>
-				<td class="b n2"><input type="text" name="title" value="<?=esc($cat['title']) ?>" size="50" maxlength="500"></td>
-			</tr><tr>
-				<td class="b n1 center">Display order:</td>
-				<td class="b n2"><input type="text" name="ord" value="<?=$cat['ord'] ?>" size="4" maxlength="10"></td>
-			</tr>
-			<tr class="h"><td class="b h" colspan="2">&nbsp;</td></tr>
-			<tr>
-				<td class="b n1 center"></td>
-				<td class="b n2">
-					<input type="submit" name="savecat" value="Save category">
-						<?=($cid == 'new' ? '' : '<input type="submit" name="delcat" value="Delete category" onclick="if (!confirm("Really delete this category?")) return false;"> ') ?>
-					<button type="button" id="back" onclick="window.location='manageforums.php';">Back</button>
-				</td>
-			</tr>
-		</table>
-	</form><?php
+
+	echo $twig->render("manageforums_category.twig", [
+		'cid' => $cid,
+		'cat' => $cat
+	]);
 } else if (isset($_GET['fid']) && $fid = $_GET['fid']) {
 	// forum editor
 	if ($fid == 'new') {
@@ -116,46 +100,20 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 	$cats = [];
 	while ($cat = $qcats->fetch())
 		$cats[$cat['id']] = $cat['title'];
-	$catlist = fieldselect('cat', $forum['cat'], $cats);
 
-	?><form action="" method="POST">
-		<table class="c1">
-			<tr class="h"><td class="b h" colspan="2"><?=($fid == 'new' ? 'Create' : 'Edit') ?> forum</td></tr>
-			<tr>
-				<td class="b n1 center">Title:</td>
-				<td class="b n2"><input type="text" name="title" value="<?=esc($forum['title']) ?>" size="50" maxlength="500"></td>
-			</tr><tr>
-				<td class="b n1 center">Description:<br><small>HTML allowed.</small></td>
-				<td class="b n2"><textarea wrap="virtual" name="descr" rows="3" cols="50"><?=esc($forum['descr']) ?></textarea></td>
-			</tr><tr>
-				<td class="b n1 center">Category:</td>
-				<td class="b n2"><?=$catlist ?></td>
-			</tr><tr>
-				<td class="b n1 center">Display order:</td>
-				<td class="b n2"><input type="text" name="ord" value="<?=$forum['ord'] ?>" size="4" maxlength="10"></td>
-			</tr>
-			<tr class="h"><td class="b h" colspan="2">Permissions</td></tr>
-			<tr>
-				<td class="b n1 center">Who can view:</td>
-				<td class="b n2"><?=fieldselect('minread', $forum['minread'], $powerlevels) ?></td>
-			</tr><tr>
-				<td class="b n1 center">Who can make threads:</td>
-				<td class="b n2"><?=fieldselect('minthread', $forum['minthread'], $powerlevels) ?></td>
-			</tr><tr>
-				<td class="b n1 center">Who can reply:</td>
-				<td class="b n2"><?=fieldselect('minreply', $forum['minreply'], $powerlevels) ?></td>
-			</tr>
-			<tr class="h"><td class="b h" colspan="2">&nbsp;</td></tr>
-			<tr>
-				<td class="b n1 center"></td>
-				<td class="b n2">
-					<input type="submit" name="saveforum" value="Save forum">
-					<?=($fid == 'new' ? '' : '<input type="submit" name="delforum" value="Delete forum" onclick="if (!confirm("Really delete this forum?")) return false;">') ?>
-					<button type="button" id="back" onclick="window.location='manageforums.php'">Back</button>
-				</td>
-			</tr>
-		</table>
-	</form><?php
+	$perms = [
+		'minread' => 'Who can view',
+		'minthread' => 'Who can make threads',
+		'minreply' => 'Who can reply'
+	];
+
+	echo $twig->render("manageforums_forum.twig", [
+		'fid' => $fid,
+		'forum' => $forum,
+		'cats' => $cats,
+		'powerlevels' => $powerlevels,
+		'perms' => $perms
+	]);
 } else {
 	// main page -- category/forum listing
 
@@ -185,33 +143,8 @@ if (isset($_GET['cid']) && $cid = $_GET['cid']) {
 		$c = ($c == 1) ? 2 : 1;
 	}
 
-	?><table class="fullwidth">
-		<tr>
-			<td class="nb" style="width:50%; vertical-align:top;">
-				<table class="c1">
-					<tr class="h"><td class="b">Categories</td></tr>
-					<?=$catlist ?>
-					<tr class="h"><td class="b">&nbsp;</td></tr>
-					<tr><td class="b n1"><a href="manageforums.php?cid=new">New category</a></td></tr>
-				</table>
-			</td>
-			<td class="nb" style="width:50%; vertical-align:top;">
-				<table class="c1">
-					<tr class="h"><td class="b">Forums</td></tr>
-					<?=$forumlist ?>
-					<tr class="h"><td class="b">&nbsp;</td></tr>
-					<tr><td class="b n1"><a href="manageforums.php?fid=new">New forum</a></td></tr>
-				</table>
-			</td>
-		</tr>
-	</table><?php
+	echo $twig->render("manageforums.twig", [
+		'catlist' => $catlist,
+		'forumlist' => $forumlist
+	]);
 }
-
-$content = ob_get_contents();
-ob_end_clean();
-
-$twig = _twigloader();
-echo $twig->render('_legacy.twig', [
-	'page_title' => 'Forum management',
-	'content' => $content
-]);
