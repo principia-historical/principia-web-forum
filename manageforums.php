@@ -50,8 +50,8 @@ if (isset($_POST['savecat'])) {
 			$fid = result("SELECT MAX(id) FROM z_forums");
 			if (!$fid) $fid = 0;
 			$fid++;
-			query("INSERT INTO z_forums (id,cat,title,descr,ord) VALUES (?,?,?,?,?,?,?)",
-				[$fid, $cat, $title, $descr, $ord]);
+			query("INSERT INTO z_forums (id,cat,title,descr,ord,minread,minthread,minreply) VALUES (?,?,?,?,?,?,?,?)",
+				[$fid, $cat, $title, $descr, $ord, $minread, $minthread, $minreply]);
 		} else {
 			$fid = (int)$fid;
 			if (!result("SELECT COUNT(*) FROM z_forums WHERE id=?",[$fid]))
