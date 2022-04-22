@@ -52,7 +52,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
 			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.user = ? "
-		. "AND ? >= minread"
+		. "AND ? >= minread "
 		. "ORDER BY t.sticky DESC, t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 		[$uid, $userdata['powerlevel']]);
@@ -79,7 +79,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
 			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
 		. "WHERE t.lastdate > ? "
-		. "AND ? >= f.minread"
+		. "AND ? >= f.minread "
 		. "ORDER BY t.lastdate DESC "
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 	[$mintime, $userdata['powerlevel']]);
