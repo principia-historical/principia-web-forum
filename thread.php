@@ -187,7 +187,7 @@ if ($viewmode == "thread") {
 }
 
 $modlinks = '';
-if (isset($tid) && ($userdata['powerlevel'] > 2 || ($userdata['id'] == $thread['user'] && !$thread['closed'] && $userdata['powerlevel'] > 0))) {
+if ($log && isset($tid) && ($userdata['powerlevel'] > 2 || ($userdata['id'] == $thread['user'] && !$thread['closed'] && $userdata['powerlevel'] > 0))) {
 	$link = "<a href=javascript:submitmod";
 	if ($userdata['powerlevel'] > 2) {
 		$stick = ($thread['sticky'] ? "$link('unstick')>Unstick</a>" : "$link('stick')>Stick</a>");
