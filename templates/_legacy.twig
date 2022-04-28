@@ -1,6 +1,6 @@
 {% extends "_layout.twig" %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% set title = page_title %}
 
 	{% block content %}
 {{ content | raw }}
