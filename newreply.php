@@ -22,12 +22,14 @@ $error = '';
 
 if ($action == 'Submit') {
 	$lastpost = fetch("SELECT id,user,date FROM z_posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
-	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400)) // && !hasPerm('consecutive-posts')
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && $userdata['powerlevel'] < 4) // && !hasPerm('consecutive-posts')
 		$error = "You can't double post until it's been at least one day!";
 	//if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !hasPerm('consecutive-posts'))
 	//	$error = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
 		$error = "Your post is empty! Enter a message and try again.";
+	if (strlen(trim($_POST['message'])) < 35)
+		$error = "Your post is too short to be meaningful. Please try to write something longer.";
 
 	if (!$error) {
 		query("UPDATE users SET posts = posts + 1, lastpost = ? WHERE id = ?", [time(), $userdata['id']]);
