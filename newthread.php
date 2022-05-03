@@ -72,7 +72,7 @@ if ($action == 'Preview') {
 $twig = _twigloader();
 echo $twig->render('newthread.twig', [
 	'post' => $post ?? null,
-	'title' => $title,
+	'threadtitle' => $title,
 	'message' => $message,
 	'topbot' => $topbot,
 	'action' => $action,
