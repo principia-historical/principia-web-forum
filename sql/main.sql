@@ -65,7 +65,8 @@ CREATE TABLE `z_posts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user` int(10) unsigned NOT NULL DEFAULT 0,
   `thread` int(10) unsigned NOT NULL DEFAULT 0,
-  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `date` int(10) unsigned NOT NULL DEFAULT 0,
+  `revision` int(10) unsigned NOT NULL DEFAULT 1,
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `threadid` (`thread`)
