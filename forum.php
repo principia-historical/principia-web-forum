@@ -84,12 +84,10 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 	[$mintime, $userdata['powerlevel']]);
 
-	$forum['threads'] = result("SELECT COUNT(*) "
-		. "FROM z_threads t "
-		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. "WHERE t.lastdate > ? "
-		. "AND ? >= f.minread",
-	[$mintime, $userdata['powerlevel']]);
+	$forum['threads'] = result("SELECT COUNT(*) FROM z_threads t
+			LEFT JOIN z_forums f ON f.id=t.forum
+			WHERE t.lastdate > ? AND ? >= f.minread",
+		[$mintime, $userdata['powerlevel']]);
 
 	$topbot = [];
 } else {
