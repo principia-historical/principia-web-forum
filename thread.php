@@ -54,14 +54,7 @@ if (isset($tid) && $log && $act && ($userdata['powerlevel'] > 2 ||
 	else						error("400", "Unknown action.");
 }
 
-$pin = (isset($_GET['pin']) && is_numeric($_GET['pin']) ? $_GET['pin'] : null);
-$rev = (isset($_GET['rev']) && is_numeric($_GET['rev']) ? $_GET['rev'] : null);
-
-//determine string for revision pinning
-if ($pin && $rev && $userdata['powerlevel'] > 1)
-	$pinstr = "AND (pt2.id <> $pin OR pt2.revision <> ($rev+1)) ";
-else
-	$pinstr = '';
+$offset = (($page - 1) * $ppp);
 
 if ($viewmode == "thread") {
 	if (!$tid) $tid = 0;
@@ -96,31 +89,31 @@ if ($viewmode == "thread") {
 			query("REPLACE INTO z_forumsread VALUES (?,?,?)", [$userdata['id'], $thread['fid'], time()]);
 	}
 
-	//select top revision
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.forum tforum "
-		. "FROM z_posts p "
-		. "LEFT JOIN z_threads t ON t.id = p.thread "
-		. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
-		. "LEFT JOIN users u ON p.user = u.id "
-		. "WHERE p.thread = ? "
-		. "GROUP BY p.id ORDER BY p.id "
-		. "LIMIT ".(($page - 1) * $ppp).",$ppp",
-		[$tid]);
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.forum tforum
+			FROM z_posts p
+			LEFT JOIN z_threads t ON t.id = p.thread
+			LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision
+			LEFT JOIN users u ON p.user = u.id
+			WHERE p.thread = ?
+			GROUP BY p.id ORDER BY p.id
+			LIMIT ?,?",
+		[$tid, $offset, $ppp]);
+
 } elseif ($viewmode == "user") {
 	$user = fetch("SELECT * FROM users WHERE id = ?", [$uid]);
 
 	if ($user == null) error("404", "User doesn't exist.");
 
 	$title = "Posts by " . $user['name'];
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
-		. "FROM z_posts p "
-		. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
-		. "LEFT JOIN users u ON p.user=u.id "
-		. "LEFT JOIN z_threads t ON p.thread=t.id "
-		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. "WHERE p.user = ? AND ? >= f.minread "
-		. "ORDER BY p.id "
-		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$uid, $userdata['powerlevel']]);
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum
+			FROM z_posts p
+			LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision
+			LEFT JOIN users u ON p.user = u.id
+			LEFT JOIN z_threads t ON p.thread = t.id
+			LEFT JOIN z_forums f ON f.id = t.forum
+			WHERE p.user = ? AND ? >= f.minread
+			ORDER BY p.id LIMIT ?,?",
+		[$uid, $userdata['powerlevel'], $offset, $ppp]);
 
 	$thread['replies'] = result("SELECT count(*) FROM z_posts p WHERE user = ?", [$uid]) - 1;
 } elseif ($viewmode == "time") {
@@ -128,15 +121,16 @@ if ($viewmode == "thread") {
 
 	$title = 'Latest posts';
 
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
-		. "FROM z_posts p "
-		. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
-		. "LEFT JOIN users u ON p.user=u.id "
-		. "LEFT JOIN z_threads t ON p.thread=t.id "
-		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. "WHERE p.date > ? AND ? >= f.minread "
-		. "ORDER BY p.date DESC "
-		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$mintime, $userdata['powerlevel']]);
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum
+			FROM z_posts p
+			LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision
+			LEFT JOIN users u ON p.user=u.id
+			LEFT JOIN z_threads t ON p.thread=t.id
+			LEFT JOIN z_forums f ON f.id=t.forum
+			WHERE p.date > ? AND ? >= f.minread
+			ORDER BY p.date DESC
+			LIMIT ?,?",
+		[$mintime, $userdata['powerlevel'], $offset, $ppp]);
 
 	$thread['replies'] = result("SELECT count(*) FROM z_posts WHERE date > ?", [$mintime]) - 1;
 } else
@@ -251,8 +245,7 @@ echo $twig->render('thread.twig', [
 	'modlinks' => $modlinks,
 	'pagelist' => $pagelist,
 	'faccess' => $faccess ?? null,
-	'pin' => $pin,
-	'rev' => $rev,
+	'pin' => $_GET['pin'] ?? null,
 	'tid' => $tid ?? null,
 	'title' => $title
 ]);

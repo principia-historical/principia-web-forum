@@ -22,14 +22,6 @@
 		{% set pthread = {id: post.tid, title: post.ttitle} %}
 	{% endif %}
 
-	{#
-	if (!$pin || $post['id'] != $pin) {
-		$post['maxrevision'] = $post['revision']; // not pinned, hence the max. revision equals the revision we selected
-	} else {
-		$post['maxrevision'] = result("SELECT MAX(revision) FROM z_poststext WHERE id = ?", [$pin]);
-	}
-	#}
-
 	{% if thread.forum and userdata.powerlevel > 1 and pin and post.id == pin %}
 		{% set post = post|merge({'deleted': false}) %}
 	{% endif %}
