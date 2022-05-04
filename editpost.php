@@ -41,9 +41,12 @@ if ($action == 'Submit') {
 		error("400", "No changes detected.");
 	}
 
-	$rev = result("SELECT MAX(revision) FROM z_poststext WHERE id = ?", [$pid]) + 1;
+	$newrev = $sql->result("SELECT revision FROM z_posts WHERE id = ?", [$pid]) + 1;
 
-	query("INSERT INTO z_poststext (id,text,revision,date) VALUES (?,?,?,?)", [$pid,$_POST['message'],$rev,time()]);
+	query("UPDATE z_posts SET revision = ? WHERE id = ?", [$newrev, $id]);
+
+	query("INSERT INTO z_poststext (id,text,revision,date) VALUES (?,?,?,?)",
+		[$pid, $_POST['message'], $newrev, time()]);
 
 	redirect("thread.php?pid=$pid#edit");
 } else if ($action == 'delete' || $action == 'undelete') {

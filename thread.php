@@ -66,10 +66,8 @@ else
 if ($viewmode == "thread") {
 	if (!$tid) $tid = 0;
 
-	if ($act == 'rename')
-		$params = [$_POST['title'], $tid];
-	else
-		$params = [$tid];
+	$params = ($act == 'rename' ? [$_POST['title'], $tid] : [$tid]);
+
 	query("UPDATE z_threads SET views = views + 1 $action WHERE id = ?", $params);
 
 	$thread = fetch("SELECT t.*, f.title ftitle, t.forum fid".($log ? ', r.time frtime' : '').' '
@@ -99,13 +97,12 @@ if ($viewmode == "thread") {
 	}
 
 	//select top revision
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.forum tforum "
 		. "FROM z_posts p "
 		. "LEFT JOIN z_threads t ON t.id = p.thread "
-		. "LEFT JOIN z_poststext pt ON p.id = pt.id "
-		. "LEFT JOIN z_poststext pt2 ON pt2.id = pt.id AND pt2.revision = (pt.revision + 1) $pinstr " //SQL barrel roll
+		. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
 		. "LEFT JOIN users u ON p.user = u.id "
-		. "WHERE p.thread = ? AND ISNULL(pt2.id) "
+		. "WHERE p.thread = ? "
 		. "GROUP BY p.id ORDER BY p.id "
 		. "LIMIT ".(($page - 1) * $ppp).",$ppp",
 		[$tid]);
@@ -115,15 +112,13 @@ if ($viewmode == "thread") {
 	if ($user == null) error("404", "User doesn't exist.");
 
 	$title = "Posts by " . $user['name'];
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
 		. "FROM z_posts p "
-		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
-		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
+		. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
 		. "LEFT JOIN users u ON p.user=u.id "
 		. "LEFT JOIN z_threads t ON p.thread=t.id "
 		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. "WHERE p.user = ? AND ISNULL(pt2.id) "
-		. "AND ? >= f.minread "
+		. "WHERE p.user = ? AND ? >= f.minread "
 		. "ORDER BY p.id "
 		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$uid, $userdata['powerlevel']]);
 
@@ -133,15 +128,13 @@ if ($viewmode == "thread") {
 
 	$title = 'Latest posts';
 
-	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
+	$posts = query("SELECT $fieldlist p.*, pt.text, pt.date ptdate, pt.revision cur_revision, t.id tid, f.id fid, t.title ttitle, t.forum tforum "
 		. "FROM z_posts p "
-		. "LEFT JOIN z_poststext pt ON p.id=pt.id "
-		. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) $pinstr "
+		. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
 		. "LEFT JOIN users u ON p.user=u.id "
 		. "LEFT JOIN z_threads t ON p.thread=t.id "
 		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. "WHERE p.date > ? AND ISNULL(pt2.id) "
-		. "AND ? >= f.minread "
+		. "WHERE p.date > ? AND ? >= f.minread "
 		. "ORDER BY p.date DESC "
 		. "LIMIT " . (($page - 1) * $ppp) . "," . $ppp, [$mintime, $userdata['powerlevel']]);
 
