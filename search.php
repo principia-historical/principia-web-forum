@@ -1,9 +1,10 @@
 <?php
 require("lib/common.php");
 
+needsLogin();
+
 $query = $_GET['q'] ?? '';
 $where = $_GET['w'] ?? 0;
-$forum = $_GET['f'] ?? 0;
 
 ob_start();
 
@@ -83,8 +84,6 @@ foreach ($wordor as $num => $word) {
 	}
 }
 $string = trim(substr($string, strlen($defbool)));
-if ($forum)
-	$string .= " AND f.id='$forum' ";
 
 if ($where == 1) {
 	$fieldlist = userfields_post();
@@ -148,7 +147,7 @@ if ($where == 1) {
 	}
 
 	$query = urlencode($query);
-	$fpagelist = pagelist($threadcount, $userdata['tpp'], "search.php?q=$query&action=Search&w=0&f=$forum", $page);
+	$fpagelist = pagelist($threadcount, $userdata['tpp'], "search.php?q=$query&action=Search&w=0", $page);
 	?></table><?php echo $fpagelist;
 }
 

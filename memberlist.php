@@ -14,7 +14,7 @@ $order = 'posts' . $sortby;
 if ($sort == 'name') $order = 'name' . $sortby;
 if ($sort == 'reg') $order = 'joined' . $sortby;
 
-$users = query("SELECT * FROM users ORDER BY $order LIMIT " . ($page - 1) * $ppp . ",$ppp");
+$users = query("SELECT * FROM users ORDER BY $order LIMIT ?,?", [($page - 1) * $ppp, $ppp]);
 $num = result("SELECT COUNT(*) FROM users");
 
 $pagelist = '';
