@@ -63,15 +63,14 @@ $quotetext = $_POST['message'] ?? '';
 if ($pid) {
 	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, p.thread, f.minread "
 			. "FROM z_posts p "
-			. "LEFT JOIN z_poststext pt ON p.id=pt.id "
-			. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) "
+			. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
 			. "LEFT JOIN users u ON p.user=u.id "
 			. "LEFT JOIN z_threads t ON t.id=p.thread "
 			. "LEFT JOIN z_forums f ON f.id=t.forum "
-			. "WHERE p.id = ? AND ISNULL(pt2.id)", [$pid]);
+			. "WHERE p.id = ?", [$pid]);
 
 	//does the user have reading access to the quoted post?
-	if ($userdata['powerlevel'] >= $post['minread']) {
+	if ($userdata['powerlevel'] < $post['minread']) {
 		$post['name'] = 'ROllerozxa';
 		$post['text'] = 'uwu';
 	}

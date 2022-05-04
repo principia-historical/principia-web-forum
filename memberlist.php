@@ -5,7 +5,7 @@ $sort = $_GET['sort'] ?? 'posts';
 $page = $_GET['page'] ?? '';
 $orderby = $_GET['orderby'] ?? '';
 
-$ppp = 50;
+$ppp = 30;
 if ($page < 1) $page = 1;
 
 $sortby = ($orderby == 'a' ? " ASC" : " DESC");

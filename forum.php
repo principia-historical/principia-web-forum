@@ -57,7 +57,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 		[$uid, $userdata['powerlevel']]);
 
-	$forum['threads'] = result("SELECT count(*) FROM z_threads t "
+	$forum['threads'] = result("SELECT COUNT(*) FROM z_threads t "
 		. "LEFT JOIN z_forums f ON f.id = t.forum "
 		. "WHERE t.user = ? AND ? >= minread", [$uid, $userdata['powerlevel']]);
 
@@ -84,7 +84,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
 	[$mintime, $userdata['powerlevel']]);
 
-	$forum['threads'] = result("SELECT count(*) "
+	$forum['threads'] = result("SELECT COUNT(*) "
 		. "FROM z_threads t "
 		. "LEFT JOIN z_forums f ON f.id=t.forum "
 		. "WHERE t.lastdate > ? "
@@ -96,7 +96,7 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	error("404", "Forum does not exist.");
 }
 
-$showforum = (isset($time) ? $time : $uid);
+$showforum = $time ?? $uid;
 
 if ($forum['threads'] <= $userdata['tpp']) {
 	$fpagelist = '';
@@ -115,5 +115,5 @@ echo $twig->render('forum.twig', [
 	'showforum' => $showforum,
 	'topbot' => $topbot,
 	'fpagelist' => $fpagelist,
-	'time' => (isset($time) ? $time : null)
+	'time' => $time ?? null
 ]);

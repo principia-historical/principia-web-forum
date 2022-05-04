@@ -30,8 +30,7 @@ if ($thread['closed'] && $userdata['powerlevel'] <= 1) {
 	error("404", "Invalid post ID.");
 }
 
-$post = fetch("SELECT u.id, p.user, pt.text FROM z_posts p LEFT JOIN z_poststext pt ON p.id=pt.id "
-		."JOIN (SELECT id,MAX(revision) toprev FROM z_poststext GROUP BY id) as pt2 ON pt2.id = pt.id AND pt2.toprev = pt.revision "
+$post = fetch("SELECT u.id, p.user, pt.text FROM z_posts p LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
 		."LEFT JOIN users u ON p.user = u.id WHERE p.id = ?", [$pid]);
 
 if (!isset($post)) $err = "Post doesn't exist.";

@@ -23,8 +23,8 @@ function threadpost($post, $pthread = '') {
 	if (isset($post['deleted']) && $post['deleted']) {
 		if ($userdata['powerlevel'] > 1) {
 			$postlinks = sprintf(
-				'<a href="thread.php?pid=%s&pin=%s&rev=%s#%s">Peek</a> &bull; <a href="editpost.php?pid=%s&act=undelete">Undelete</a> &bull; ID: %s',
-			$post['id'], $post['id'], $post['revision'], $post['id'], $post['id'], $post['id']);
+				'<a href="thread.php?pid=%s&pin=%s#%s">Peek</a> &bull; <a href="editpost.php?pid=%s&act=undelete">Undelete</a> &bull; ID: %s',
+			$post['id'], $post['id'], $post['id'], $post['id'], $post['id']);
 		} else {
 			$postlinks = 'ID: '.$post['id'];
 		}
