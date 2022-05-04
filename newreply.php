@@ -61,7 +61,7 @@ $topbot = [
 $pid = $_GET['pid'] ?? 0;
 $quotetext = $_POST['message'] ?? '';
 if ($pid) {
-	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, p.thread "
+	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, p.thread, f.minread "
 			. "FROM z_posts p "
 			. "LEFT JOIN z_poststext pt ON p.id=pt.id "
 			. "LEFT JOIN z_poststext pt2 ON pt2.id=pt.id AND pt2.revision=(pt.revision+1) "
