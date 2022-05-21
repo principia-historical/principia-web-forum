@@ -68,7 +68,7 @@
 			<td class="b">{{ thread.replies }}</td>
 			<td class="b">{{ thread.views }}</td>
 			<td class="b">
-				<nobr>{{ thread.lastdate | date(forum_dateformat) }}</nobr><br>
+				<nobr>{{ thread.lastdate | date('Y-m-d H:i') }}</nobr><br>
 				<span>by {{ userlink(thread, 'u2') }} <a href="thread.php?pid={{ thread.lastid }}#{{ thread.lastid }}">&raquo;</a></span>
 			</td>
 		</tr>

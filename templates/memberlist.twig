@@ -34,7 +34,7 @@
 			{% endif %}
 		</td>
 		<td class="b">{{ userlink(user) }}</td>
-		<td class="b center">{{ user.joined | date(forum_dateformat) }}</td>
+		<td class="b center">{{ user.joined | date('Y-m-d H:i') }}</td>
 		<td class="b center">{{ user.posts }}</td>
 	</tr>
 	{% endfor %}

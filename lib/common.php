@@ -15,9 +15,6 @@ chdir('forum/');
 foreach (glob("lib/*.php") as $filename)
 	require_once($filename);
 
-// todo
-$userdata['dateformat'] = "Y-m-d";
-$userdata['timeformat'] = "H:i";
-$userdata['ppp'] = 20;
-$userdata['tpp'] = 20;
-$dateformat = $userdata['dateformat'].' '.$userdata['timeformat'];
+// pages/threads per page
+$ppp = 20;
+$tpp = 20;

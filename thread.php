@@ -1,12 +1,9 @@
 <?php
 require('lib/common.php');
 
-$page = isset($_REQUEST['page']) ? (int)$_REQUEST['page'] : 1;
-if ($page < 0) error("404", "Invalid page number");
+$page = (int)($_REQUEST['page'] ?? 1);
 
 $fieldlist = userfields('u', 'u') . ',' . userfields_post();
-
-$ppp = $userdata['ppp'];
 
 if (isset($_REQUEST['id'])) {
 	$tid = (int)$_REQUEST['id'];
@@ -17,9 +14,7 @@ if (isset($_REQUEST['id'])) {
 } elseif (isset($_GET['time'])) {
 	$time = (int)$_GET['time'];
 	$viewmode = "time";
-}
-// "link" support (i.e., thread.php?pid=999whatever)
-elseif (isset($_GET['pid'])) {
+} elseif (isset($_GET['pid'])) { // "link" support (i.e., thread.php?pid=999whatever)
 	$pid = (int)$_GET['pid'];
 	$numpid = fetch("SELECT t.id tid FROM z_posts p LEFT JOIN z_threads t ON p.thread = t.id WHERE p.id = ?", [$pid]);
 	if (!$numpid) error("404", "Thread post does not exist.");
@@ -38,7 +33,6 @@ else
 
 $action = '';
 
-$post_c = $_POST['c'] ?? '';
 $act = $_POST['action'] ?? '';
 
 if (isset($tid) && $log && $act && ($userdata['powerlevel'] > 2 ||
@@ -51,7 +45,6 @@ if (isset($tid) && $log && $act && ($userdata['powerlevel'] > 2 ||
 	elseif ($act == 'trash')	editThread($tid, '', $trashid, 1);
 	elseif ($act == 'rename')	$action = ",title=?";
 	elseif ($act == 'move')		editThread($tid, '', $_POST['arg']);
-	else						error("400", "Unknown action.");
 }
 
 $offset = (($page - 1) * $ppp);
@@ -136,14 +129,13 @@ if ($viewmode == "thread") {
 } else
 	$title = '';
 
-if ($thread['replies'] <= $ppp) {
-	$pagelist = '';
-} else {
+$pagelist = '';
+if ($thread['replies']+1 > $ppp) {
 	$furl = "thread.php?";
 	if ($viewmode == "thread")	$furl .= "id=$tid";
 	if ($viewmode == "user")	$furl .= "user=$uid";
 	if ($viewmode == "time")	$furl .= "time=$time";
-	$pagelist = '<br>'.pagelist($thread['replies'], $ppp, $furl, $page, true);
+	$pagelist = '<br>'.pagelist($thread['replies']+1, $ppp, $furl, $page, true);
 }
 
 if ($viewmode == "thread") {

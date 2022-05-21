@@ -77,7 +77,7 @@ if ($where == 1) {
 			LEFT JOIN z_forums f ON f.id = t.forum
 			WHERE t.title LIKE CONCAT('%', ?, '%') AND ? >= f.minread
 			ORDER BY t.lastdate DESC LIMIT ?,?",
-		[$query, $userdata['powerlevel'], ($page - 1) * $userdata['tpp'], $userdata['tpp']]);
+		[$query, $userdata['powerlevel'], ($page - 1) * $tpp, $tpp]);
 
 	$threadcount = result("SELECT COUNT(*) FROM z_threads t
 			LEFT JOIN z_forums f ON f.id=t.forum
@@ -99,14 +99,14 @@ if ($where == 1) {
 				<a href="thread.php?id=<?=$thread['id'] ?>"><?=esc($thread['title']) ?></a> <?=($thread['sticky'] ? ' (Sticky)' : '')?>
 			</td>
 			<td class="b"><?=userlink($thread,'u') ?></td>
-			<td class="b"><?=date($dateformat,$thread['lastdate']) ?></td>
+			<td class="b"><?=date('Y-m-d H:i',$thread['lastdate']) ?></td>
 		</tr><?php
 	}
 	if ($i == 1)
 		ifEmptyQuery("No threads found.", 6);
 
 	$query = urlencode($query);
-	echo '</table>'.pagelist($threadcount, $userdata['tpp'], "search.php?q=$query&action=Search&w=0", $page);
+	echo '</table>'.pagelist($threadcount, $tpp, "search.php?q=$query&action=Search&w=0", $page);
 }
 
 $content = ob_get_contents();

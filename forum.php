@@ -1,17 +1,30 @@
 <?php
 require('lib/common.php');
 
-$page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
-$fid = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$uid = isset($_GET['user']) ? (int)$_GET['user'] : 0;
+$page = (int)($_GET['page'] ?? 1);
+$fid = (int)($_GET['id'] ?? 0);
+$uid = (int)($_GET['user'] ?? 0);
 
-$fieldlist = userfields('u1', 'u1').",".userfields('u2', 'u2');
+$topbot = [];
 
+$offset = (($page - 1) * $tpp);
+$isread = $threadsread = '';
+
+if ($log) {
+	$isread = ($log ? ', (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread ' : '');
+	$threadsread = ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
+		."LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '');
+}
+
+$ufields = userfields('u1', 'u1') . "," . userfields('u2', 'u2') . ",";
 if (isset($_GET['id']) && $fid = $_GET['id']) {
 	if ($log) {
 		$forum = fetch("SELECT f.*, r.time rtime FROM z_forums f LEFT JOIN z_forumsread r ON (r.fid = f.id AND r.uid = ?) "
 			. "WHERE f.id = ? AND ? >= minread", [$userdata['id'], $fid, $userdata['powerlevel']]);
 		if (!$forum['rtime']) $forum['rtime'] = 0;
+
+		$isread = ", (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<'$forum[rtime]') isread";
+		$threadsread = "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id])";
 	} else
 		$forum = fetch("SELECT * FROM z_forums WHERE id = ? AND ? >= minread", [$fid, $userdata['powerlevel']]);
 
@@ -19,16 +32,14 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	$title = $forum['title'];
 
-	$threads = query("SELECT $fieldlist, t.*"
-		. ($log ? ", (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<'$forum[rtime]') isread" : '') . ' '
-		. "FROM z_threads t "
-		. "LEFT JOIN users u1 ON u1.id=t.user "
-		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
-		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id])" : '')
-		. "WHERE t.forum = ? "
-		. "ORDER BY t.sticky DESC, t.lastdate DESC "
-		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
-		[$fid]);
+	$threads = query("SELECT $ufields t.* $isread FROM z_threads t
+			LEFT JOIN users u1 ON u1.id = t.user
+			LEFT JOIN users u2 ON u2.id = t.lastuser
+			$threadsread
+			WHERE t.forum = ?
+			ORDER BY t.sticky DESC, t.lastdate DESC
+			LIMIT ?,?",
+		[$fid, $offset, $tpp]);
 
 	$topbot = [
 		'breadcrumb' => [['href' => './', 'title' => 'Main']],
@@ -36,30 +47,29 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 	];
 	if ($userdata['powerlevel'] >= $forum['minthread'])
 		$topbot['actions'] = [['href' => "newthread.php?id=$fid", 'title' => 'New thread']];
+
 } elseif (isset($_GET['user']) && $uid = $_GET['user']) {
 	$user = fetch("SELECT name FROM users WHERE id = ?", [$uid]);
 
 	if (!$user) error("404", "User does not exist.");
 
-	$title = "Threads by " . $user['name'];
+	$title = "Threads by ".$user['name'];
 
-	$threads = query("SELECT $fieldlist, t.*, f.id fid, "
-		. ($log ? " (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread, " : ' ')
-		. "f.title ftitle FROM z_threads t "
-		. "LEFT JOIN users u1 ON u1.id=t.user "
-		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
-		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
-			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
-		. "WHERE t.user = ? "
-		. "AND ? >= minread "
-		. "ORDER BY t.sticky DESC, t.lastdate DESC "
-		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
+	$threads = query("SELECT $ufields t.*, f.id fid $isread, f.title ftitle FROM z_threads t
+			LEFT JOIN users u1 ON u1.id = t.user
+			LEFT JOIN users u2 ON u2.id = t.lastuser
+			LEFT JOIN z_forums f ON f.id = t.forum
+			$threadsread
+			WHERE t.user = ? AND ? >= minread
+			ORDER BY t.sticky DESC, t.lastdate DESC
+			LIMIT ?,?",
+		[$uid, $userdata['powerlevel'], $offset, $tpp]);
+
+	$forum['threads'] = result("SELECT count(*) FROM z_threads t
+			LEFT JOIN z_forums f ON f.id = t.forum
+			WHERE t.user = ? AND ? >= minread",
 		[$uid, $userdata['powerlevel']]);
 
-	$forum['threads'] = result("SELECT COUNT(*) FROM z_threads t "
-		. "LEFT JOIN z_forums f ON f.id = t.forum "
-		. "WHERE t.user = ? AND ? >= minread", [$uid, $userdata['powerlevel']]);
 
 	$topbot = [
 		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "/user.php?id=$uid", 'title' => $user['name']]],
@@ -70,40 +80,35 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 
 	$title = 'Latest threads';
 
-	$threads = query("SELECT $fieldlist, t.*, f.id fid,
-		f.title ftitle" . ($log ? ', (NOT (r.time<t.lastdate OR isnull(r.time)) OR t.lastdate<fr.time) isread ' : ' ')
-		. "FROM z_threads t "
-		. "LEFT JOIN users u1 ON u1.id=t.user "
-		. "LEFT JOIN users u2 ON u2.id=t.lastuser "
-		. "LEFT JOIN z_forums f ON f.id=t.forum "
-		. ($log ? "LEFT JOIN z_threadsread r ON (r.tid=t.id AND r.uid=$userdata[id]) "
-			. "LEFT JOIN z_forumsread fr ON (fr.fid=f.id AND fr.uid=$userdata[id]) " : '')
-		. "WHERE t.lastdate > ? "
-		. "AND ? >= f.minread "
-		. "ORDER BY t.lastdate DESC "
-		. "LIMIT " . (($page - 1) * $userdata['tpp']) . "," . $userdata['tpp'],
-	[$mintime, $userdata['powerlevel']]);
+	$threads = query("SELECT $ufields t.*, f.id fid $isread, f.title ftitle
+			FROM z_threads t
+			LEFT JOIN users u1 ON u1.id = t.user
+			LEFT JOIN users u2 ON u2.id = t.lastuser
+			LEFT JOIN z_forums f ON f.id = t.forum
+			$threadsread
+			WHERE t.lastdate > ? AND ? >= f.minread
+			ORDER BY t.lastdate DESC
+			LIMIT ?,?",
+		[$mintime, $userdata['powerlevel'], $offset, $tpp]);
 
-	$forum['threads'] = result("SELECT COUNT(*) FROM z_threads t
-			LEFT JOIN z_forums f ON f.id=t.forum
+	$forum['threads'] = result("SELECT count(*) FROM z_threads t
+			LEFT JOIN z_forums f ON f.id = t.forum
 			WHERE t.lastdate > ? AND ? >= f.minread",
 		[$mintime, $userdata['powerlevel']]);
 
-	$topbot = [];
 } else {
 	error("404", "Forum does not exist.");
 }
 
 $showforum = $time ?? $uid;
 
-if ($forum['threads'] <= $userdata['tpp']) {
-	$fpagelist = '';
-} else {
+$fpagelist = '';
+if ($forum['threads'] > $tpp) {
 	$furl = "forum.php?";
 	if ($fid)	$furl .= "id=$fid";
 	if ($uid)	$furl .= "user=$uid";
 	if ($time)	$furl .= "time=$time";
-	$fpagelist = '<br>'.pagelist($forum['threads'], $userdata['tpp'], $furl, $page, true);
+	$fpagelist = '<br>'.pagelist($forum['threads'], $tpp, $furl, $page, true);
 }
 
 $twig = _twigloader();

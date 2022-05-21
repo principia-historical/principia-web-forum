@@ -18,7 +18,7 @@ function esc($text) {
 }
 
 function threadpost($post, $pthread = '') {
-	global $log, $dateformat, $userdata;
+	global $log, $userdata;
 
 	if (isset($post['deleted']) && $post['deleted']) {
 		if ($userdata['powerlevel'] > 1) {
@@ -57,7 +57,7 @@ HTML;
 		$postlinks = "<a href=\"thread.php?pid=$post[id]#$post[id]\">Link</a>";
 
 	if (isset($post['revision']) && $post['revision'] >= 2)
-		$revisionstr = " (edited ".date($dateformat, $post['ptdate']).")";
+		$revisionstr = " (edited ".date('Y-m-d H:i', $post['ptdate']).")";
 
 	if (isset($post['thread']) && $log) {
 		// TODO: check minreply
@@ -81,7 +81,7 @@ HTML;
 		$postlinks .= " &bull; ID: $post[id]";
 
 	$ulink = userlink($post, 'u');
-	$pdate = date($dateformat, $post['date']);
+	$pdate = date('Y-m-d H:i', $post['date']);
 	$lastpost = ($post['ulastpost'] ? timeunits(time() - $post['ulastpost']) : 'none');
 	$lastview = timeunits(time() - $post['ulastview']);
 	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');

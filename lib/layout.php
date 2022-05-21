@@ -15,34 +15,18 @@ function newStatus($type) {
 	return "<img src=\"assets/status/$statusimg\" alt=\"$text\">";
 }
 
-function renderActions($actions, $ret = false) {
+function renderActions($actions) {
 	$out = '';
 	$i = 0;
 	foreach ($actions as $action) {
-		if (isset($action['confirm'])) {
-			if ($action['confirm'] === true)
-				$confirmmsg = 'Are you sure you want to ' . $action['title'] . '?';
-			else
-				$confirmmsg = str_replace("'", "\\'", $action['confirm']);
+		if ($i++) $out .= ' | ';
 
-			$href = sprintf(
-				"javascript:if(confirm('%s')) window.location.href='%s'; else void('');",
-			$confirmmsg, $action['href']);
-		} else {
-			$href = (isset($action['href']) ? $action['href'] : '');
-		}
-		if ($i++)
-			$out .= ' | ';
-		if (isset($action['href'])) {
-			$out .= sprintf('<a href="%s">%s</a>', htmlentities($href, ENT_QUOTES), $action['title']);
-		} else {
+		if (isset($action['href']))
+			$out .= sprintf('<a href="%s">%s</a>', htmlentities($action['href'], ENT_QUOTES), $action['title']);
+		else
 			$out .= $action['title'];
-		}
 	}
-	if ($ret)
-		return $out;
-	else
-		echo $out;
+	echo $out;
 }
 
 function renderPageBar($pagebar) {
@@ -59,9 +43,6 @@ function renderPageBar($pagebar) {
 	else
 		echo "&nbsp;";
 	echo "</td></table>";
-	if (!empty($pagebar['message'])) {
-		echo '<table width=100% class=c1><tr><td class="center">'.$pagebar['message'].'</td></tr></table><br>';
-	}
 }
 
 function pagelist($total, $limit, $url, $sel = 0, $showall = false) {
@@ -117,7 +98,7 @@ function ifEmptyQuery($message, $colspan = 0, $table = false) {
 }
 
 function _twigloader($subfolder = '') {
-	global $dateformat, $acmlm;
+	global $acmlm;
 
 	$twig = twigloader($subfolder, function () use ($subfolder) {
 		return new \Twig\Loader\FilesystemLoader('templates/' . $subfolder);
@@ -130,7 +111,6 @@ function _twigloader($subfolder = '') {
 
 	$twig->addExtension(new PrincipiaForumExtension());
 
-	$twig->addGlobal('forum_dateformat', $dateformat);
 	$twig->addGlobal('acmlm', $acmlm);
 
 	return $twig;

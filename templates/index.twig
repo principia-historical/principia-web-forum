@@ -37,7 +37,7 @@
 		<td class="b n1">{{ forum.posts }}</td>
 		<td class="b n2">
 			{% if forum.posts > 0 and forum.lastdate > 0 %}
-				<nobr>{{ forum.lastdate | date(forum_dateformat) }}</nobr>
+				<nobr>{{ forum.lastdate | date('Y-m-d H:i') }}</nobr>
 				<br>
 				<span>by {{ userlink(forum, 'u') }} <a href="thread.php?pid={{ forum.lastid }}#{{ forum.lastid }}">&raquo;</a></span>
 			{% else %}

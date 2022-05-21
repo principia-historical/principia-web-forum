@@ -43,14 +43,15 @@ if ($id && $userdata['powerlevel'] > 3) {
 	$title = $ptitle;
 }
 
+$ufields = userfields('u', 'u');
 $pmsgc = result("SELECT COUNT(*) FROM z_pmsgs WHERE user$fieldn2 = ? AND del_$fieldn2 = ?", [$id, $showdel]);
-$pmsgs = query("SELECT ".userfields('u', 'u').", p.* FROM z_pmsgs p "
-					."LEFT JOIN users u ON u.id = p.user$fieldn "
-					."WHERE p.user$fieldn2 = ? "
-				."AND del_$fieldn2 = ? "
-					."ORDER BY p.unread DESC, p.date DESC "
-					."LIMIT " . (($page - 1) * $userdata['tpp']) . ", " . $userdata['tpp'],
-				[$id, $showdel]);
+$pmsgs = query("SELECT $ufields, p.* FROM z_pmsgs p
+				LEFT JOIN users u ON u.id = p.user$fieldn
+				WHERE p.user$fieldn2 = ?
+				AND del_$fieldn2 = ?
+				ORDER BY p.unread DESC, p.date DESC
+				LIMIT ?,?",
+			[$id, $showdel, (($page - 1) * $tpp), $tpp]);
 
 $topbot = [
 	'breadcrumb' => [['href' => './', 'title' => 'Main']],
@@ -64,14 +65,12 @@ else
 
 $topbot['actions'][] = ['href' => 'sendprivate.php', 'title' => 'Send new'];
 
-if ($pmsgc <= $userdata['tpp'])
-	$fpagelist = '<br>';
-else {
-	if ($id != $userdata['id'])
-		$furl = "private.php?id=$id&view=$view";
-	else
-		$furl = "private.php?view=$view";
-	$fpagelist = pagelist($pmsgc, $userdata['tpp'], $furl, $page).'<br>';
+
+$fpagelist = '<br>';
+if ($pmsgc > $tpp) {
+	if ($id != $userdata['id'])	$furl = "private.php?id=$id&view=$view";
+	else	$furl = "private.php?view=$view";
+	$fpagelist = pagelist($pmsgc, $tpp, $furl, $page).'<br>';
 }
 
 $twig = _twigloader();

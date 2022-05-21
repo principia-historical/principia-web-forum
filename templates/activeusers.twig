@@ -22,7 +22,7 @@
 		<tr class="n{% if i % 2 %}1{% else %}2{% endif %} center">
 			<td class="b">{{ i }}.</td>
 			<td class="b left">{{ userlink(user) }}</td>
-			<td class="b">{{ user.joined | date(forum_dateformat) }}</td>
+			<td class="b">{{ user.joined | date('Y-m-d H:i') }}</td>
 			<td class="b"><b>{{ user.num }}</b></td>
 			<td class="b"><b>{{ user.posts }}</b></td>
 		</tr>

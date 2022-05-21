@@ -19,9 +19,4 @@ class PrincipiaForumExtension extends \Twig\Extension\AbstractExtension {
 			new \Twig\TwigFunction('threadpost', 'threadpost', ['is_safe' => ['html']]),
 		];
 	}
-	public function getFilters() {
-		return [
-
-		];
-	}
 }

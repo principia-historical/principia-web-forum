@@ -30,8 +30,3 @@ function moveThread($id, $forum) {
 		query("UPDATE z_forums SET posts = posts + (? + 1), threads = threads + 1, lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
 		[$thread['replies'], $last2['lastdate'], $last2['lastuser'], $last2['lastid'], $forum]);
 }
-
-function getForumByThread($tid) {
-	static $cache;
-	return isset($cache[$tid]) ? $cache[$tid] : $cache[$tid] = result("SELECT forum FROM z_threads WHERE id = ?", [$tid]);
-}
