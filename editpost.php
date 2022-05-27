@@ -40,9 +40,9 @@ if ($action == 'Submit') {
 		error("400", "No changes detected.");
 	}
 
-	$newrev = $sql->result("SELECT revision FROM z_posts WHERE id = ?", [$pid]) + 1;
+	$newrev = result("SELECT revision FROM z_posts WHERE id = ?", [$pid]) + 1;
 
-	query("UPDATE z_posts SET revision = ? WHERE id = ?", [$newrev, $id]);
+	query("UPDATE z_posts SET revision = ? WHERE id = ?", [$newrev, $pid]);
 
 	query("INSERT INTO z_poststext (id,text,revision,date) VALUES (?,?,?,?)",
 		[$pid, $_POST['message'], $newrev, time()]);
