@@ -22,29 +22,28 @@ if (isset($_REQUEST['id'])) {
 	$tid = result("SELECT thread FROM z_posts WHERE id = ?", [$pid]);
 	$page = floor(result("SELECT COUNT(*) FROM z_posts WHERE thread = ? AND id < ?", [$tid, $pid]) / $ppp) + 1;
 	$viewmode = "thread";
-} else {
+} else
 	error("404", "Thread does not exist.");
-}
 
 if ($viewmode == "thread")
 	$threadcreator = result("SELECT user FROM z_threads WHERE id = ?", [$tid]);
 else
 	$threadcreator = 0;
 
-$action = '';
+$modact = '';
 
 $act = $_POST['action'] ?? '';
 
 if (isset($tid) && $log && $act && ($userdata['powerlevel'] > 2 ||
 		($userdata['id'] == $threadcreator && $act == "rename" && $userdata['powerlevel'] > 0 && isset($_POST['title'])))) {
 
-	if ($act == 'stick')		$action = ',sticky=1';
-	elseif ($act == 'unstick')	$action = ',sticky=0';
-	elseif ($act == 'close')	$action = ',closed=1';
-	elseif ($act == 'open')		$action = ',closed=0';
-	elseif ($act == 'trash')	editThread($tid, '', $trashid, 1);
-	elseif ($act == 'rename')	$action = ",title=?";
-	elseif ($act == 'move')		editThread($tid, '', $_POST['arg']);
+	if ($act == 'stick')	$modact = ',sticky=1';
+	if ($act == 'unstick')	$modact = ',sticky=0';
+	if ($act == 'close')	$modact = ',closed=1';
+	if ($act == 'open')		$modact = ',closed=0';
+	if ($act == 'trash')	editThread($tid, '', $trashid, 1);
+	if ($act == 'rename')	$modact = ",title=?";
+	if ($act == 'move')		editThread($tid, '', $_POST['arg']);
 }
 
 $offset = (($page - 1) * $ppp);
@@ -54,7 +53,7 @@ if ($viewmode == "thread") {
 
 	$params = ($act == 'rename' ? [$_POST['title'], $tid] : [$tid]);
 
-	query("UPDATE z_threads SET views = views + 1 $action WHERE id = ?", $params);
+	query("UPDATE z_threads SET views = views + 1 $modact WHERE id = ?", $params);
 
 	$thread = fetch("SELECT t.*, f.title ftitle, t.forum fid".($log ? ', r.time frtime' : '').' '
 			. "FROM z_threads t LEFT JOIN z_forums f ON f.id=t.forum "
@@ -141,7 +140,7 @@ if ($thread['replies']+1 > $ppp) {
 if ($viewmode == "thread") {
 	$topbot = [
 		'breadcrumb' => [['href' => './', 'title' => 'Main'],['href' => 'forum.php?id='.$thread['forum'], 'title' => $thread['ftitle']]],
-		'title' => esc($thread['title'])
+		'title' => $thread['title']
 	];
 
 	$faccess = fetch("SELECT id,minreply FROM z_forums WHERE id = ?",[$thread['forum']]);
@@ -161,8 +160,6 @@ if ($viewmode == "thread") {
 } elseif ($viewmode == "time") {
 	$topbot = [];
 	$time = $_GET['time'];
-} else {
-	error("404", "Thread does not exist.<br><a href=./>Back to main</a>");
 }
 
 $modlinks = '';

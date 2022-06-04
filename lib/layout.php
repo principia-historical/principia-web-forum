@@ -22,7 +22,7 @@ function renderActions($actions) {
 		if ($i++) $out .= ' | ';
 
 		if (isset($action['href']))
-			$out .= sprintf('<a href="%s">%s</a>', htmlentities($action['href'], ENT_QUOTES), $action['title']);
+			$out .= sprintf('<a href="%s">%s</a>', esc($action['href']), $action['title']);
 		else
 			$out .= $action['title'];
 	}
@@ -35,9 +35,9 @@ function renderPageBar($pagebar) {
 	echo "<table width=100%><td class=nb>";
 	if (!empty($pagebar['breadcrumb'])) {
 		foreach ($pagebar['breadcrumb'] as $action)
-			printf('<a href=%s>%s</a> &raquo; ', '"'.htmlentities($action['href'], ENT_QUOTES).'"', $action['title']);
+			printf('<a href=%s>%s</a> &raquo; ', '"'.esc($action['href']).'"', esc($action['title']));
 	}
-	echo $pagebar['title'].'</td><td class="nb right">';
+	echo esc($pagebar['title']).'</td><td class="nb right">';
 	if (!empty($pagebar['actions']))
 		renderActions($pagebar['actions']);
 	else

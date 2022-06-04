@@ -54,7 +54,7 @@ if (!$action) {
 				'[reply="%s" id="%s"]%s[/reply]'.PHP_EOL.PHP_EOL,
 			$post['name'], $pid, $post['text']);
 
-			$title = 'Re:' . $post['title'];
+			$title = 'Re: ' . $post['title'];
 			$userto = $post['name'];
 		}
 	}
@@ -65,15 +65,11 @@ if (!$action) {
 		$userto = $_POST['userto'];
 	}
 } else if ($action == 'Preview') { // Previewing PM
-	$post['date'] = time();
+	$post['date'] = $post['ulastpost'] = time();
 	$post['text'] = $_POST['message'];
 	foreach ($userdata as $field => $val)
-		$post['u' . $field] = $val;
-	$post['ulastpost'] = time();
+		$post['u'.$field] = $val;
 
-	$userto = $_POST['userto'];
-	$title = $_POST['title'];
-	$quotetext = $_POST['message'];
 	$topbot['title'] .= ' (Preview)';
 }
 
@@ -81,7 +77,7 @@ $twig = _twigloader();
 echo $twig->render('sendprivate.twig', [
 	'post' => $post ?? null,
 	'userto' => $userto,
-	'title' => $title,
+	'messagetitle' => $title,
 	'quotetext' => $quotetext,
 	'topbot' => $topbot,
 	'action' => $action,

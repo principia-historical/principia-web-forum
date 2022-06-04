@@ -57,11 +57,10 @@ $topbot = [
 ];
 
 if ($action == 'Preview') {
-	$post['date'] = time();
+	$post['date'] = $post['ulastpost'] = time();
 	$post['text'] = $_POST['message'];
 	foreach ($userdata as $field => $val)
-		$post['u' . $field] = $val;
-	$post['ulastpost'] = time();
+		$post['u'.$field] = $val;
 
 	$topbot['title'] .= ' (Preview)';
 

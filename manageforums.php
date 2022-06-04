@@ -3,15 +3,13 @@ require('lib/common.php');
 
 if ($userdata['powerlevel'] < 3) error('403', 'You have no permissions to do this!');
 
-$error = '';
-
 if (isset($_POST['savecat'])) {
 	// save new/existing category
 	$cid = $_GET['cid'];
 	$title = $_POST['title'];
 	$ord = (int)$_POST['ord'];
 	if (!trim($title))
-		$error = 'Please enter a title for the category.';
+		error('400', 'Please enter a title for the category.');
 	else {
 		if ($cid == 'new') {
 			$cid = result("SELECT MAX(id) FROM z_categories");
@@ -44,7 +42,7 @@ if (isset($_POST['savecat'])) {
 	$minreply = (int)$_POST['minreply'];
 
 	if (!trim($title))
-		$error = 'Please enter a title for the forum.';
+		error('400', 'Please enter a title for the forum.');
 	else {
 		if ($fid == 'new') {
 			$fid = result("SELECT MAX(id) FROM z_forums");
@@ -67,8 +65,6 @@ if (isset($_POST['savecat'])) {
 	query("DELETE FROM z_forums WHERE id=?",[$fid]);
 	redirect('manageforums.php');
 }
-
-if ($error) error("Error", $error);
 
 $twig = _twigloader();
 

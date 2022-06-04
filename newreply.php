@@ -10,22 +10,21 @@ $thread = fetch("SELECT t.*, f.title ftitle, f.minreply fminreply
 	FROM z_threads t LEFT JOIN z_forums f ON f.id=t.forum
 	WHERE t.id = ? AND ? >= f.minread", [$tid, $userdata['powerlevel']]);
 
-if (!$thread) {
+if (!$thread)
 	error("404", "Thread does not exist.");
-} else if ($thread['fminreply'] > $userdata['powerlevel']) {
+if ($thread['fminreply'] > $userdata['powerlevel'])
 	error("403", "You have no permissions to create posts in this forum!");
-} elseif ($thread['closed'] && $userdata['powerlevel'] < 2) {
+if ($thread['closed'] && $userdata['powerlevel'] < 2)
 	error("400", "You can't post in closed threads.");
-}
 
 $error = '';
 
 if ($action == 'Submit') {
 	$lastpost = fetch("SELECT id,user,date FROM z_posts WHERE thread = ? ORDER BY id DESC LIMIT 1", [$thread['id']]);
-	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && $userdata['powerlevel'] < 4) // && !hasPerm('consecutive-posts')
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 86400) && $userdata['powerlevel'] < 3)
 		$error = "You can't double post until it's been at least one day!";
-	//if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && !hasPerm('consecutive-posts'))
-	//	$error = "You must wait 2 seconds before posting consecutively.";
+	if ($lastpost['user'] == $userdata['id'] && $lastpost['date'] >= (time() - 2) && $userdata['powerlevel'] > 2)
+		$error = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
 		$error = "Your post is empty! Enter a message and try again.";
 	if (strlen(trim($_POST['message'])) < 35)
@@ -53,7 +52,7 @@ if ($action == 'Submit') {
 $topbot = [
 	'breadcrumb' => [
 		['href' => './', 'title' => 'Main'], ['href' => "forum.php?id={$thread['forum']}", 'title' => $thread['ftitle']],
-		['href' => "thread.php?id={$thread['id']}", 'title' => esc($thread['title'])]
+		['href' => "thread.php?id={$thread['id']}", 'title' => $thread['title']]
 	],
 	'title' => "New reply"
 ];
@@ -61,13 +60,13 @@ $topbot = [
 $pid = $_GET['pid'] ?? 0;
 $quotetext = $_POST['message'] ?? '';
 if ($pid) {
-	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, p.thread, f.minread "
-			. "FROM z_posts p "
-			. "LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision "
-			. "LEFT JOIN users u ON p.user=u.id "
-			. "LEFT JOIN z_threads t ON t.id=p.thread "
-			. "LEFT JOIN z_forums f ON f.id=t.forum "
-			. "WHERE p.id = ?", [$pid]);
+	$post = fetch("SELECT u.name name, p.user, pt.text, f.id fid, p.thread, f.minread
+			FROM z_posts p
+			LEFT JOIN z_poststext pt ON p.id = pt.id AND p.revision = pt.revision
+			LEFT JOIN users u ON p.user = u.id
+			LEFT JOIN z_threads t ON t.id = p.thread
+			LEFT JOIN z_forums f ON f.id = t.forum
+			WHERE p.id = ?", [$pid]);
 
 	//does the user have reading access to the quoted post?
 	if ($userdata['powerlevel'] < $post['minread']) {
@@ -75,14 +74,15 @@ if ($pid) {
 		$post['text'] = 'uwu';
 	}
 
-	$quotetext = sprintf('[quote="%s" id="%s"]%s[/quote]', $post['name'], $pid, str_replace("&", "&amp;", $post['text']));
+	$quotetext = sprintf(
+		'[quote="%s" id="%s"]%s[/quote]'.PHP_EOL.PHP_EOL,
+	$post['name'], $pid, $post['text']);
 }
 
-$post['date'] = time();
+$post['date'] = $post['ulastpost'] = time();
 $post['text'] = ($action == 'Preview' ? $_POST['message'] : $quotetext);
 foreach ($userdata as $field => $val)
-	$post['u' . $field] = $val;
-$post['ulastpost'] = time();
+	$post['u'.$field] = $val;
 
 if ($action == 'Preview') {
 	$topbot['title'] .= ' (Preview)';
