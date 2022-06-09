@@ -35,7 +35,7 @@
 {% if not time %}<br>{% endif %}
 
 {% if thread.id and userdata.powerlevel >= faccess.minreply and not thread.closed %}
-<form action="newreply.php" method="POST">
+<form action="newreply.php?id={{ tid }}" method="POST">
 	<table class="c1">
 		<tr class="h"><td class="b h" colspan="2">Quick Reply</a></td>
 		<tr>
@@ -44,7 +44,6 @@
 		</tr><tr class="n1">
 			<td class="b"></td>
 			<td class="b">
-				<input type="hidden" name="tid" value="{{ tid }}">
 				<input type="submit" name="action" value="Submit">
 				<input type="submit" name="action" value="Preview">
 			</td>

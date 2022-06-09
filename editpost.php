@@ -1,16 +1,12 @@
 <?php
 require('lib/common.php');
 
-$_GET['act'] = $_GET['act'] ?? null;
-$_POST['action'] = $_POST['action'] ?? '';
+$act = $_GET['act'] ?? '';
+$action = $_POST['action'] ?? '';
 
-if ($action = $_POST['action']) {
-	$pid = $_POST['pid'];
-} else {
-	$pid = $_GET['pid'];
-}
+$pid = $_GET['pid'] ?? null;
 
-if ($_GET['act'] == 'delete' || $_GET['act'] == 'undelete') {
+if ($act == 'delete' || $act == 'undelete') {
 	$action = $_GET['act'];
 	$pid = $pid;
 }

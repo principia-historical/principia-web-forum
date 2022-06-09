@@ -12,7 +12,7 @@
 {% endif %}
 
 <br>
-<form action="editpost.php" method="POST">
+<form action="editpost.php?pid={{ pid }}" method="POST">
 	<table class="c1">
 		<tr class="h"><td class="b h" colspan="2">Edit Post</td></tr>
 		<tr>
@@ -21,7 +21,6 @@
 		</tr><tr>
 			<td class="b n1"></td>
 			<td class="b n1">
-				<input type="hidden" name="pid" value="{{ pid }}">
 				<input type="submit" name="action" value="Submit">
 				<input type="submit" name="action" value="Preview">
 			</td>

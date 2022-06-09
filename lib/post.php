@@ -46,7 +46,7 @@ HTML;
 
 	$postheaderrow = $threadlink = $postlinks = $revisionstr = '';
 
-	$post['utitle'] = $post['utitle'] . ((strlen($post['utitle']) >= 1) ? '<br>' : '');
+	$post['utitle'] = $post['utitle'] . ($post['utitle'] ? '<br>' : '');
 
 	$post['id'] = $post['id'] ?? 0;
 

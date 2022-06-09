@@ -4,7 +4,7 @@ require('lib/common.php');
 needsLogin();
 
 $action = $_POST['action'] ?? null;
-$tid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['tid']) ? $_POST['tid'] : null));
+$tid = $_GET['id'] ?? null;
 
 $thread = fetch("SELECT t.*, f.title ftitle, f.minreply fminreply
 	FROM z_threads t LEFT JOIN z_forums f ON f.id=t.forum

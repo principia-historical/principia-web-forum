@@ -22,12 +22,6 @@ function submitmove(fid){
 	document.mod.arg.value=fid;
 	submitmod('move')
 }
-function submit_on_return(event,act){
-	a=event.keyCode?event.keyCode:event.which?event.which:event.charCode;
-	document.mod.action.value=act;
-	document.mod.arg.value=document.mod.tmp.value;
-	if (a==13) document.mod.submit();
-}
 function movetid() {
 	var x = document.getElementById('forumselect').selectedIndex;
 	document.getElementById('move').innerHTML = document.getElementsByTagName('option')[x].value;
@@ -43,10 +37,4 @@ function trashConfirm(e) {
 	else {
 		e.preventDefault();
 	}
-}
-
-// Functions moved from manageforums.php
-function toggleAll(cls, enable) {
-	var elems = document.getElementsByClassName(cls);
-	for (var i = 0; i < elems.length; i++) elems[i].disabled = !enable;
 }

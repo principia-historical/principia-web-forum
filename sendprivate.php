@@ -12,19 +12,23 @@ $topbot = [
 
 if ($userdata['powerlevel'] < 1) error('403', 'You have no permissions to do this!');
 
+$userto = $_POST['userto'] ?? '';
+$title = $_POST['title'] ?? '';
+$message = $_POST['message'] ?? '';
+
 $error = '';
 
 // Submitting a PM
 if ($action == 'Submit') {
-	$userto = result("SELECT id FROM users WHERE name LIKE ?", [$_POST['userto']]);
+	$userto = result("SELECT id FROM users WHERE name LIKE ?", [$userto]);
 
-	if ($userto && $_POST['message']) {
+	if ($userto && $message) {
 		$recentpms = fetch("SELECT date FROM z_pmsgs WHERE date >= (UNIX_TIMESTAMP() - 30) AND userfrom = ?", [$userdata['id']]);
 		if ($recentpms) {
 			$error = "You can't send more than one PM within 30 seconds!";
 		} else {
 			query("INSERT INTO z_pmsgs (date,userto,userfrom,title,text) VALUES (?,?,?,?,?)",
-				[time(),$userto,$userdata['id'],$_POST['title'],$_POST['message']]);
+				[time(),$userto,$userdata['id'],$title,$message]);
 			$nextId = insertId();
 
 			query("INSERT INTO notifications (type, level, recipient, sender) VALUES (?,?,?,?)",
@@ -34,14 +38,10 @@ if ($action == 'Submit') {
 		}
 	} elseif (!$userto) {
 		$error = "That user doesn't exist!";
-	} elseif (!$_POST['message']) {
+	} elseif (!$message) {
 		$error = "You can't send a blank message!";
 	}
 }
-
-$userto = $_POST['userto'] ?? '';
-$title = $_POST['title'] ?? '';
-$quotetext = $_POST['message'] ?? '';
 
 // Default
 if (!$action) {
@@ -78,7 +78,7 @@ echo $twig->render('sendprivate.twig', [
 	'post' => $post ?? null,
 	'userto' => $userto,
 	'messagetitle' => $title,
-	'quotetext' => $quotetext,
+	'message' => $message,
 	'topbot' => $topbot,
 	'action' => $action,
 	'error' => $error

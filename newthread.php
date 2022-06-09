@@ -4,7 +4,7 @@ require('lib/common.php');
 needsLogin();
 
 $action = $_POST['action'] ?? null;
-$fid = (isset($_GET['id']) ? $_GET['id'] : (isset($_POST['fid']) ? $_POST['fid'] : null));
+$fid = $_GET['id'] ?? null;
 
 $forum = fetch("SELECT * FROM z_forums WHERE id = ? AND ? >= minread", [$fid, $userdata['powerlevel']]);
 
