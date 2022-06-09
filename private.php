@@ -54,7 +54,6 @@ $pmsgs = query("SELECT $ufields, p.* FROM z_pmsgs p
 			[$id, $showdel, (($page - 1) * $tpp), $tpp]);
 
 $topbot = [
-	'breadcrumb' => [['href' => './', 'title' => 'Main']],
 	'title' => $title
 ];
 

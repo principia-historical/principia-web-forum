@@ -51,7 +51,7 @@ if ($action == 'Submit') {
 
 $topbot = [
 	'breadcrumb' => [
-		['href' => './', 'title' => 'Main'], ['href' => "forum.php?id={$thread['forum']}", 'title' => $thread['ftitle']],
+		['href' => "forum.php?id={$thread['forum']}", 'title' => $thread['ftitle']],
 		['href' => "thread.php?id={$thread['id']}", 'title' => $thread['title']]
 	],
 	'title' => "New reply"

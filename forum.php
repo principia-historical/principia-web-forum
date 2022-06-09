@@ -42,7 +42,6 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 		[$fid, $offset, $tpp]);
 
 	$topbot = [
-		'breadcrumb' => [['href' => './', 'title' => 'Main']],
 		'title' => $forum['title']
 	];
 	if ($userdata['powerlevel'] >= $forum['minthread'])
@@ -70,9 +69,8 @@ if (isset($_GET['id']) && $fid = $_GET['id']) {
 			WHERE t.user = ? AND ? >= minread",
 		[$uid, $userdata['powerlevel']]);
 
-
 	$topbot = [
-		'breadcrumb' => [['href' => './', 'title' => 'Main'], ['href' => "/user.php?id=$uid", 'title' => $user['name']]],
+		'breadcrumb' => [['href' => "/user.php?id=$uid", 'title' => $user['name']]],
 		'title' => 'Threads'
 	];
 } elseif (isset($_GET['time']) && $time = $_GET['time']) {

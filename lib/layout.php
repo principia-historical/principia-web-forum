@@ -32,17 +32,15 @@ function renderActions($actions) {
 function renderPageBar($pagebar) {
 	if (empty($pagebar)) return;
 
-	echo "<table width=100%><td class=nb>";
+	echo '<div class="breadcrumb"><a href="./">Forum</a> &raquo; ';
 	if (!empty($pagebar['breadcrumb'])) {
 		foreach ($pagebar['breadcrumb'] as $action)
 			printf('<a href=%s>%s</a> &raquo; ', '"'.esc($action['href']).'"', esc($action['title']));
 	}
-	echo esc($pagebar['title']).'</td><td class="nb right">';
+	echo esc($pagebar['title']).'<div class="actions">';
 	if (!empty($pagebar['actions']))
 		renderActions($pagebar['actions']);
-	else
-		echo "&nbsp;";
-	echo "</td></table>";
+	echo "</div></div>";
 }
 
 function pagelist($total, $limit, $url, $sel = 0, $showall = false) {
