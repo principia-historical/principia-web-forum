@@ -37,7 +37,7 @@ if ($action == 'Submit') {
 		$pid = insertId();
 		query("INSERT INTO z_poststext (id,text) VALUES (?,?)",
 			[$pid,$_POST['message']]);
-		query("UPDATE z_threads SET replies = replies + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
+		query("UPDATE z_threads SET posts = posts + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
 			[time(), $userdata['id'], $pid, $tid]);
 		query("UPDATE z_forums SET posts = posts + 1,lastdate = ?, lastuser = ?, lastid = ? WHERE id = ?",
 			[time(), $userdata['id'], $pid, $thread['forum']]);

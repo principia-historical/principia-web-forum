@@ -85,7 +85,7 @@ CREATE TABLE `z_poststext` (
 CREATE TABLE `z_threads` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
-  `replies` int(10) unsigned NOT NULL DEFAULT 0,
+  `posts` int(10) unsigned NOT NULL DEFAULT 1,
   `views` int(10) unsigned NOT NULL DEFAULT 0,
   `forum` int(10) unsigned NOT NULL DEFAULT 0,
   `user` int(10) unsigned NOT NULL DEFAULT 0,

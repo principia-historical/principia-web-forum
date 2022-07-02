@@ -25,10 +25,7 @@ if (isset($_GET['id'])) {
 } else
 	error("404", "Thread does not exist.");
 
-if ($viewmode == "thread")
-	$threadcreator = result("SELECT user FROM z_threads WHERE id = ?", [$tid]);
-else
-	$threadcreator = 0;
+$threadcreator = ($viewmode == "thread" ? result("SELECT user FROM z_threads WHERE id = ?", [$tid]) : 0);
 
 $modact = '';
 
@@ -41,9 +38,9 @@ if (isset($tid) && $log && $act && ($userdata['powerlevel'] > 2 ||
 	if ($act == 'unstick')	$modact = ',sticky=0';
 	if ($act == 'close')	$modact = ',closed=1';
 	if ($act == 'open')		$modact = ',closed=0';
-	if ($act == 'trash')	editThread($tid, '', $trashid, 1);
+	if ($act == 'trash')	moveThread($tid, $trashid, 1);
 	if ($act == 'rename')	$modact = ",title=?";
-	if ($act == 'move')		editThread($tid, '', $_POST['arg']);
+	if ($act == 'move')		moveThread($tid, $_POST['arg']);
 }
 
 $offset = (($page - 1) * $ppp);
@@ -107,7 +104,7 @@ if ($viewmode == "thread") {
 			ORDER BY p.id LIMIT ?,?",
 		[$uid, $userdata['powerlevel'], $offset, $ppp]);
 
-	$thread['replies'] = result("SELECT count(*) FROM z_posts p WHERE user = ?", [$uid]) - 1;
+	$thread['posts'] = result("SELECT count(*) FROM z_posts p WHERE user = ?", [$uid]);
 } elseif ($viewmode == "time") {
 	$mintime = ($time > 0 && $time <= 2592000 ? time() - $time : 86400);
 
@@ -124,17 +121,17 @@ if ($viewmode == "thread") {
 			LIMIT ?,?",
 		[$mintime, $userdata['powerlevel'], $offset, $ppp]);
 
-	$thread['replies'] = result("SELECT count(*) FROM z_posts WHERE date > ?", [$mintime]) - 1;
+	$thread['posts'] = result("SELECT count(*) FROM z_posts WHERE date > ?", [$mintime]);
 } else
 	$title = '';
 
 $pagelist = '';
-if ($thread['replies']+1 > $ppp) {
+if ($thread['posts'] > $ppp) {
 	$furl = "thread.php?";
 	if ($viewmode == "thread")	$furl .= "id=$tid";
 	if ($viewmode == "user")	$furl .= "user=$uid";
 	if ($viewmode == "time")	$furl .= "time=$time";
-	$pagelist = '<br>'.pagelist($thread['replies']+1, $ppp, $furl, $page, true);
+	$pagelist = '<br>'.pagelist($thread['posts'], $ppp, $furl, $page, true);
 }
 
 if ($viewmode == "thread") {

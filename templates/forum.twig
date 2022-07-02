@@ -65,7 +65,7 @@
 				<a href="thread.php?id={{ thread.id }}">{{ thread.title }}</a>
 			</td>
 			<td class="b">{{ userlink(thread, 'u1') }}</td>
-			<td class="b">{{ thread.replies }}</td>
+			<td class="b">{{ thread.posts - 1 }}</td>
 			<td class="b">{{ thread.views }}</td>
 			<td class="b">
 				<nobr>{{ thread.lastdate | date('Y-m-d H:i') }}</nobr><br>
