@@ -30,21 +30,15 @@ function threadpost($post, $pthread = '') {
 		}
 
 		$ulink = userlink($post, 'u');
-		$text = <<<HTML
-<table class="c1"><tr>
-	<td class="b n1" style="border-right:0;width:180px">$ulink</td>
-	<td class="b n1" style="border-left:0">
-		<table width="100%">
-			<td class="nb">(post deleted)</td>
-			<td class="nb right">$postlinks</td>
-		</table>
-	</td>
+		return <<<HTML
+<table class="c1 threadpost"><tr>
+	<td class="b n1 topbar_1">$ulink</td>
+	<td class="b n1 topbar_2 fullwidth">(post deleted) <span class="float-right">$postlinks</span></td>
 </tr></table>
 HTML;
-		return $text;
 	}
 
-	$postheaderrow = $threadlink = $postlinks = $revisionstr = '';
+	$threadlink = $postlinks = $revisionstr = '';
 
 	$post['utitle'] = $post['utitle'] . ($post['utitle'] ? '<br>' : '');
 
@@ -93,14 +87,9 @@ HTML;
 	$posttext = postfilter($post['text']);
 	return <<<HTML
 <table class="c1 threadpost" id="{$post['id']}">
-	$postheaderrow
 	<tr>
 		<td class="b n1 topbar_1">$ulink</td>
-		<td class="b n1 topbar_2 fullwidth">
-			<table class="fullwidth">
-				<tr><td class="nb">Posted on $pdate$threadlink $revisionstr</td><td class="nb right">$postlinks</td></tr>
-			</table>
-		</td>
+		<td class="b n1 topbar_2 fullwidth">Posted on $pdate$threadlink$revisionstr <span class="float-right">$postlinks</span></td>
 	</tr><tr valign="top">
 		<td class="b n1 sidebar">
 			{$post['utitle']}

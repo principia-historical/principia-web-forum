@@ -61,11 +61,10 @@ $topbot = [
 ];
 
 $euser = fetch("SELECT * FROM users WHERE id = ?", [$post['id']]);
-$post['date'] = time();
+$post['date'] = $post['ulastpost'] = time();
 $post['text'] = ($action == 'Preview' ? $_POST['message'] : $post['text']);
 foreach ($euser as $field => $val)
 	$post['u'.$field] = $val;
-$post['ulastpost'] = time();
 
 if ($action == 'Preview') {
 	$topbot['title'] .= ' (Preview)';

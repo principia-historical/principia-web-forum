@@ -27,7 +27,7 @@ if ($action == 'Submit') {
 		$error = "You must wait 2 seconds before posting consecutively.";
 	if (strlen(trim($_POST['message'])) == 0)
 		$error = "Your post is empty! Enter a message and try again.";
-	if (strlen(trim($_POST['message'])) < 35)
+	if (strlen(trim($_POST['message'])) < 25)
 		$error = "Your post is too short to be meaningful. Please try to write something longer.";
 
 	if (!$error) {

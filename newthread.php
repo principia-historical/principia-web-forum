@@ -19,7 +19,7 @@ $title = $_POST['title'] ?? '';
 $message = $_POST['message'] ?? '';
 
 if ($action == 'Submit') {
-	if (strlen(trim($title)) < 25)
+	if (strlen(trim($title)) < 15)
 		$error = "You need to enter a longer title.";
 	if (strlen(trim($message)) == 0)
 		$error = "You need to enter a message to your thread.";
