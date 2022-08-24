@@ -61,6 +61,7 @@ if ($action == 'Preview') {
 	$post['text'] = $_POST['message'];
 	foreach ($userdata as $field => $val)
 		$post['u'.$field] = $val;
+	$post['headerbar'] = 'Post preview';
 
 	$topbot['title'] .= ' (Preview)';
 

@@ -38,7 +38,11 @@ function threadpost($post, $pthread = '') {
 HTML;
 	}
 
-	$threadlink = $postlinks = $revisionstr = '';
+	$headerbar = $threadlink = $postlinks = $revisionstr = '';
+
+	if (isset($post['headerbar'])) {
+		$headerbar = sprintf('<tr class="h"><td class="b h" colspan="2">%s</td></tr>', $post['headerbar']);
+	}
 
 	$post['utitle'] = $post['utitle'] . ($post['utitle'] ? '<br>' : '');
 
@@ -78,7 +82,7 @@ HTML;
 	$pdate = date('Y-m-d H:i', $post['date']);
 	$lastpost = ($post['ulastpost'] ? timeunits(time() - $post['ulastpost']) : 'none');
 	$lastview = timeunits(time() - $post['ulastview']);
-	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\">" : '');
+	$picture = ($post['uavatar'] ? "<img src=\"userpic/{$post['uid']}\" alt=\"(Avatar)\">" : '');
 	if (!$log) $post['usignature'] = '';
 	else if ($post['usignature']) {
 		$post['usignature'] = '<div class="siggy">' . postfilter($post['usignature']) . '</div>';
@@ -87,6 +91,7 @@ HTML;
 	$posttext = postfilter($post['text']);
 	return <<<HTML
 <table class="c1 threadpost" id="{$post['id']}">
+	$headerbar
 	<tr>
 		<td class="b n1 topbar_1">$ulink</td>
 		<td class="b n1 topbar_2 fullwidth">Posted on $pdate$threadlink$revisionstr <span class="float-right">$postlinks</span></td>

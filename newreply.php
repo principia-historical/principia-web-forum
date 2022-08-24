@@ -79,18 +79,19 @@ if ($pid) {
 	$post['name'], $pid, $post['text']);
 }
 
-$post['date'] = $post['ulastpost'] = time();
-$post['text'] = ($action == 'Preview' ? $_POST['message'] : $quotetext);
-foreach ($userdata as $field => $val)
-	$post['u'.$field] = $val;
-
 if ($action == 'Preview') {
+	$post['date'] = $post['ulastpost'] = time();
+	$post['text'] = ($action == 'Preview' ? $_POST['message'] : $quotetext);
+	foreach ($userdata as $field => $val)
+		$post['u'.$field] = $val;
+	$post['headerbar'] = 'Post preview';
+
 	$topbot['title'] .= ' (Preview)';
 }
 
 $twig = _twigloader();
 echo $twig->render('newreply.twig', [
-	'post' => $post,
+	'post' => $post ?? null,
 	'topbot' => $topbot,
 	'action' => $action,
 	'tid' => $tid,

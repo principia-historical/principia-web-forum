@@ -60,19 +60,20 @@ $topbot = [
 	'title' => 'Edit post'
 ];
 
-$euser = fetch("SELECT * FROM users WHERE id = ?", [$post['id']]);
-$post['date'] = $post['ulastpost'] = time();
-$post['text'] = ($action == 'Preview' ? $_POST['message'] : $post['text']);
-foreach ($euser as $field => $val)
-	$post['u'.$field] = $val;
-
 if ($action == 'Preview') {
+	$euser = fetch("SELECT * FROM users WHERE id = ?", [$post['id']]);
+	$post['date'] = $post['ulastpost'] = time();
+	$post['text'] = ($action == 'Preview' ? $_POST['message'] : $post['text']);
+	foreach ($euser as $field => $val)
+		$post['u'.$field] = $val;
+	$post['headerbar'] = 'Post preview';
+
 	$topbot['title'] .= ' (Preview)';
 }
 
 $twig = _twigloader();
 echo $twig->render('editpost.twig', [
-	'post' => $post,
+	'post' => $post ?? null,
 	'topbot' => $topbot,
 	'action' => $action,
 	'pid' => $pid

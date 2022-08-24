@@ -69,6 +69,7 @@ if (!$action) {
 	$post['text'] = $_POST['message'];
 	foreach ($userdata as $field => $val)
 		$post['u'.$field] = $val;
+	$post['headerbar'] = $title.' (Message preview)';
 
 	$topbot['title'] .= ' (Preview)';
 }
